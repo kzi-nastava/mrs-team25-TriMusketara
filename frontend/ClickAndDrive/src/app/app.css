@@ -1,0 +1,8 @@
+:host {
+  display: flex !important;
+  flex-direction: column;
+  height: 100vh !important; /* Forces the height of the entire screen */
+  width: 100vw !important;
+  margin: 0;
+  padding: 0;
+}

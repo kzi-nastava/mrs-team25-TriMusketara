@@ -1,0 +1,47 @@
+<nav class="navbar">
+  <!-- LEFT: Logo and name -->
+  <div class="nav-left">
+    <div class="logo-circle">
+      <img src="logo.png" alt="Logo" class="logo-img">
+    </div>
+    <span class="brand-name">Click&Drive</span>
+  </div>
+
+  <!-- CENTER: Welcome message  -->
+  <div class="nav-center">
+    @if (userType !== 'guest') {
+      <span class="welcome-text">Hi, {{ userName() }}</span>
+    }
+    @if (userType == 'guest'){
+        <button class="btn-white">Let's Ride!</button>
+    }
+  </div>
+
+  <!-- RIGHT: Buttons -->
+  <div class="nav-right">
+    
+    <!-- GUEST NAVBAR -->
+    @if (userType === 'guest') {
+      <button class="btn-yellow">Log in</button>
+      <button class="btn-yellow">Register</button>
+    }
+
+    <!-- REGISTERED USER NAVBAR -->
+    @if (userType === 'user') {
+      <button class="btn-white">Let's Ride!</button>
+      <button class="btn-red">PANIC</button>
+      <button class="user-circle-btn" (click)="onProfileClick()">
+        <img src="user-icon.png" alt="Profile">
+      </button>
+    }
+
+    <!-- ADMIN NAVBAR -->
+    @if (userType === 'admin') {
+      <button class="btn-red-wide">PANIC MESSAGES</button> 
+      <button class="user-circle-btn" (click)="onProfileClick()">
+        <img src="user-icon.png" alt="Profile">
+      </button>
+    }
+
+  </div>
+</nav>
