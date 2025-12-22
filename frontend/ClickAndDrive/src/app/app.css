@@ -1,8 +1,19 @@
+/* app.css */
 :host {
-  display: flex !important;
+  display: flex;
   flex-direction: column;
-  height: 100vh !important; /* Forces the height of the entire screen */
-  width: 100vw !important;
+  height: 100vh; /* Full viewport height */
+  width: 100vw;
   margin: 0;
-  padding: 0;
+  overflow: hidden; /* Prevents unwanted scrolls */
+}
+
+app-navbar {
+  flex: 0 0 80px; /* Fixed height matching your navbar CSS */
+  z-index: 1000;  /* Keeps navbar above the main content */
+}
+
+app-main-page {
+  flex: 1; /* Fills remaining space */
+  display: flex;
 }

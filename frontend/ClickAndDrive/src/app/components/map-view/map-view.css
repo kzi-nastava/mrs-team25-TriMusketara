@@ -1,16 +1,18 @@
+/* map-view.css */
 :host {
   display: block;
   width: 100%;
-  max-width: 1235px; /* Maksimalna širina iz Figme */
-  height: 100%;      /* Sada će raditi jer je roditelj flex */
-  max-height: 674px; /* Da ne postane prevelika na ogromnim ekranima */
+  max-width: 1235px; /* Maximum width from Figma */
+  height: 100%;      
+  max-height: 674px; /* Figma height limit */
+  margin: auto;      /* Final centering safety */
 }
 
 .map-rectangle {
   width: 100%;
   height: 100%;
   background: url('/map.png') no-repeat center center;
-  background-size: cover; /* Slika će uvek popuniti okvir */
+  background-size: cover; 
   border: 2px solid rgba(245, 203, 92, 0.81);
   box-sizing: border-box;
 }

@@ -1,0 +1,86 @@
+<div class="history-page">
+  <div class="content-wrapper">
+    
+    <!-- Higher section: Title and Filters -->
+    <div class="header-section">
+      <h1 class="all-drives-title">All Drives</h1>
+      <div class="filters">
+        <div class="search-container">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search" class="figma-input">
+        </div>
+        <div class="sort-container">
+          <label>Sort by : </label>
+          <select class="figma-select">
+            <option>Newest</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+      <table class="figma-table">
+        <thead>
+          <tr>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Price (RSD)</th>
+            <th>Panic</th>
+            <th>Date of drive</th>
+            <th>Details</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Example of a row from Figma -->
+          <tr>
+            <td>Bulevar oslobođenja 45</td>
+            <td>Cara Dušana 12</td>
+            <td>758</td>
+            <td><span class="badge badge-panic-no">NO</span></td>
+            <td>11/28/2025</td>
+            <td><button class="btn-details">Details</button></td>
+            <td><span class="badge badge-completed">Completed</span></td>
+          </tr>
+          <!-- Example of a cancelled drive -->
+          <tr>
+            <td>Narodnih heroja 27</td>
+            <td>Dunavska 3</td>
+            <td>548</td>
+            <td><span class="badge badge-panic-yes">YES</span></td>
+            <td>09/02/2025</td>
+            <td><button class="btn-details">Details</button></td>
+            <td><span class="badge badge-cancelled">Cancelled by user</span></td>
+          </tr>
+          <!-- More example rows -->
+        <tr>
+            <td>Bulevar oslobođenja 45</td>
+            <td>Cara Dušana 12</td>
+            <td>758</td>
+            <td><span class="badge badge-panic-no">NO</span></td>
+            <td>5/28/2025</td>
+            <td><button class="btn-details">Details</button></td>
+            <td><span class="badge badge-completed">Completed</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-footer">
+      <p class="data-info">Showing data 1 to 8 drives</p>
+      <div class="pagination-controls">
+        <button class="page-arrow">&lt;</button>
+        <button class="page-num active">1</button>
+        <button class="page-num">2</button>
+        <button class="page-num">3</button>
+        <button class="page-num">4</button>
+        <span class="dots">...</span>
+        <button class="page-num">40</button>
+        <button class="page-arrow">&gt;</button>
+      </div>
+    </div>
+
+  </div>
+</div>

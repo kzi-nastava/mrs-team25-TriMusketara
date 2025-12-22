@@ -1,1 +1,10 @@
- <app-map-view></app-map-view>
+<div class="main-page-host">
+  <!-- Use @if to switch between the Map and the other views -->
+  @if (currentView === 'driver-history') {
+    <app-driver-history></app-driver-history>
+  } 
+  @else {
+    <!-- Default view is the map for all other buttons -->
+    <app-map-view></app-map-view>
+  }
+</div>

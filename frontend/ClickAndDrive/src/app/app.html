@@ -1,2 +1,2 @@
-<app-navbar></app-navbar>
-<app-main-page></app-main-page>
+<app-navbar (viewChange)="onViewChange($event)"></app-navbar>
+<app-main-page [currentView]="activeView"></app-main-page>

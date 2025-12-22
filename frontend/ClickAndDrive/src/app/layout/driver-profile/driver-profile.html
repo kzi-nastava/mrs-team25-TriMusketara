@@ -18,6 +18,7 @@
             @for (btn of driverButtons; track btn.label) {
                 <button
                     [class.redText]="btn.redText"
+                    (click)="onButtonClick(btn.view)"
                 >
                     {{btn.label}}
                 </button>

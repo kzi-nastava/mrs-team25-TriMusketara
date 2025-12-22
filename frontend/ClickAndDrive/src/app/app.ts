@@ -11,4 +11,12 @@ import { MainPageComponent } from './main-page/main-page';
 })
 export class App {
   protected readonly title = signal('ClickAndDrive');
+
+  // State shared between siblings
+  activeView: string = 'map';
+
+  // Update state when Navbar sends an event
+  onViewChange(newView: string) {
+    this.activeView = newView;
+  }
 }

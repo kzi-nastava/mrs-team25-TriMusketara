@@ -13,7 +13,12 @@
       <span class="welcome-text">Hi, {{ userName() }}</span>
     }
     @if (userType == 'guest'){
+      @if (!inDrive) {
         <button class="btn-white">Let's Ride!</button>
+      }
+      @if (inDrive) {
+        <button class="btn-red-wide">PANIC</button>
+      }
     }
   </div>
 
@@ -26,10 +31,24 @@
       <button class="btn-yellow">Register</button>
     }
 
+    <!-- DRIVER NAVBAR -->
+    @if (userType === 'driver') {
+      @if (inDrive) {
+        <button class="btn-red">PANIC</button>
+      }
+      <button class="user-circle-btn" (click)="onProfileClick()">
+        <img src="user-icon.png" alt="Profile">
+      </button>
+    }
+
     <!-- REGISTERED USER NAVBAR -->
     @if (userType === 'user') {
-      <button class="btn-white">Let's Ride!</button>
-      <button class="btn-red">PANIC</button>
+      @if (!inDrive) {
+        <button class="btn-white">Let's Ride!</button>
+      }
+      @if (inDrive) {
+        <button class="btn-red">PANIC</button>
+      }
       <button class="user-circle-btn" (click)="onProfileClick()">
         <img src="user-icon.png" alt="Profile">
       </button>
@@ -52,7 +71,7 @@
 }
 
 @if (showSidebar && userType === 'driver') {
-  <app-driver-profile></app-driver-profile>
+  <app-driver-profile (viewSelected)="handleViewSelection($event)"></app-driver-profile>
 }
 
 @if (showSidebar && userType === 'admin') {
