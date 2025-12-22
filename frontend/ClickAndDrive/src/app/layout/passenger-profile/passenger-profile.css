@@ -1,0 +1,11 @@
+.profile-sidebar {
+    width: 26vw;
+}
+
+#profile-name {
+    margin-bottom: 0;
+}
+
+button.redText {
+    color: #F55C5C;
+}

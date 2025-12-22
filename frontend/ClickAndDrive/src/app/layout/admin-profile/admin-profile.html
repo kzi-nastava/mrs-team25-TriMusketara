@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Profile</title>
+</head>
+<body>
+    <div class="profile-sidebar">
+        <div class="profile-picture-frame">
+            <div class="profile-picture">
+                <img src="noProfilePic.svg" alt="No Picture">
+            </div>
+            <p id="profile-name">NAME LASTNAME</p>
+        </div>
+        <div class="buttons-frame">
+            <div class="left-side-buttons">
+                @for (btn of leftButtons; track btn.label) {
+                    <button>{{btn.label}}</button>
+                }
+            </div>
+            <div class="right-side-buttons">
+                @for (btn of rightButtons; track btn.label) {
+                    <button
+                        [class.redText]="btn.redText"
+                    >{{btn.label}}</button>
+                }
+            </div>
+        </div>
+    </div>
+</body>
+</html>

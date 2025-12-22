@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Profile</title>
+</head>
+<body>
+    <div class="profile-sidebar">
+        <div class="profile-picture-frame">
+            <div class="profile-picture">
+                <img src="noProfilePic.svg" alt="No Picture">
+            </div>
+            <p id="driving-time">4/8h</p>
+            <p id="profile-name">NAME LASTNAME</p>
+        </div>
+        <div class="buttons-frame">
+            @for (btn of driverButtons; track btn.label) {
+                <button
+                    [class.redText]="btn.redText"
+                >
+                    {{btn.label}}
+                </button>
+            }
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,16 @@
+.profile-sidebar {
+    width: 26vw;
+}
+
+#profile-name {
+    margin-top: 0;
+}
+
+.profile-picture {
+    margin-top: 15px;
+}
+
+#driving-time {
+    margin-top: 8px;
+    margin-bottom: 0;
+}
