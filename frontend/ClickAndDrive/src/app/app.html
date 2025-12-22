@@ -1,2 +1,4 @@
-<app-navbar (viewChange)="onViewChange($event)"></app-navbar>
-<app-main-page [currentView]="activeView"></app-main-page>
+<app-navbar></app-navbar>
+<div class="main-page-host">
+  <router-outlet></router-outlet>
+</div>

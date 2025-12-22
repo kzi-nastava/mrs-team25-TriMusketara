@@ -1,5 +1,6 @@
-import { Component, signal, EventEmitter, Output } from '@angular/core';
-import {PassengerProfile} from '../../layout/passenger-profile/passenger-profile'
+import { Component, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { PassengerProfile } from '../../layout/passenger-profile/passenger-profile'
 import { DriverProfile } from '../../layout/driver-profile/driver-profile';
 import { AdminProfile } from '../../layout/admin-profile/admin-profile';
 
@@ -11,9 +12,6 @@ import { AdminProfile } from '../../layout/admin-profile/admin-profile';
   imports: [PassengerProfile, DriverProfile, AdminProfile]
 })
 export class NavbarComponent {
-  // Event to notify MainPage about which view to display
-  @Output() viewChange = new EventEmitter<string>();
-
   // Can be changed manually to test: 'guest', 'user', 'admin'
   userType: 'guest' | 'user' | 'driver' |'admin' = 'driver';
 
@@ -23,6 +21,8 @@ export class NavbarComponent {
 
   // Flag to show profile sidebar
   showSidebar = false;
+
+  constructor(private router: Router) {}
 
   onProfileClick() {
     console.log('Opening user profile:', this.userName());
@@ -34,9 +34,9 @@ export class NavbarComponent {
     }
   }
 
-  // Receives data from the Sidebar and passes it to the Parent (MainPage)
-  handleViewSelection(view: string) {
-    this.viewChange.emit(view);
-    this.showSidebar = false; // Close sidebar after clicking a link
+  // Navigate to a specific route and close sidebar
+  handleViewSelection(route: string) {
+    this.router.navigate([route]);
+    this.showSidebar = false;
   }
 }

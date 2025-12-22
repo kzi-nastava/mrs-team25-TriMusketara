@@ -13,7 +13,13 @@ app-navbar {
   z-index: 1000;  /* Keeps navbar above the main content */
 }
 
-app-main-page {
-  flex: 1; /* Fills remaining space */
+.main-page-host {
+  flex: 1;
   display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #333533;
+  padding: 20px;
+  box-sizing: border-box;
+  height: 100%;
 }

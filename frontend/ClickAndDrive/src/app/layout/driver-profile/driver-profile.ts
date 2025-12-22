@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -10,23 +11,22 @@ import { CommonModule } from '@angular/common';
 })
 export class DriverProfile {
   
-  @Output() viewSelected = new EventEmitter<string>();
+  constructor(private router: Router) {}
 
   driverButtons = [
-    //At the moment, everything exept ride history shows the map view
-    {label: 'Scheduled rides', view: 'map'}, // should be scheduled for example
-    {label: 'Ride history', view: 'driver-history'}, 
-    {label: 'Change information', view: 'map'}, // should be change-info for example
-    {label: 'Reports', view: 'map'}, // should be reports for example
-    {label: 'Notes', view: 'map'}, // should be notes for example
-    {label: 'Support', view: 'map'}, // should be support for example
-    {label: 'Log out', redText: true, view: 'map'} // should be logout for example
+    {label: 'Scheduled rides', route: 'scheduled-rides'},
+    {label: 'Ride history', route: 'driver-history'},
+    {label: 'Change information', route: 'change-info'},
+    {label: 'Reports', route: 'reports'},
+    {label: 'Notes', route: 'notes'},
+    {label: 'Support', route: 'support'},
+    {label: 'Log out', redText: true, route: 'logout'}
   ]
 
-  // Emit the selected view when a button is clicked
-  onButtonClick(view: string | undefined) {
-    if (view) {
-      this.viewSelected.emit(view);
+  // Navigate to the selected route when a button is clicked
+  onButtonClick(route: string | undefined) {
+    if (route) {
+      this.router.navigate([route]);
     }
   }
 }
