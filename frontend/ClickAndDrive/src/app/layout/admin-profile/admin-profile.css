@@ -1,0 +1,81 @@
+body {
+    margin: 0;
+}
+
+.profile-sidebar {
+    background-color: #F5CB5C;
+    height: 100vh;
+    width: 36vw;
+    position: fixed;
+    margin-top: 80px;
+    right: 0;
+    top: 0;
+}
+
+.profile-picture-frame {
+    height: 30%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-picture {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    margin-top: 20px;
+    background: #333533;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.profile-picture img {
+    width: 60%;
+    height: 60%;
+    object-fit: cover;
+}
+
+.buttons-frame {
+    background-color: #F5CB5C;
+    height: 70%;
+    padding-top: 10px;
+    display: flex;
+    flex-direction: row;
+}
+
+.left-side-buttons {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.right-side-buttons {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.buttons-frame button {
+    height: 40px;
+    font-size: 16px;
+    background-color: #333533;
+    color: #FFFFFF;
+    border: none;
+    width: 90%;
+    box-sizing: border-box;
+    border-radius: 30px;
+}
+
+.right-side-buttons button.redText {
+    color: #F55C5C;
+    margin-top: 20px;
+}
