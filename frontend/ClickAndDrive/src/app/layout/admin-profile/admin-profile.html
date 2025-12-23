@@ -23,6 +23,7 @@
                 @for (btn of rightButtons; track btn.label) {
                     <button
                         [class.redText]="btn.redText"
+                        (click)="onButtonClick(btn.route)"
                     >{{btn.label}}</button>
                 }
             </div>

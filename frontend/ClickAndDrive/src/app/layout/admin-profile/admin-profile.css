@@ -73,9 +73,16 @@ body {
     width: 90%;
     box-sizing: border-box;
     border-radius: 30px;
+    cursor: pointer;
+    transition-duration: 0.4s;
 }
 
 .right-side-buttons button.redText {
     color: #F55C5C;
     margin-top: 20px;
+}
+
+.buttons-frame button:hover {
+    background-color: #F5CB5C;
+    color: #333533;
 }

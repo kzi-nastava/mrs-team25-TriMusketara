@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-admin-profile',
@@ -12,12 +14,14 @@ export class AdminProfile {
     {label: 'Change prices'},
     {label: 'Ride history'},
     {label: 'Requests'},
-    {label: 'Change information'},
+    {label: 'Change information', route: 'change-information-page'},
     {label: 'Support'},
     {label: 'Reports'},
     {label: 'Notes'},
     {label: 'Log out', redText: true}
   ];
+
+  constructor(private router: Router) {}
 
   get leftButtons() {
     return this.adminButtons.slice(0, 4);
@@ -25,5 +29,11 @@ export class AdminProfile {
 
   get rightButtons() {
     return this.adminButtons.slice(4);
+  }
+
+  onButtonClick(route: string | undefined) {
+    if (route) {
+      this.router.navigate([route]);
+    }
   }
 }

@@ -20,9 +20,10 @@ export class PassengerProfile {
   
   constructor(private router: Router) {}
 
-  onButtonClick(btn: any) {
-    if (!btn.route) return;
-    this.router.navigate([btn.route])
+  onButtonClick(route: string | undefined) {
+    if (route) {
+      this.router.navigate([route]);
+    }
   }
 
 }
