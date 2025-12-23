@@ -5,7 +5,7 @@ import { RouterOutlet } from '@angular/router';
 @Component({
   selector: 'app-main-page',
   standalone: true,
-  imports: [MapViewComponent, RouterOutlet],
+  imports: [MapViewComponent, RouterOutlet], 
   templateUrl: './main-page.html',
   styleUrl: './main-page.css'
 })

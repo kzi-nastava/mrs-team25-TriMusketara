@@ -65,15 +65,18 @@ body {
     background-color: #333533;
     color: #FFFFFF;
     border: none;
-    border-radius: 30px;
     cursor: pointer;
-    transition: background 0.3s;
-}
-
-.buttons-frame button:hover {
-    background-color: #444444;
+    border-radius: 30px;
+    transition-duration: 0.4s;
+    cursor: pointer;
 }
 
 .buttons-frame button.redText {
     color: #F55C5C;
 }
+
+.buttons-frame button:hover {
+    background-color: #F5CB5C;
+    color: #333533;
+}
+
