@@ -10,7 +10,7 @@ import { MainPageComponent } from './main-page/main-page';
 export const routes: Routes = [
   { path: '', redirectTo: 'map', pathMatch: 'full' },
   { path: 'map', component: MainPageComponent },
-  { path: 'change-information-page',component: ChangeInfoPage }
+  { path: 'change-information-page',component: ChangeInfoPage },
   { path: 'driver-history', component: DriverHistory },
   { path: 'scheduled-rides', component: MainPageComponent },
   { path: 'change-info', component: MapViewComponent },
