@@ -1,14 +1,21 @@
+/* Shared sidebar styles provided by your colleague */
 body {
     margin: 0;
 }
 
 .profile-sidebar {
-    background-color: #F5CB5C;
-    height: 100vh;
+    background-color: #F5CB5C; /* Yellow background from your code */
+    /* Use calc to ensure it fits perfectly between navbar and screen bottom */
+    height: calc(100vh - 80px); 
     position: fixed;
-    margin-top: 80px;
+    width: 26vw; /* Colleague's width */
+    min-width: 300px;
     right: 0;
-    top: 0;
+    top: 80px; /* Starts exactly where the 80px navbar ends */
+    z-index: 9999; /* Higher than map and navbar buttons */
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
 }
 
 .profile-picture-frame {
@@ -36,6 +43,11 @@ body {
     object-fit: cover;
 }
 
+#profile-name {
+    margin-top: 10px;
+    font-weight: 700;
+}
+
 .buttons-frame {
     background-color: #F5CB5C;
     height: 70%;
@@ -56,6 +68,7 @@ body {
     cursor: pointer;
     border-radius: 30px;
     transition-duration: 0.4s;
+    cursor: pointer;
 }
 
 .buttons-frame button.redText {
@@ -66,3 +79,4 @@ body {
     background-color: #F5CB5C;
     color: #333533;
 }
+

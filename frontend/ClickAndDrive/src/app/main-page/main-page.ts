@@ -9,4 +9,6 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './main-page.html',
   styleUrl: './main-page.css'
 })
-export class MainPageComponent {}
+export class MainPageComponent {
+
+}

@@ -1,9 +1,13 @@
 :host {
   display: flex !important;
   flex: 1 !important; /* Gets all remaining space */
+  width: 100%;
+  height: 100%;
   background-color: #333533;
   justify-content: center;
   align-items: center;
-  padding: 20px; /* Padding so the map doesn't hit the edges */
+  background-color: #333533;
+  padding: 20px;
   box-sizing: border-box;
+  height: 100%;
 }

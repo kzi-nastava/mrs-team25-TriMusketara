@@ -13,7 +13,12 @@
       <span class="welcome-text">Hi, {{ userName() }}</span>
     }
     @if (userType == 'guest'){
+      @if (!inDrive) {
         <button class="btn-white">Let's Ride!</button>
+      }
+      @if (inDrive) {
+        <button class="btn-red-wide">PANIC</button>
+      }
     }
   </div>
 
@@ -22,14 +27,28 @@
     
     <!-- GUEST NAVBAR -->
     @if (userType === 'guest') {
-      <button class="btn-yellow">Log in</button>
-      <button class="btn-yellow">Register</button>
+      <button class="btn-yellow" (click)="onLoginClick()">Log in</button>
+      <button class="btn-yellow" (click)="onRegisterClick()">Register</button>
+    }
+
+    <!-- DRIVER NAVBAR -->
+    @if (userType === 'driver') {
+      @if (inDrive) {
+        <button class="btn-red">PANIC</button>
+      }
+      <button class="user-circle-btn" (click)="onProfileClick()">
+        <img src="user-icon.png" alt="Profile">
+      </button>
     }
 
     <!-- REGISTERED USER NAVBAR -->
     @if (userType === 'user') {
-      <button class="btn-white">Let's Ride!</button>
-      <button class="btn-red">PANIC</button>
+      @if (!inDrive) {
+        <button class="btn-white">Let's Ride!</button>
+      }
+      @if (inDrive) {
+        <button class="btn-red">PANIC</button>
+      }
       <button class="user-circle-btn" (click)="onProfileClick()">
         <img src="user-icon.png" alt="Profile">
       </button>
