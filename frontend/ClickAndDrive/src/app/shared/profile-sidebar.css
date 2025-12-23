@@ -53,9 +53,16 @@ body {
     background-color: #333533;
     color: #FFFFFF;
     border: none;
+    cursor: pointer;
     border-radius: 30px;
+    transition-duration: 0.4s;
 }
 
 .buttons-frame button.redText {
     color: #F55C5C;
+}
+
+.buttons-frame button:hover {
+    background-color: #F5CB5C;
+    color: #333533;
 }

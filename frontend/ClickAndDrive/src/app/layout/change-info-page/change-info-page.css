@@ -1,0 +1,102 @@
+.page-wrapper {
+    background-color: #333533;
+    height: calc(100vh - 80px);
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.account-information {
+    width: 50%;
+    height: 90%;
+    background-color: #242423;
+    border: 2px solid #F5CB5C;
+    display: flex;
+    flex-direction: column;
+}
+
+.title-container {
+    width: 100%;
+    height: 20%;
+    /* border: 1px solid red; */
+}
+
+.title {
+    color: white;
+    font-size: 47px;
+    text-decoration: underline;
+    margin-left: 10%;
+}
+
+.container {
+    width: 100%;
+    height: 70%;
+    /* border: 1px solid green; */
+}
+
+.form-container {
+    width: 70%;
+    height: 100%;
+    /* border: 1px solid pink; */
+}
+
+.form-container form {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 30px;
+}
+
+.form-row {
+    /* border: 1px solid orange; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    height: 10%;
+    width: 100%;
+}
+
+.form-row label {
+    width: 150px;
+    text-align: right;
+    font-size: 27px;
+    color: white;
+}
+
+.form-row input {
+    height: 70%;
+    width: 30%;
+    background-color: #A7A7A7;
+}
+
+.buttons-container {
+    width: 100%;
+    height: 10%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    /* border: 1px solid blue; */
+}
+
+.buttons-container button {
+    background-color: #F5CB5C;
+    color: white;
+    font-size: 15px;
+    width: auto;
+    height: 65%;
+    border-radius: 5px;
+    border: none;
+    margin-right: 8%;
+    margin-bottom: 8%;
+    cursor: pointer;
+    transition-duration: 0.4s;
+}
+
+.buttons-container button:hover {
+    background-color: #333533;
+    color: white;
+}
+

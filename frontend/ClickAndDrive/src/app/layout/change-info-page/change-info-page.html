@@ -1,0 +1,27 @@
+<div class="page-wrapper">
+    <div class="account-information">
+        <div class="title-container">
+            <p class="title">Account information</p>
+        </div>
+        <div class="container">
+            <div class="form-container">
+                <form action="">
+                    @for (field of fields; track field.label) {
+                        <div class="form-row">
+                        <label [for]="field.label">{{field.text}}</label>
+                        <input
+                            [id]="field.label"
+                            [name]="field.label"
+                            [type]="field.type"
+                            [placeholder]="field.placeholder"
+                        />
+                        </div>
+                    }
+                </form>
+            </div>
+        </div>
+        <div class="buttons-container">
+            <button>  Change information  </button>
+        </div>
+    </div>
+</div>
