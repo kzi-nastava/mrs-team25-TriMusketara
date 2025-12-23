@@ -9,7 +9,7 @@ import { AdminProfile } from '../../layout/admin-profile/admin-profile';
   standalone: true,
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
-  imports: [PassengerProfile, DriverProfile, AdminProfile]
+  imports: [PassengerProfile, DriverProfile, AdminProfile, RouterModule] // <-- RouterModule dodan
 })
 export class NavbarComponent {
   // Can be changed manually to test: 'guest', 'user', 'admin'
@@ -25,13 +25,8 @@ export class NavbarComponent {
   constructor(private router: Router) {}
 
   onProfileClick() {
+    this.showSidebar = !this.showSidebar;
     console.log('Opening user profile:', this.userName());
-    if (this.showSidebar) {
-      this.showSidebar = false;
-    } 
-    else {
-      this.showSidebar = true;
-    }
   }
 
   // Navigate to a specific route and close sidebar
