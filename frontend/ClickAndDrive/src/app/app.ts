@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar';
 
 @Component({
@@ -9,6 +9,13 @@ import { NavbarComponent } from './components/navbar/navbar';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
+
 export class App {
   protected readonly title = 'ClickAndDrive';
+
+  constructor(public router: Router) {}
+
+  showNavbar(): boolean {
+    return this.router.url !== '/login' && this.router.url !== '/register';
+  }
 }
