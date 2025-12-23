@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
-import { RouterModule } from '@angular/router'; // <-- dodaj ovo
-import { PassengerProfile } from '../../layout/passenger-profile/passenger-profile';
+import { Router } from '@angular/router';
+import { PassengerProfile } from '../../layout/passenger-profile/passenger-profile'
 import { DriverProfile } from '../../layout/driver-profile/driver-profile';
 import { AdminProfile } from '../../layout/admin-profile/admin-profile';
 
@@ -13,14 +13,25 @@ import { AdminProfile } from '../../layout/admin-profile/admin-profile';
 })
 export class NavbarComponent {
   // Can be changed manually to test: 'guest', 'user', 'admin'
-  userType: 'guest' | 'user' | 'driver' | 'admin' = 'guest'; 
+  userType: 'guest' | 'user' | 'driver' |'admin' = 'driver';
+
+  inDrive: boolean = false;
+
   userName = signal('TriMusketara');
 
   // Flag to show profile sidebar
   showSidebar = false;
 
+  constructor(private router: Router) {}
+
   onProfileClick() {
     this.showSidebar = !this.showSidebar;
     console.log('Opening user profile:', this.userName());
+  }
+
+  // Navigate to a specific route and close sidebar
+  handleViewSelection(route: string) {
+    this.router.navigate([route]);
+    this.showSidebar = false;
   }
 }

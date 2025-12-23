@@ -1,0 +1,140 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Inter:wght@600&display=swap');
+
+.history-page {
+    background-color: #333533; /* Base background from Figma */
+    min-height: calc(100vh - 70px);
+    display: flex;
+    justify-content: center;
+    padding: 40px 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+.content-wrapper {
+    width: 90%;
+    /* max-width: 1280px; */
+    color: #E7E7E7; /* Text color from Figma */
+}
+
+/* Title */
+.all-drives-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 22px;
+    color: #E7E7E7;
+}
+
+/* Header Filters */
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.filters { display: flex; gap: 20px; }
+
+.figma-input, .figma-select {
+    background: #F9FBFF;
+    border-radius: 10px;
+    border: none;
+    padding: 8px 15px;
+    color: #7E7E7E;
+    font-size: 12px;
+}
+
+/* Table */
+.figma-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.figma-table th {
+    text-align: left;
+    color: #B5B7C0; /* Header color from Figma */
+    font-weight: 500;
+    font-size: 14px;
+    padding: 15px 10px;
+    border-bottom: 1px solid #EEEEEE; /* Line from Figma */
+}
+
+.figma-table td {
+    padding: 20px 10px;
+    border-bottom: 1px solid #EEEEEE;
+    font-size: 14px;
+    color: #E7E7E7;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* Badges (Colors directly from Figma) */
+.badge {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: 500;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 60px;
+}
+
+.badge-completed, .badge-panic-no {
+    background: rgba(92, 245, 106, 0.75); /* Green from Figma */
+    color: #E7E7E7;
+}
+
+.badge-completed {
+    background: rgba(92, 245, 106, 0.75); /* Green from Figma */
+    color: #E7E7E7;
+    min-width: 200px;
+}
+
+.badge-cancelled, .badge-panic-yes {
+    background: #F55C5C; /* Red from Figma */
+    color: #E7E7E7;
+}
+
+.badge-cancelled {
+    background: #F55C5C; /* Red from Figma */
+    color: #E7E7E7;
+    min-width: 200px;
+}
+
+.btn-details {
+    background: rgba(245, 203, 92, 0.75); /* Yellow/Gold from Figma */
+    border: none;
+    border-radius: 4px;
+    padding: 4px 15px;
+    color: #E7E7E7;
+    cursor: pointer;
+    font-family: 'Poppins';
+}
+
+/* Pagination */
+.pagination-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+}
+
+.data-info { color: #E7E7E7; font-size: 14px; }
+
+.pagination-controls { display: flex; gap: 8px; align-items: center; }
+
+.page-num, .page-arrow {
+    background: #F5F5F5;
+    border: 1px solid #EEEEEE;
+    border-radius: 4px;
+    width: 25px;
+    height: 24px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.page-num.active {
+    background: #F5CB5C; /* Yellow active color from Figma */
+    border: 1px solid #5932EA;
+    color: white;
+}
+
+.dots { color: #E7E7E7; }
