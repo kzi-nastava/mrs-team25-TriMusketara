@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { PassengerProfile } from '../../layout/passenger-profile/passenger-profile'
 import { DriverProfile } from '../../layout/driver-profile/driver-profile';
 import { AdminProfile } from '../../layout/admin-profile/admin-profile';
@@ -9,11 +9,11 @@ import { AdminProfile } from '../../layout/admin-profile/admin-profile';
   standalone: true,
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
-  imports: [PassengerProfile, DriverProfile, AdminProfile, RouterModule] // <-- RouterModule dodan
+  imports: [PassengerProfile, DriverProfile, AdminProfile, RouterOutlet] // <-- RouterModule dodan
 })
 export class NavbarComponent {
   // Can be changed manually to test: 'guest', 'user', 'admin'
-  userType: 'guest' | 'user' | 'driver' |'admin' = 'driver';
+  userType: 'guest' | 'user' | 'driver' |'admin' = 'guest';
 
   inDrive: boolean = false;
 
@@ -27,6 +27,14 @@ export class NavbarComponent {
   onProfileClick() {
     this.showSidebar = !this.showSidebar;
     console.log('Opening user profile:', this.userName());
+  }
+
+  onLoginClick() {
+    this.router.navigate(['login']);
+  }
+
+  onRegisterClick() {
+    this.router.navigate(['register']);
   }
 
   // Navigate to a specific route and close sidebar
