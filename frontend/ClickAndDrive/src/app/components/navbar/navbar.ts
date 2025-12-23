@@ -13,7 +13,7 @@ import { AdminProfile } from '../../layout/admin-profile/admin-profile';
 })
 export class NavbarComponent {
   // Can be changed manually to test: 'guest', 'user', 'admin'
-  userType: 'guest' | 'user' | 'driver' | 'admin' = 'guest'; 
+  userType: 'guest' | 'user' | 'driver' | 'admin' = 'guest';
   userName = signal('TriMusketara');
 
   // Flag to show profile sidebar

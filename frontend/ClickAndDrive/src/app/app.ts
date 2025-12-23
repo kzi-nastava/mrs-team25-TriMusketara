@@ -18,6 +18,7 @@ const routes: Routes = [
   `,
   styleUrls: ['./app.css']
 })
+  
 export class App {
   protected readonly title = signal('ClickAndDrive');
 }

@@ -29,7 +29,6 @@
 }
 
 .brand-name {
-    font-family: 'Montserrat';
     font-style: italic;
     font-weight: 800;
     font-size: 24px;
@@ -38,7 +37,6 @@
 
 /* Hi, TriMusketara */
 .welcome-text {
-    font-family: 'Montserrat';
     font-style: italic;
     font-weight: 900;
     font-size: 32px;
@@ -56,7 +54,6 @@ button {
     height: 41px;
     border-radius: 30px;
     border: none;
-    font-family: 'Montserrat';
     font-size: 18px;
     cursor: pointer;
     display: flex;

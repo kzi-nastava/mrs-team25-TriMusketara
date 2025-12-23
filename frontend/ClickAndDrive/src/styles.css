@@ -4,3 +4,7 @@ html, body {
   padding: 0;
   overflow: hidden; /* For blocking any scroll - TO-DO: CHANGE LATER */
 }
+
+* {
+  font-family: "Montserrat", sans-serif;
+}

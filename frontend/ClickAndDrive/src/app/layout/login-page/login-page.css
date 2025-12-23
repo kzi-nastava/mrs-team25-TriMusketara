@@ -9,7 +9,6 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  font-family: sans-serif;
 }
 
 .login-container::before {
