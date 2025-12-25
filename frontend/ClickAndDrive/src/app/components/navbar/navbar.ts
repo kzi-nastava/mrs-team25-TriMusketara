@@ -3,6 +3,7 @@ import { Router, RouterOutlet } from '@angular/router';
 import { PassengerProfile } from '../../layout/passenger-profile/passenger-profile'
 import { DriverProfile } from '../../layout/driver-profile/driver-profile';
 import { AdminProfile } from '../../layout/admin-profile/admin-profile';
+import { RidePopup } from '../../shared/ride-popup';
 
 @Component({
   selector: 'app-navbar',
@@ -13,7 +14,7 @@ import { AdminProfile } from '../../layout/admin-profile/admin-profile';
 })
 export class NavbarComponent {
   // Can be changed manually to test: 'guest', 'user', 'admin'
-  userType: 'guest' | 'user' | 'driver' |'admin' = 'user';
+  userType: 'guest' | 'user' | 'driver' |'admin' = 'guest';
 
   inDrive: boolean = false;
 
@@ -22,7 +23,10 @@ export class NavbarComponent {
   // Flag to show profile sidebar
   showSidebar = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private ridePopup: RidePopup
+  ) {}
 
   onProfileClick() {
     this.showSidebar = !this.showSidebar;
@@ -41,5 +45,9 @@ export class NavbarComponent {
   handleViewSelection(route: string) {
     this.router.navigate([route]);
     this.showSidebar = false;
+  }
+
+  openPopup() {
+    this.ridePopup.open();
   }
 }

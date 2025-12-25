@@ -18,5 +18,5 @@ export const routes: Routes = [
   { path: 'notes', component: MapViewComponent },
   { path: 'support', component: MapViewComponent },
   { path: 'login', component: LoginPage },
-  {path: 'register', component: RegistrationPage}
+  { path: 'register', component: RegistrationPage }
 ];

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { RidePopup } from '../../shared/ride-popup';
 
 @Component({
   selector: 'app-map-view',
@@ -7,4 +8,6 @@ import { Component } from '@angular/core';
   templateUrl: './map-view.html',
   styleUrl: './map-view.css',
 })
-export class MapViewComponent {}
+export class MapViewComponent {
+  constructor(public ridePopup: RidePopup) {}
+}

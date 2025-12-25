@@ -66,12 +66,22 @@ button {
     background: #E8EDDF;
     color: rgba(36, 36, 35, 0.75);
     font-weight: 600;
+    transition: .3s;
+}
+
+.btn-white:hover {
+    background: #b7bbb0;
 }
 
 .btn-yellow {
     background: #F5CB5C;
     color: rgba(36, 36, 35, 0.75);
     font-weight: 600;
+    transition: .3s;
+}
+
+.btn-yellow:hover {
+    background: #f5cc5cc2;
 }
 
 /* Admin Red Button (Wide) */

@@ -1,3 +1,23 @@
 <div class="map-rectangle">
     <!-- Inside this div we will later add other elements -->
 </div>
+
+<div class="overlay" [class.open]="ridePopup.isOpen()" (click)="ridePopup.close()"></div>
+
+<!-- POPUP -->
+@if (ridePopup.isOpen()) {
+  <form class="popup" [class.open]="ridePopup.isOpen()" (click)="$event.stopPropagation()">
+    <p>Ride data</p>
+
+    <div class="form-group">
+        <label for="origin">Origin:</label>
+        <input name="origin" type="text">
+    </div>
+    <div class="form-group">
+        <label for="destination">Destination:</label>
+        <input name="destination" type="text">
+    </div>
+
+    <button class="route-btn">Show route & ETA</button>
+  </form>
+}
