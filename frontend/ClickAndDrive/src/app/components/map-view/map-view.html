@@ -1,8 +1,12 @@
 <div class="map-rectangle">
     <!-- Inside this div we will later add other elements -->
+    <div class="ride-data" [class.visible]="showRideData()">
+        <p><span class="w-clr">Driver</span> arrival: <span class="driver-arrival-data">6 minutes</span></p>
+        <p>Estimated <span class="w-clr">time</span>: <span class="estimated-time-data">20 minutes</span></p>
+  </div>
 </div>
 
-<div class="overlay" [class.open]="ridePopup.isOpen()" (click)="ridePopup.close()"></div>
+<div class="overlay" [class.open]="ridePopup.isOpen()" (click)="onOverlayClick()"></div>
 
 <!-- POPUP -->
 @if (ridePopup.isOpen()) {
@@ -18,6 +22,6 @@
         <input name="destination" type="text">
     </div>
 
-    <button class="route-btn">Show route & ETA</button>
+    <button type="button" class="route-btn" (click)="onShowRoute()">Show route & ETA</button>
   </form>
 }

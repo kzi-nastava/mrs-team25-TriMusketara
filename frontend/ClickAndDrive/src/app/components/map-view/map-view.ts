@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RidePopup } from '../../shared/ride-popup';
 
 @Component({
@@ -10,4 +10,16 @@ import { RidePopup } from '../../shared/ride-popup';
 })
 export class MapViewComponent {
   constructor(public ridePopup: RidePopup) {}
+
+  showRideData = signal(false);
+
+  onShowRoute() {
+    this.showRideData.set(true);
+    this.ridePopup.close();
+  }
+
+  onOverlayClick() {
+    this.showRideData.set(false);
+    this.ridePopup.close();
+  }
 }
