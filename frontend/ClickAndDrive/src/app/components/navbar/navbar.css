@@ -6,6 +6,7 @@
     background: #242423;
     padding: 0 25px;
     box-sizing: border-box;
+    position: relative;
 }
 
 .nav-left {
@@ -67,6 +68,13 @@ button {
     color: rgba(36, 36, 35, 0.75);
     font-weight: 600;
     transition: .3s;
+}
+
+.center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .btn-white:hover {
