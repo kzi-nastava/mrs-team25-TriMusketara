@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="nav_bg">#242423</color>
+    <color name="home_bg">#333533</color>
+    <color name="profile_bg">#F5CB5C</color>
+</resources>
