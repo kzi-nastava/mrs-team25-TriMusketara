@@ -19,4 +19,6 @@ public class Passenger extends User {
     )
     @Column(name = "email")
     private List<String> linkedEmails;
+
+    private List<Route> favoriteRoutes;
 }
