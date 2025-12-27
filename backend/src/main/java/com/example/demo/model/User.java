@@ -36,4 +36,8 @@ public abstract class User {
 
     @Column(nullable = false)
     private String phone;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "chat_id", referencedColumnName = "id")
+    private Chat chat;
 }

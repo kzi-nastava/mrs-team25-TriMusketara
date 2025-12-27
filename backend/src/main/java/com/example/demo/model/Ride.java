@@ -42,4 +42,9 @@ public class Ride {
     private Route route;
 
     private double price;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "review_id")
+    private Review review;
+
 }
