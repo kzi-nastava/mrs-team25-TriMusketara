@@ -51,4 +51,7 @@ public class Ride {
     @JoinColumn(name = "review_id")
     private Review review;
 
+    @OneToMany(mappedBy = "ride", cascade = CascadeType.ALL)
+    private List<InconsistencyReport> inconsistencyReports;
+
 }
