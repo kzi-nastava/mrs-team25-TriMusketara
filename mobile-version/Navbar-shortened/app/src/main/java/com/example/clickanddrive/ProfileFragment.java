@@ -4,18 +4,133 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.google.android.material.button.MaterialButton;
 
 public class ProfileFragment extends Fragment {
+
+    private CardView cardGuest, cardMyAccount, cardApplication;
+    private LinearLayout containerApplicationButtons;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        // Find by id all of the cards defined above
+        cardGuest = view.findViewById(R.id.card_guest);
+        cardMyAccount = view.findViewById(R.id.card_my_account);
+        cardApplication = view.findViewById(R.id.card_application);
+        containerApplicationButtons = view.findViewById(R.id.container_application_buttons);
+
+        // All cards have no visibility
+        cardGuest.setVisibility(View.GONE);
+        cardMyAccount.setVisibility(View.GONE);
+        cardApplication.setVisibility(View.GONE);
+
+        // Button actions
+        // ...
+
+
+        switch (SessionManager.currentUserType) {
+            case SessionManager.GUEST:
+                cardGuest.setVisibility(View.VISIBLE);
+                break;
+            case SessionManager.USER:
+            case SessionManager.DRIVER:
+            case SessionManager.ADMIN:
+                cardMyAccount.setVisibility(View.VISIBLE);
+                cardApplication.setVisibility(View.VISIBLE);
+
+                // Add different buttons based on the role
+                addApplicationButtons(SessionManager.currentUserType);
+                break;
+        }
+
+        return view;
+    }
+
+    private void addApplicationButtons(int userType) {
+        containerApplicationButtons.removeAllViews();
+
+        switch(userType) {
+            case SessionManager.USER:
+                addButton("Favorite routes", () -> {});
+                addButton("Ride history",  () -> {});
+                addButton("Reports",  () -> {});
+                addButton("Notes", () -> {});
+                addButton("Support", () -> {});
+                addButton("Log out",  () -> {});
+                break;
+
+            case SessionManager.DRIVER:
+                addButton("Scheduled rides",  () -> {});
+                addButton("Ride history",  () -> {});
+                addButton("Reports",  () -> {});
+                addButton("Notes", () -> {});
+                addButton("Support",  () -> {});
+                addButton("Log out", () -> {});
+                break;
+
+            case SessionManager.ADMIN:
+                addButton("Check current rides", () -> {});
+                addButton("Change prices", () -> {});
+                addButton("Ride history", () -> {});
+                addButton("Requests",  () -> {});
+                addButton("Support",  () -> {});
+                addButton("Reports",  () -> {});
+                addButton("Notes",  () -> {});
+                addButton("Log out",  () -> {});
+                break;
+        }
+    }
+
+    private View createDivider() {
+        View divider = new View(getContext());
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 3);
+        params.setMargins(0,8,0,8);
+
+        divider.setLayoutParams(params);
+
+        divider.setBackgroundColor(
+                ContextCompat.getColor(requireContext(), R.color.divider_color)
+        );
+
+        return divider;
+    }
+
+    /*private void addButton(String text, Runnable action) {
+        Button button = new Button(new ContextThemeWrapper(getContext(), R.style.ProfileActionButton), null, 0);
+
+        button.setText(text);
+
+        button.setOnClickListener(v -> action.run());
+        containerApplicationButtons.addView(button);
+
+        // Bottom line
+        containerApplicationButtons.addView(createDivider());
+    }*/
+
+    private void addButton(String text, Runnable action) {
+        MaterialButton button = new MaterialButton(new ContextThemeWrapper(getContext(), R.style.ProfileActionButton), null, 0);
+        button.setText(text);
+
+        button.setOnClickListener(v -> action.run());
+        containerApplicationButtons.addView(button);
+        containerApplicationButtons.addView(createDivider());
     }
 }
