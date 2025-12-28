@@ -4,6 +4,10 @@ import com.example.demo.dto.request.RideFromFavoritesRequestDTO;
 import com.example.demo.dto.request.RideRequestDTO;
 import com.example.demo.dto.response.RideResponseDTO;
 import com.example.demo.model.RideStatus;
+import com.example.demo.dto.request.RideCancellationRequestDTO;
+import com.example.demo.dto.request.RideRequestUnregisteredDTO;
+import com.example.demo.dto.request.RideStopRequestDTO;
+import com.example.demo.dto.response.RideEstimateResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -67,7 +71,29 @@ public class RideController {
     @GetMapping("/ping")
     public String ping() {
             return "RideController radi!";
-        }
+    }
 
+    @PostMapping("/estimate")
+    public ResponseEntity<RideEstimateResponseDTO> estimateRide(
+            @RequestBody RideRequestUnregisteredDTO request
+    ) {
+        RideEstimateResponseDTO response = new RideEstimateResponseDTO();
+        return ResponseEntity.ok(response);
+    }
 
+    @PostMapping("/{id}/cancel")
+    public ResponseEntity<Void> cancelRide(
+            @PathVariable Long id,
+            @RequestBody RideCancellationRequestDTO request
+    ) {
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/stop")
+    public ResponseEntity<Void> stopRide(
+            @PathVariable Long id,
+            @RequestBody RideStopRequestDTO request
+    ) {
+        return ResponseEntity.ok().build();
+    }
 }
