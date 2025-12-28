@@ -1,5 +1,6 @@
 package com.example.demo.dto.request;
 
+import com.example.demo.dto.LocationDTO;
 import com.example.demo.model.VehicleType;
 import lombok.Getter;
 import lombok.Setter;

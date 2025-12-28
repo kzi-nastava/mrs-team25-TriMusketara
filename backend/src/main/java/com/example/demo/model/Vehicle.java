@@ -30,5 +30,7 @@ public class Vehicle {
     private Boolean isBabyFriendly;
     private Boolean isPetFriendly;
 
+    private Boolean busy = false;
+
     //private double price; maybe not needed here
 }

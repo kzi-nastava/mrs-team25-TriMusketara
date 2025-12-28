@@ -1,6 +1,6 @@
 package com.example.demo.dto.response;
 
-import com.example.demo.dto.request.LocationDTO;
+import com.example.demo.dto.LocationDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
