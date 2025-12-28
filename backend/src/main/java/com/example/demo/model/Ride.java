@@ -24,6 +24,10 @@ public class Ride {
     @Enumerated(EnumType.STRING)
     private RideStatus status;
 
+    @ManyToOne
+    @JoinColumn(name = "driver_id")
+    private Driver driver;
+
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private LocalDateTime scheduledTime;
