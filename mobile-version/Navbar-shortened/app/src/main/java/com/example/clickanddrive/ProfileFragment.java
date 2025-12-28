@@ -43,6 +43,11 @@ public class ProfileFragment extends Fragment {
 
         // Button actions
         // ...
+        Button btnLogin = view.findViewById(R.id.btn_login);
+        Button btnRegister = view.findViewById(R.id.btn_register);
+
+        btnLogin.setOnClickListener(v -> openLoginFragment());
+        btnRegister.setOnClickListener(v -> openRegisterFragment());
 
 
         switch (SessionManager.currentUserType) {
@@ -61,6 +66,26 @@ public class ProfileFragment extends Fragment {
         }
 
         return view;
+    }
+
+    private void openLoginFragment() {
+        LoginFragment loginFragment = new LoginFragment();
+
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.flFragment, loginFragment) 
+                .addToBackStack(null) 
+                .commit();
+    }
+
+    private void openRegisterFragment() {
+        RegisterFragment registerFragment = new RegisterFragment();
+
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.flFragment, registerFragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     private void addApplicationButtons(int userType) {
