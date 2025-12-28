@@ -5,7 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-
 public class RideCancellationRequestDTO {
     private String reason;
 }

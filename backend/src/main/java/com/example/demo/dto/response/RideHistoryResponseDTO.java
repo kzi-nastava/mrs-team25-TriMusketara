@@ -8,7 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-
 public class RideHistoryResponseDTO {
     private Long rideId;
     private String startAddress;

@@ -5,7 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-
 public class RideStopRequestDTO {
     private LocationDTO stopLocation;
 }
