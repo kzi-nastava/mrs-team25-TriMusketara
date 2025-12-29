@@ -103,7 +103,7 @@ public class ProfileFragment extends Fragment {
 
             case SessionManager.DRIVER:
                 addButton("Scheduled rides",  () -> {});
-                addButton("Ride history",  () -> {});
+                addButton("Ride history",  () -> openDriverHistoryFragment());
                 addButton("Reports",  () -> {});
                 addButton("Notes", () -> {});
                 addButton("Support",  () -> {});
@@ -157,5 +157,14 @@ public class ProfileFragment extends Fragment {
         button.setOnClickListener(v -> action.run());
         containerApplicationButtons.addView(button);
         containerApplicationButtons.addView(createDivider());
+    }
+
+    private void openDriverHistoryFragment() {
+        DriverHistoryFragment historyFragment = new DriverHistoryFragment();
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.flFragment, historyFragment)
+                .addToBackStack(null)
+                .commit();
     }
 }
