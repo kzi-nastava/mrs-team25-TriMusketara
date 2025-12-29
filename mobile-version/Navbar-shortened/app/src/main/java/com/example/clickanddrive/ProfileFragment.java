@@ -49,6 +49,10 @@ public class ProfileFragment extends Fragment {
         btnLogin.setOnClickListener(v -> openLoginFragment());
         btnRegister.setOnClickListener(v -> openRegisterFragment());
 
+        // Getting button for changing information by its id
+        Button btnChangeInfo = view.findViewById(R.id.btn_change_info);
+        btnChangeInfo.setOnClickListener(v -> openProfileChangeInfoFragment());  
+
 
         switch (SessionManager.currentUserType) {
             case SessionManager.GUEST:
@@ -86,6 +90,12 @@ public class ProfileFragment extends Fragment {
                 .replace(R.id.flFragment, registerFragment)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    // Opening a new fragment with user info, along side ability to change info
+    private void openProfileChangeInfoFragment() {
+        ChangeInfoFragment fragment = new ChangeInfoFragment();
+        requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, fragment).addToBackStack(null).commit();
     }
 
     private void addApplicationButtons(int userType) {

@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ChangeInfoFragment">
+
+    <LinearLayout
+        android:id="@+id/container_change_info"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:background="@color/nav_bg"
+        android:padding="16dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="10dp"
+            app:strokeWidth="2dp"
+            android:backgroundTint="@color/home_bg"
+            app:strokeColor="@color/profile_bg"
+            android:layout_marginBottom="16dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Account Information"
+                    android:textSize="22sp"
+                    android:textColor="@color/whiteish"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp"/>
+
+                <!-- Form row -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
+
+                    <!-- Label -->
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="16sp"
+                        android:text="First Name"
+                        android:textColor="@color/whiteish"/>
+
+                    <!-- Input -->
+                    <EditText
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:layout_weight="2"
+                        android:textSize="16sp"
+                        android:hint="Jhon"
+                        android:textColor="@color/profile_bg"
+                        android:textColorHint="@color/whiteish"
+                        android:backgroundTint="@color/whiteish"/>
+
+                </LinearLayout>
+
+                <!-- Form row -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
+
+                    <!-- Label -->
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="16sp"
+                        android:text="Last Name"
+                        android:textColor="@color/whiteish"/>
+
+                    <!-- Input -->
+                    <EditText
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:layout_weight="2"
+                        android:textSize="16sp"
+                        android:hint="Doe"
+                        android:textColor="@color/whiteish"
+                        android:textColorHint="@color/whiteish"
+                        android:backgroundTint="@color/whiteish"/>
+                </LinearLayout>
+
+                <!-- Form row -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
+
+                    <!-- Label -->
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="16sp"
+                        android:text="Email"
+                        android:textColor="@color/whiteish"/>
+
+                    <!-- Input -->
+                    <EditText
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:layout_weight="2"
+                        android:textSize="16sp"
+                        android:hint="jhondoe@gmai.com"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/whiteish"
+                        android:backgroundTint="@color/whiteish"/>
+                </LinearLayout>
+
+                <!-- Form row -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
+
+                    <!-- Label -->
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="16sp"
+                        android:text="Password"
+                        android:textColor="@color/whiteish"/>
+
+                    <!-- Input -->
+                    <EditText
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:layout_weight="2"
+                        android:textSize="16sp"
+                        android:hint="*********"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/whiteish"
+                        android:backgroundTint="@color/whiteish"/>
+                </LinearLayout>
+
+                <!-- Form row -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
+
+                    <!-- Label -->
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="16sp"
+                        android:text="Address"
+                        android:textColor="@color/whiteish"/>
+
+                    <!-- Input -->
+                    <EditText
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:layout_weight="2"
+                        android:textSize="16sp"
+                        android:hint="Hueco Mundo"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/whiteish"
+                        android:backgroundTint="@color/whiteish"/>
+                </LinearLayout>
+
+
+                <!-- Form row -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
+
+                    <!-- Label -->
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="16sp"
+                        android:text="Mobile"
+                        android:textColor="@color/whiteish"/>
+
+                    <!-- Input -->
+                    <EditText
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:layout_weight="2"
+                        android:textSize="16sp"
+                        android:hint="+123456789"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/whiteish"
+                        android:backgroundTint="@color/whiteish"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/driver_part"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_marginTop="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Vehicle Information"
+                        android:textSize="22sp"
+                        android:textColor="@color/whiteish"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="16dp"/>
+
+
+                    <!-- Form row -->
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp">
+
+                        <!-- Label -->
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:text="Model"
+                            android:textColor="@color/whiteish"/>
+
+                        <!-- Input -->
+                        <EditText
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:minHeight="48dp"
+                            android:layout_weight="2"
+                            android:textSize="16sp"
+                            android:hint="model"
+                            android:textColor="@color/black"
+                            android:textColorHint="@color/whiteish"
+                            android:backgroundTint="@color/whiteish"/>
+                    </LinearLayout>
+
+                    <!-- Form row -->
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp">
+
+                        <!-- Label -->
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:text="Type"
+                            android:textColor="@color/whiteish"/>
+
+                        <!-- Input -->
+                        <EditText
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:minHeight="48dp"
+                            android:layout_weight="2"
+                            android:textSize="16sp"
+                            android:hint="type"
+                            android:textColor="@color/black"
+                            android:textColorHint="@color/whiteish"
+                            android:backgroundTint="@color/whiteish"/>
+                    </LinearLayout>
+
+                    <!-- Form row -->
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp">
+
+                        <!-- Label -->
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:text="Baby friendly"
+                            android:textColor="@color/whiteish"/>
+
+                        <!-- Input -->
+                        <EditText
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:minHeight="48dp"
+                            android:layout_weight="2"
+                            android:textSize="16sp"
+                            android:hint="YES"
+                            android:textColor="@color/black"
+                            android:textColorHint="@color/whiteish"
+                            android:backgroundTint="@color/whiteish"/>
+                    </LinearLayout>
+
+                    <!-- Form row -->
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp">
+
+                        <!-- Label -->
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:text="Pet friendly"
+                            android:textColor="@color/whiteish"/>
+
+                        <!-- Input -->
+                        <EditText
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:minHeight="48dp"
+                            android:layout_weight="2"
+                            android:textSize="16sp"
+                            android:hint="NO"
+                            android:textColor="@color/black"
+                            android:textColorHint="@color/whiteish"
+                            android:backgroundTint="@color/whiteish"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Change information button -->
+                <Button
+                    android:id="@+id/btn_confirm_change"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/nav_bg"
+                    android:textColor="@color/profile_bg"
+                    android:text="Confirm change"
+                    android:layout_gravity="center_horizontal"
+                    android:padding="12dp"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+
+    </LinearLayout>
+</ScrollView>
