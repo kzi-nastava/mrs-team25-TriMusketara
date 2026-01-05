@@ -18,11 +18,34 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // One bottom navigation bar will exist for all roles
+        // However based on who is logged in, a different menu will be displayed in the nav bar
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
+        // Clear old menu
+        bottomNavigationView.getMenu().clear();
+
+        // Fragments that will be displayed
         Fragment homeFragment = new HomeFragment();
         Fragment profileFragment = new ProfileFragment();
         Fragment newRideFragment = new NewRideFragment();
+        // add more based on role ...
+
+
+        // Change the menu in the navigation bar based on role
+        switch(SessionManager.currentUserType) {
+            case SessionManager.GUEST:
+            case SessionManager.USER:
+                bottomNavigationView.inflateMenu(R.menu.bottom_nav_user);
+                break;
+            case SessionManager.DRIVER:
+                bottomNavigationView.inflateMenu(R.menu.bottom_nav_driver);
+                break;
+            case SessionManager.ADMIN:
+                bottomNavigationView.inflateMenu(R.menu.bottom_nav_admin);
+                break;
+        }
+
 
         setCurrentFragment(homeFragment);
 
@@ -32,15 +55,15 @@ public class MainActivity extends AppCompatActivity {
             if (id == R.id.home) {
                 setCurrentFragment(homeFragment);
                 return true;
-
             } else if (id == R.id.profile) {
                 setCurrentFragment(profileFragment);
                 return true;
-
             } else if (id == R.id.new_ride) {
                 setCurrentFragment(newRideFragment);
                 return true;
             }
+            // ...
+            // will add other cases when other role fragments are created
 
             return false;
         });
