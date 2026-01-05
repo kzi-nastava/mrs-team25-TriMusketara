@@ -13,12 +13,7 @@
       <span class="welcome-text">Hi, {{ userName() }}</span>
     }
     @if (userType == 'guest'){
-      @if (!inDrive) {
-        <button class="btn-white center" (click)="openPopup()">Let's Ride!</button>
-      }
-      @if (inDrive) {
-        <button class="btn-red-wide">PANIC</button>
-      }
+      <button class="btn-white center" (click)="openPopup()">Let's Ride!</button>
     }
   </div>
 
