@@ -36,12 +36,19 @@
     color: #E8EDDF;
 }
 
+.nav-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
 /* Hi, TriMusketara */
 .welcome-text {
     font-style: italic;
     font-weight: 900;
     font-size: 32px;
-    color: #F5CB5C; 
+    color: #F5CB5C;
 }
 
 .nav-right {
@@ -98,6 +105,7 @@ button {
     background: #F55C5C;
     color: white;
     font-weight: 800; /* Figma requires 800 for admin */
+    transition: .2s;
 }
 
 /* User Red Button (Normal) */
@@ -106,6 +114,15 @@ button {
     background: #F55C5C;
     color: white;
     font-weight: 800;
+    transition: .2s;
+}
+
+.btn-red-wide:hover {
+    background: #f55c5cd6;
+}
+
+.btn-red:hover {
+    background: #f55c5cd6;
 }
 
 /* Circle for user/admin icon */

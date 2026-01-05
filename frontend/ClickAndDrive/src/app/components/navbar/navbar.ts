@@ -14,7 +14,7 @@ import { RidePopup } from '../../shared/ride-popup';
 })
 export class NavbarComponent {
   // Can be changed manually to test: 'guest', 'user', 'admin'
-  userType: 'guest' | 'user' | 'driver' |'admin' = 'guest';
+  userType: 'guest' | 'user' | 'driver' |'admin' = 'driver';
 
   inDrive: boolean = false;
 

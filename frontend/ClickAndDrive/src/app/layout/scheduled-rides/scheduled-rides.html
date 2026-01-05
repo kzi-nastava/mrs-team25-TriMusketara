@@ -1,0 +1,121 @@
+<div class="scheduled-rides">
+  <div class="content-wrapper">
+    
+    <!-- Higher section: Title and Filters -->
+    <div class="header-section">
+      <h1 class="scheduled-rides-title">Scheduled Rides</h1>
+      <div class="filters">
+        <div class="search-container">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search" class="figma-input">
+        </div>
+        <div class="sort-container">
+          <label>Sort by : </label>
+          <select class="figma-select">
+            <option>Newest</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+      <table class="figma-table">
+        <thead>
+          <tr>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Time</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>Choose</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- Example of a row from Figma -->
+          <tr>
+            <td>Bulevar oslobođenja 45</td>
+            <td>Cara Dušana 12</td>
+            <td>15:34</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><button class="btn-begin">Begin ride</button></td>
+            <td><button class="btn-cancel">Cancel ride</button></td>
+          </tr>
+          <!-- Example of a cancelled drive -->
+          <tr>
+            <td>Narodnih heroja 27</td>
+            <td>Dunavska 3</td>
+            <td>15:35</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><button class="btn-begin">Begin ride</button></td>
+            <td><button class="btn-cancel">Cancel ride</button></td>
+          </tr>
+          <!-- More example rows -->
+        <tr>
+            <td>Ive Lole Ribara 89</td>
+            <td>Kej Skojevaca 10</td>
+            <td>15:43</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><button class="btn-begin">Begin ride</button></td>
+            <td><button class="btn-cancel">Cancel ride</button></td>
+          </tr>
+        <tr>
+            <td>Bulevar Mihajla Pupina 22</td>
+            <td>Cankareva 5</td>
+            <td>15:47</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><button class="btn-begin">Begin ride</button></td>
+            <td><button class="btn-cancel">Cancel ride</button></td>
+          </tr>
+        <tr>
+            <td>Čika Stevina 33</td>
+            <td>Hadži Đerina 56</td>
+            <td>16:00</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><button class="btn-begin">Begin ride</button></td>
+            <td><button class="btn-cancel">Cancel ride</button></td>
+          </tr>
+        <tr>
+            <td>Futoška 78</td>
+            <td>Bulevar cara Lazara 96</td>
+            <td>16:32</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><button class="btn-begin">Begin ride</button></td>
+            <td><button class="btn-cancel">Cancel ride</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-footer">
+      <p class="data-info">Showing data 1 to 6 rides</p>
+      <div class="pagination-controls">
+        <button class="page-arrow">&lt;</button>
+        <button class="page-num active">1</button>
+        <button class="page-num">2</button>
+        <button class="page-num">3</button>
+        <button class="page-num">4</button>
+        <span class="dots">...</span>
+        <button class="page-num">40</button>
+        <button class="page-arrow">&gt;</button>
+      </div>
+    </div>
+
+  </div>
+</div>
