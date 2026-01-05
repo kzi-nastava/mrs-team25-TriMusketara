@@ -103,32 +103,30 @@ public class ProfileFragment extends Fragment {
 
         switch(userType) {
             case SessionManager.USER:
-                addButton("Favorite routes", () -> {});
-                addButton("Ride history",  () -> {});
-                addButton("Reports",  () -> {});
-                addButton("Notes", () -> {});
-                addButton("Support", () -> {});
-                addButton("Log out",  () -> {});
+                addButton("Favorite routes", R.drawable.heart ,() -> {});
+                addButton("Ride history", R.drawable.history  ,() -> {});
+                addButton("Reports", R.drawable.report,  () -> {});
+                addButton("Notes", R.drawable.notes, () -> {});
+                addButton("Support", R.drawable.support, () -> {});
+                addButton("Log out", R.drawable.logout,  () -> {});
                 break;
 
             case SessionManager.DRIVER:
-                addButton("Scheduled rides",  () -> {});
-                addButton("Ride history",  () -> openDriverHistoryFragment());
-                addButton("Reports",  () -> {});
-                addButton("Notes", () -> {});
-                addButton("Support",  () -> {});
-                addButton("Log out", () -> {});
+                addButton("Ride history", R.drawable.history,  () -> openDriverHistoryFragment());
+                addButton("Reports", R.drawable.report,  () -> {});
+                addButton("Notes", R.drawable.notes, () -> {});
+                addButton("Support", R.drawable.support, () -> {});
+                addButton("Log out", R.drawable.logout, () -> {});
                 break;
 
             case SessionManager.ADMIN:
-                addButton("Check current rides", () -> {});
-                addButton("Change prices", () -> {});
-                addButton("Ride history", () -> {});
-                addButton("Requests",  () -> {});
-                addButton("Support",  () -> {});
-                addButton("Reports",  () -> {});
-                addButton("Notes",  () -> {});
-                addButton("Log out",  () -> {});
+                addButton("Check current rides", 0, () -> {});
+                addButton("Change prices", R.drawable.price, () -> {});
+                addButton("Ride history", R.drawable.history, () -> {});
+                addButton("Requests", 0,  () -> {});
+                addButton("Reports", R.drawable.report,  () -> {});
+                addButton("Notes", R.drawable.notes,  () -> {});
+                addButton("Log out", R.drawable.logout,  () -> {});
                 break;
         }
     }
@@ -160,9 +158,16 @@ public class ProfileFragment extends Fragment {
         containerApplicationButtons.addView(createDivider());
     }*/
 
-    private void addButton(String text, Runnable action) {
+    private void addButton(String text, int iconRes, Runnable action) {
         MaterialButton button = new MaterialButton(new ContextThemeWrapper(getContext(), R.style.ProfileActionButton), null, 0);
         button.setText(text);
+
+        // If button has icon, display it
+        if (iconRes != 0) {
+            button.setIcon(ContextCompat.getDrawable(getContext(), iconRes));
+            button.setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_START);
+            button.setIconPadding(16);
+        }
 
         button.setOnClickListener(v -> action.run());
         containerApplicationButtons.addView(button);
