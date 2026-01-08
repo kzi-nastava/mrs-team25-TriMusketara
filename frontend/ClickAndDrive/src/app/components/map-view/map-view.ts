@@ -1,29 +1,18 @@
-import { Component, signal, AfterViewInit } from '@angular/core';
-import { RidePopup } from '../../shared/ride-popup';
+import { Component, AfterViewInit, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 declare var mapboxgl: any;
 
 @Component({
   selector: 'app-map-view',
   standalone: true,
-  imports: [], 
+  imports: [CommonModule],
   templateUrl: './map-view.html',
   styleUrl: './map-view.css',
 })
 export class MapViewComponent implements AfterViewInit {
-  constructor(public ridePopup: RidePopup) {}
 
-  showRideData = signal(false);
-
-  onShowRoute() {
-    this.showRideData.set(true);
-    this.ridePopup.close();
-  }
-
-  onOverlayClick() {
-    this.showRideData.set(false);
-    this.ridePopup.close();
-  }
+  @Input() size: 'large' | 'small' = 'large';
 
   ngAfterViewInit() {
     mapboxgl.accessToken = 'pk.eyJ1IjoicmliaWNuaWtvbGEiLCJhIjoiY21qbTJvNHFlMmV6OTNncXhpOGNiaTVnayJ9.Bhzo0Euk2D923K3smmoVaQ';

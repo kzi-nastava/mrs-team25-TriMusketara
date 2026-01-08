@@ -91,7 +91,7 @@
     cursor: pointer;
     width: 130px;
     font-weight: 500;
-    transition: .2s;
+    transition: .3s;
 }
 
 .btn-begin {
@@ -142,3 +142,79 @@
 }
 
 .dots { color: #E7E7E7; }
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 1000;
+}
+
+.overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #242423;
+  color: white;
+  border-radius: 10px;
+  width: 350px;
+  height: 200px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.popup.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.popup p {
+  margin: 0;
+  text-align: center;
+  font-size: 20px;
+}
+
+.btn-cancel-popup {
+  padding: 12px 25px;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  background-color: #F55C5C;
+  color: white;
+  transition: .3s;
+}
+
+.btn-cancel-popup:hover {
+  background-color: #f55c5ccd;
+}
+
+.popup textarea {
+    width: 75%;
+    resize: none;
+    background-color: #A7A7A7;
+    outline: none;
+    border: none;
+}
+
+.form-group {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-around;
+}

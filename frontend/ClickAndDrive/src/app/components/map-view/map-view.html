@@ -1,27 +1,4 @@
-<div class="map-rectangle" id="map">
-    <!-- Inside this div we will later add other elements -->
-    <div class="ride-data" [class.visible]="showRideData()">
-        <p><span class="w-clr">Driver</span> arrival: <span class="driver-arrival-data">6 minutes</span></p>
-        <p>Estimated <span class="w-clr">time</span>: <span class="estimated-time-data">20 minutes</span></p>
-  </div>
+<div class="map-rectangle" id="map" [ngClass]="size">
+  <!-- Inside this div we will later add other elements -->
+  <ng-content></ng-content>
 </div>
-
-<div class="overlay" [class.open]="ridePopup.isOpen()" (click)="onOverlayClick()"></div>
-
-<!-- POPUP -->
-@if (ridePopup.isOpen()) {
-  <form class="popup" [class.open]="ridePopup.isOpen()" (click)="$event.stopPropagation()">
-    <p>Ride data</p>
-
-    <div class="form-group">
-        <label for="origin">Origin:</label>
-        <input name="origin" type="text">
-    </div>
-    <div class="form-group">
-        <label for="destination">Destination:</label>
-        <input name="destination" type="text">
-    </div>
-
-    <button type="button" class="route-btn" (click)="onShowRoute()">Show route & ETA</button>
-  </form>
-}

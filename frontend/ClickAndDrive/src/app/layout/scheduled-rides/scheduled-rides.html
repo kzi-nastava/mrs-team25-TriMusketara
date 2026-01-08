@@ -43,8 +43,8 @@
             <td></td>
             <td></td>
             <td></td>
-            <td><button class="btn-begin">Begin ride</button></td>
-            <td><button class="btn-cancel">Cancel ride</button></td>
+            <td><button class="btn-begin" (click)="onStartClick()">Begin ride</button></td>
+            <td><button class="btn-cancel" (click)="openPopup()">Cancel ride</button></td>
           </tr>
           <!-- Example of a cancelled drive -->
           <tr>
@@ -54,8 +54,8 @@
             <td></td>
             <td></td>
             <td></td>
-            <td><button class="btn-begin">Begin ride</button></td>
-            <td><button class="btn-cancel">Cancel ride</button></td>
+            <td><button class="btn-begin" (click)="onStartClick()">Begin ride</button></td>
+            <td><button class="btn-cancel" (click)="openPopup()">Cancel ride</button></td>
           </tr>
           <!-- More example rows -->
         <tr>
@@ -65,8 +65,8 @@
             <td></td>
             <td></td>
             <td></td>
-            <td><button class="btn-begin">Begin ride</button></td>
-            <td><button class="btn-cancel">Cancel ride</button></td>
+            <td><button class="btn-begin" (click)="onStartClick()">Begin ride</button></td>
+            <td><button class="btn-cancel" (click)="openPopup()">Cancel ride</button></td>
           </tr>
         <tr>
             <td>Bulevar Mihajla Pupina 22</td>
@@ -75,8 +75,8 @@
             <td></td>
             <td></td>
             <td></td>
-            <td><button class="btn-begin">Begin ride</button></td>
-            <td><button class="btn-cancel">Cancel ride</button></td>
+            <td><button class="btn-begin" (click)="onStartClick()">Begin ride</button></td>
+            <td><button class="btn-cancel" (click)="openPopup()">Cancel ride</button></td>
           </tr>
         <tr>
             <td>Čika Stevina 33</td>
@@ -85,8 +85,8 @@
             <td></td>
             <td></td>
             <td></td>
-            <td><button class="btn-begin">Begin ride</button></td>
-            <td><button class="btn-cancel">Cancel ride</button></td>
+            <td><button class="btn-begin" (click)="onStartClick()">Begin ride</button></td>
+            <td><button class="btn-cancel" (click)="openPopup()">Cancel ride</button></td>
           </tr>
         <tr>
             <td>Futoška 78</td>
@@ -95,8 +95,8 @@
             <td></td>
             <td></td>
             <td></td>
-            <td><button class="btn-begin">Begin ride</button></td>
-            <td><button class="btn-cancel">Cancel ride</button></td>
+            <td><button class="btn-begin" (click)="onStartClick()">Begin ride</button></td>
+            <td><button class="btn-cancel" (click)="openPopup()">Cancel ride</button></td>
           </tr>
         </tbody>
       </table>
@@ -119,3 +119,20 @@
 
   </div>
 </div>
+
+<!-- Overlay -->
+<div class="overlay" [class.open]="ridePopup.isOpen()" (click)="ridePopup.close()"></div>
+
+<!-- Cancel popup -->
+@if (ridePopup.isOpen()) {
+  <form class="popup" [class.open]="ridePopup.isOpen()" (click)="$event.stopPropagation()">
+    <p>Cancel ride</p>
+
+    <div class="form-group">
+      <label for="reason">Reason: </label>
+      <textarea name="reason" id=""></textarea>
+    </div>
+    
+    <button type="button" class="btn-cancel-popup" (click)="ridePopup.close()">Cancel ride</button>
+  </form>
+}
