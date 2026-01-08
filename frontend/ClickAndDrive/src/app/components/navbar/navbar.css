@@ -75,6 +75,7 @@ button {
     color: rgba(36, 36, 35, 0.75);
     font-weight: 600;
     transition: .3s;
+    width: 160px;
 }
 
 .center {
@@ -105,7 +106,7 @@ button {
     background: #F55C5C;
     color: white;
     font-weight: 800; /* Figma requires 800 for admin */
-    transition: .2s;
+    transition: .3s;
 }
 
 /* User Red Button (Normal) */
@@ -114,7 +115,7 @@ button {
     background: #F55C5C;
     color: white;
     font-weight: 800;
-    transition: .2s;
+    transition: .3s;
 }
 
 .btn-red-wide:hover {
