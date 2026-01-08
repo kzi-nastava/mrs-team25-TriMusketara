@@ -1,4 +1,4 @@
-TriMusketara's project repository for subject Metodologije razvoja softvera.
+TriMusketara's project repository.
 
 Topić Lazar SV62-2023,
 Maksimović Pavle SV58-2023,
