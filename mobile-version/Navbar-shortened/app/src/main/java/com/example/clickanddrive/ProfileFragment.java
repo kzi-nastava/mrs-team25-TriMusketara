@@ -120,6 +120,7 @@ public class ProfileFragment extends Fragment {
                 break;
 
             case SessionManager.ADMIN:
+                addButton("Register new driver", 0, () -> openDriverRegistrationFragment());
                 addButton("Check current rides", 0, () -> {});
                 addButton("Change prices", R.drawable.price, () -> {});
                 addButton("Ride history", R.drawable.history, () -> {});
@@ -181,5 +182,11 @@ public class ProfileFragment extends Fragment {
                 .replace(R.id.flFragment, historyFragment)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    private void openDriverRegistrationFragment() {
+        DriverRegistrationFragment fragment = new DriverRegistrationFragment();
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction().replace(R.id.flFragment, fragment).addToBackStack(null).commit();
     }
 }
