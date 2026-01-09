@@ -23,6 +23,9 @@ public class DriverHistorySampleDTO {
     }
 
     // Getters
+    public LocalDateTime getStartTime(){
+        return startTime;
+    }
     public String getFormattedDate() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm");
         return startTime.format(formatter);
