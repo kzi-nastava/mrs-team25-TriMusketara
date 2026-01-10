@@ -1,4 +1,4 @@
-package com.example.clickanddrive;
+package com.example.clickanddrive.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.example.clickanddrive.R;
 import com.example.clickanddrive.dtosample.DriverHistorySampleDTO;
 
 import java.util.List;

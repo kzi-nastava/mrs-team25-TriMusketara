@@ -103,7 +103,7 @@ public class ProfileFragment extends Fragment {
 
         switch(userType) {
             case SessionManager.USER:
-                addButton("Favorite routes", R.drawable.heart ,() -> {});
+                addButton("Favorite routes", R.drawable.heart ,() -> openFavoriteRoutesFragment());
                 addButton("Ride history", R.drawable.history  ,() -> {});
                 addButton("Reports", R.drawable.report,  () -> {});
                 addButton("Notes", R.drawable.notes, () -> {});
@@ -186,6 +186,12 @@ public class ProfileFragment extends Fragment {
 
     private void openDriverRegistrationFragment() {
         DriverRegistrationFragment fragment = new DriverRegistrationFragment();
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction().replace(R.id.flFragment, fragment).addToBackStack(null).commit();
+    }
+
+    private void openFavoriteRoutesFragment() {
+        FavoriteRoutesFragment fragment = new FavoriteRoutesFragment();
         requireActivity().getSupportFragmentManager()
                 .beginTransaction().replace(R.id.flFragment, fragment).addToBackStack(null).commit();
     }
