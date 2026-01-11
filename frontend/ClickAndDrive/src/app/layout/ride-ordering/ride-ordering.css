@@ -1,0 +1,115 @@
+:host {
+    all: unset;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+}
+
+.container {
+    width: 28vw;
+    height: 85vh;
+    background-color: #242423;
+   /* border: 1px solid pink; */
+    padding: .7% 6%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border-radius: 10px;
+}
+
+.title-container {
+    width: 100%;
+    height: 10%;
+    /* border: 4px solid green; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.title-container p {
+    color: white;
+    font-size: 22px;
+    font-style: italic;
+}
+
+.form-container {
+    width: 100%;
+    height: 80%;
+    /* border: 4px solid red; */
+}
+
+.form-container form {
+    height: 100%; /* calc() */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+}
+
+.form-row {
+    /* border: 1px solid cyan; */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    height: 10%;
+    width: 100%;
+}
+
+.form-row label {
+    width: 45%;
+    margin-left: 8%;
+    text-align: left;
+    font-size: 20px;
+    color: white;
+    /*border: 1px solid red; */
+}
+
+.form-row input {
+    height: 60%;
+    width: 35%;
+    margin-right: 8%;
+    background-color: #A7A7A7;
+}
+
+.form-row select {
+    height: 60%;
+    width: 35%;
+    margin-right: 8%;
+    background-color: #A7A7A7;
+}
+
+.button-container {
+    width: 100%;
+    height: 10%;
+    /* border: 4px solid orange; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.button-container button {
+    width: 50%;
+    font-size: 16px;
+    padding: 12px;
+    border-radius: 30px;
+    border: none;
+    font-weight: 500;
+    background-color: #F5CB5C;
+    cursor: pointer;
+    display: block;
+    margin: 16px auto;
+    color: #242423;
+    transition: none;
+    transition: .3s;
+}
+
+.button-container button:hover {
+    background-color: #f5cc5cc2;
+  }

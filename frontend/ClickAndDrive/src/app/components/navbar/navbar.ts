@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet, ActivatedRoute } from '@angular/router';
 import { PassengerProfile } from '../../layout/passenger-profile/passenger-profile'
 import { DriverProfile } from '../../layout/driver-profile/driver-profile';
 import { AdminProfile } from '../../layout/admin-profile/admin-profile';
@@ -14,7 +14,7 @@ import { RidePopup } from '../../shared/ride-popup';
 })
 export class NavbarComponent {
   // Can be changed manually to test: 'guest', 'user', 'admin'
-  userType: 'guest' | 'user' | 'driver' |'admin' = 'driver';
+  userType: 'guest' | 'user' | 'driver' |'admin' = 'user';
 
   inDrive: boolean = false;
 
@@ -25,7 +25,8 @@ export class NavbarComponent {
 
   constructor(
     private router: Router,
-    private ridePopup: RidePopup
+    private ridePopup: RidePopup,
+    private route: ActivatedRoute
   ) {}
 
   onProfileClick() {
@@ -49,5 +50,10 @@ export class NavbarComponent {
 
   openPopup() {
     this.ridePopup.open();
+  }
+
+  // Order route navigation
+  orderRideClick() {
+    this.router.navigate(['/map/order-ride']);
   }
 }

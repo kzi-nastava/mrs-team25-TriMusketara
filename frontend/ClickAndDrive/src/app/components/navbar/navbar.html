@@ -39,7 +39,7 @@
     <!-- REGISTERED USER NAVBAR -->
     @if (userType === 'user') {
       @if (!inDrive) {
-        <button class="btn-white">Let's Ride!</button>
+        <button class="btn-white" (click)="orderRideClick()">Let's Ride!</button>
       }
       @if (inDrive) {
         <button class="btn-red">PANIC</button>

@@ -1,0 +1,39 @@
+<div class="container">
+
+    <div class="title-container">
+        <p>Ride data</p>
+    </div>
+
+    <div class="form-container">
+        <form action="">
+            @for (field of fields; track field.label) {
+                <div class="form-row">
+                    <label [for]="field.label">{{field.text}}</label>
+
+                    <!-- Select field is needed for dropdown when inputting the vehicles type -->
+                    @if (field.type === 'select') {
+                        <select [id]="field.label" [name]="field.label">
+                            @for (option of field.options; track option) {
+                                <option [value]="option">{{option}}</option>
+                            }
+                        </select>
+                    <!-- Otherwise, use regular input field -->
+                    } @else {
+                        <input
+                        [id]="field.label"
+                        [name]="field.label"
+                        [type]="field.type"
+                        [placeholder]="field.placeholder"
+
+                    />
+                    }
+                </div>
+            }
+        </form>
+    </div>
+
+    <div class="button-container">
+        <button>Show Route & ETA</button>
+    </div>
+
+</div>
