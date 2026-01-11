@@ -1,0 +1,142 @@
+.page-wrapper {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    /* border: 4px solid red; */
+    background-image: linear-gradient(rgba(245, 203, 92, 0.25), rgba(245, 203, 92, 0.25)), url(../../../../public/driver-registration-background.jpg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.title-container {
+    width: 100%;
+    height: 15%;
+    display: flex;
+    align-items: center;
+    /* border: 4px solid green; */
+}
+
+.title {
+    color: white;
+    font-size: 47px;
+    text-decoration: underline;
+    margin: 2% 0 0 8%
+}
+
+.form-container {
+    height: 75%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 12%;
+    /*border: 4px solid purple; */
+}
+
+.driver-info {
+    height: 90%;
+    width: 40%;
+    border-radius: 5%;
+    background-color: rgba(36, 36, 35 , 0.85);
+    /* border: 4px solid orange; */
+}
+
+.vehicle-info {
+    height: 90%;
+    width: 40%;
+    border-radius: 5%;
+    background-color: rgba(36, 36, 35, 0.85);
+    /* border: 4px solid blue; */
+}
+
+.driver-info p,
+.vehicle-info p {
+    color:white;
+    text-align: center;
+    font-size: 28px;
+    margin: 20px 0;
+    font-style: italic;
+    padding-top: 20px;
+    margin-bottom: 0;
+}
+
+.form-container form {
+    height: calc(100% - 100px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+}
+
+.form-row {
+    /*border: 1px solid cyan; */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    height: 10%;
+    width: 100%;
+}
+
+.form-row label {
+    width: 45%;
+    margin-left: 8%;
+    text-align: left;
+    font-size: 24px;
+    color: white;
+    /*border: 1px solid red; */
+}
+
+.form-row input {
+    height: 70%;
+    width: 40%;
+    margin-right: 8%;
+    background-color: #A7A7A7;
+}
+
+.form-row select {
+    height: 70%;
+    width: 40%;
+    margin-right: 8%;
+    background-color: #A7A7A7;
+}
+
+.buttons-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 23px;
+    width: 100%;
+    height: 10%;
+    /*border: 4px solid black; */
+}
+
+.buttons-container button {
+    height: 60%;
+    width: 10%;
+    font-size: 18px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-bottom: 2%;
+}
+
+.cancel-driver-registration {
+    background-color: #F55C5C;
+    color: #242423;
+}
+
+.register-driver {
+    margin-right: 5%;
+    background-color: #5CF56A;
+}
+
+.cancel-.cancel-driver-registration {
+    background-color: #f55c5cbc;
+}
+
+.register-driver:hover {
+    background-color: #5cf569b8;
+}

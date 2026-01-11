@@ -1,0 +1,57 @@
+<div class="page-wrapper">
+    <div class="title-container">
+        <p class="title">Driver registration</p>
+    </div>
+    <div class="form-container">
+        <div class="driver-info">
+            <p>Driver info</p>
+            <form class="driver-form" action="">
+                @for (field of driverFields; track field.label) {
+                    <div class="form-row">
+                        <label [for]="field.label">{{field.text}}</label>
+                        <input
+                            [id]="field.label"
+                            [name]="field.label"
+                            [type]="field.type"
+                            [placeholder]="field.placeholder"
+                        />
+                    </div>
+                }
+            </form>
+        </div>
+
+        <div class="vehicle-info">
+            <p>Vehicle info</p>
+            <form class="vehicle-form" action="">
+                @for (field of vehicleFields; track field.label) {
+                    <div class="form-row">
+                        <label [for]="field.label">{{field.text}}</label>
+
+                        <!-- Select field is needed for dropdown when reigstering the vehicles type -->
+                        @if (field.type === 'select') {
+                            <select [id]="field.label" [name]="field.label">
+                                @for (option of field.options; track option) {
+                                    <option [value]="option">{{option}}</option>
+                                }
+                            </select>
+                        <!-- Otherwise, use regular input field -->
+                        } @else {
+                            <input
+                            [id]="field.label"
+                            [name]="field.label"
+                            [type]="field.type"
+                            [placeholder]="field.placeholder"
+                            [min]="field.min"
+                            [max]="field.max"
+                        />
+                        }
+                    </div>
+                }
+            </form>
+        </div>
+    </div>
+    <div class="buttons-container">
+        <button class="cancel-driver-registration">Cancel</button>
+        <button class="register-driver">Register !</button>
+    </div>
+</div>
