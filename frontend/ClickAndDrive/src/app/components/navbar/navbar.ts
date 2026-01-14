@@ -4,6 +4,7 @@ import { PassengerProfile } from '../../layout/passenger-profile/passenger-profi
 import { DriverProfile } from '../../layout/driver-profile/driver-profile';
 import { AdminProfile } from '../../layout/admin-profile/admin-profile';
 import { RidePopup } from '../../shared/ride-popup';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -13,25 +14,19 @@ import { RidePopup } from '../../shared/ride-popup';
   imports: [PassengerProfile, DriverProfile, AdminProfile, RouterOutlet] // <-- RouterModule dodan
 })
 export class NavbarComponent {
-  // Can be changed manually to test: 'guest', 'user', 'admin'
-  userType: 'guest' | 'user' | 'driver' |'admin' = 'user';
-
-  inDrive: boolean = false;
-
-  userName = signal('TriMusketara');
-
   // Flag to show profile sidebar
   showSidebar = false;
 
   constructor(
     private router: Router,
     private ridePopup: RidePopup,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    public auth: AuthService // public so you have it in HTML
   ) {}
 
   onProfileClick() {
     this.showSidebar = !this.showSidebar;
-    console.log('Opening user profile:', this.userName());
+    console.log('Opening user profile:', this.auth.userName());
   }
 
   onLoginClick() {
@@ -54,6 +49,6 @@ export class NavbarComponent {
 
   // Order route navigation
   orderRideClick() {
-    this.router.navigate(['/map/order-ride']);
+    this.ridePopup.open();
   }
 }

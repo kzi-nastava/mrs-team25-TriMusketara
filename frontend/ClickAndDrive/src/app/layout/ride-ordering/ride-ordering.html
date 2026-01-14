@@ -12,7 +12,9 @@
 
                     <!-- Select field is needed for dropdown when inputting the vehicles type -->
                     @if (field.type === 'select') {
-                        <select [id]="field.label" [name]="field.label">
+                        <select [id]="field.label" 
+                                [name]="field.label"
+                                [class.invalid]="isFieldInvalid(field.label)">
                             @for (option of field.options; track option) {
                                 <option [value]="option">{{option}}</option>
                             }
@@ -24,7 +26,7 @@
                         [name]="field.label"
                         [type]="field.type"
                         [placeholder]="field.placeholder"
-
+                        [class.invalid]="isFieldInvalid(field.label)"
                     />
                     }
                 </div>
@@ -33,7 +35,7 @@
     </div>
 
     <div class="button-container">
-        <button>Show Route & ETA</button>
+        <button class="finish-ride-ordering" (click)="onFinishOrder()">Show Route & ETA</button>
     </div>
 
 </div>

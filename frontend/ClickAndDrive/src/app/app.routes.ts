@@ -7,12 +7,11 @@ import { RegistrationPage } from './layout/registration-page/registration-page';
 import { ScheduledRides } from './layout/scheduled-rides/scheduled-rides';
 import { DriveInProgress } from './layout/drive-in-progress/drive-in-progress';
 import { MainPageComponent } from './main-page/main-page';
-import { RideOrdering } from './layout/ride-ordering/ride-ordering';
 
 
 export const routes: Routes = [
   { path: '', redirectTo: 'map', pathMatch: 'full' },
-  { path: 'map', component: MainPageComponent, children: [{path: 'order-ride', component: RideOrdering}] },
+  { path: 'map', component: MainPageComponent},
   { path: 'change-information-page',component: ChangeInfoPage },
   { path: 'driver-history', component: DriverHistory },
   { path: 'scheduled-rides', component: ScheduledRides },
@@ -22,5 +21,5 @@ export const routes: Routes = [
   { path: 'support', component: MapViewComponent },
   { path: 'login', component: LoginPage },
   { path: 'register', component: RegistrationPage },
-  { path: 'drive-in-progress', component: DriveInProgress }
+  { path: 'drive-in-progress', component: DriveInProgress },
 ];
