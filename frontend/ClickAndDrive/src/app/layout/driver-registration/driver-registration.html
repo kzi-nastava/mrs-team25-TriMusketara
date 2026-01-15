@@ -14,6 +14,7 @@
                             [name]="field.label"
                             [type]="field.type"
                             [placeholder]="field.placeholder"
+                            [class.invalid]="isFieldInvalid(field.label)"
                         />
                     </div>
                 }
@@ -29,7 +30,10 @@
 
                         <!-- Select field is needed for dropdown when reigstering the vehicles type -->
                         @if (field.type === 'select') {
-                            <select [id]="field.label" [name]="field.label">
+                            <select [id]="field.label" 
+                                    [name]="field.label"
+                                    [class.invalid]="isFieldInvalid(field.label)"
+                            >
                                 @for (option of field.options; track option) {
                                     <option [value]="option">{{option}}</option>
                                 }
@@ -43,6 +47,7 @@
                             [placeholder]="field.placeholder"
                             [min]="field.min"
                             [max]="field.max"
+                            [class.invalid]="isFieldInvalid(field.label)"
                         />
                         }
                     </div>
@@ -51,7 +56,7 @@
         </div>
     </div>
     <div class="buttons-container">
-        <button class="cancel-driver-registration">Cancel</button>
-        <button class="register-driver">Register !</button>
+        <button class="cancel-driver-registration" (click)="closeRegistrationForm()">Cancel</button>
+        <button class="register-driver" (click)="registerDriver()">Register !</button>
     </div>
 </div>

@@ -38,7 +38,7 @@
     height: 90%;
     width: 40%;
     border-radius: 5%;
-    background-color: rgba(36, 36, 35 , 0.85);
+    background-color: rgba(36, 36, 35 , 0.9);
     /* border: 4px solid orange; */
 }
 
@@ -46,7 +46,7 @@
     height: 90%;
     width: 40%;
     border-radius: 5%;
-    background-color: rgba(36, 36, 35, 0.85);
+    background-color: rgba(36, 36, 35, 0.9);
     /* border: 4px solid blue; */
 }
 
@@ -98,8 +98,9 @@
 .form-row select {
     height: 70%;
     width: 40%;
-    margin-right: 8%;
+    margin-right: 8.5%;
     background-color: #A7A7A7;
+    /* border: 1px solid orange; */
 }
 
 .buttons-container {
@@ -139,4 +140,8 @@
 
 .register-driver:hover {
     background-color: #5cf569b8;
+}
+
+.invalid {
+    border: 2px solid red !important;
 }

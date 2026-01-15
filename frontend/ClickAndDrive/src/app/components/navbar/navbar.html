@@ -61,14 +61,14 @@
 </nav>
 
 <!-- Profile sidebars -->
-@if (showSidebar && userType === 'user') {
+@if (profileSidebar.isOpen() && userType === 'user') {
   <app-passenger-profile></app-passenger-profile>
 }
 
-@if (showSidebar && userType === 'driver') {
+@if (profileSidebar.isOpen() && userType === 'driver') {
   <app-driver-profile></app-driver-profile>
 }
 
-@if (showSidebar && userType === 'admin') {
+@if (profileSidebar.isOpen() && userType === 'admin') {
   <app-admin-profile></app-admin-profile>
 }

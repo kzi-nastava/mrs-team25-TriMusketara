@@ -4,6 +4,7 @@ import { PassengerProfile } from '../../layout/passenger-profile/passenger-profi
 import { DriverProfile } from '../../layout/driver-profile/driver-profile';
 import { AdminProfile } from '../../layout/admin-profile/admin-profile';
 import { RidePopup } from '../../shared/ride-popup';
+import { ProfileSidebarService } from '../../services/profile-sidebar.service';
 
 @Component({
   selector: 'app-navbar',
@@ -14,23 +15,20 @@ import { RidePopup } from '../../shared/ride-popup';
 })
 export class NavbarComponent {
   // Can be changed manually to test: 'guest', 'user', 'admin'
-  userType: 'guest' | 'user' | 'driver' |'admin' = 'guest';
+  userType: 'guest' | 'user' | 'driver' |'admin' = 'admin';
 
   inDrive: boolean = false;
 
   userName = signal('TriMusketara');
 
-  // Flag to show profile sidebar
-  showSidebar = false;
-
   constructor(
     private router: Router,
-    private ridePopup: RidePopup
+    private ridePopup: RidePopup,
+    public profileSidebar: ProfileSidebarService
   ) {}
 
   onProfileClick() {
-    this.showSidebar = !this.showSidebar;
-    console.log('Opening user profile:', this.userName());
+    this.profileSidebar.toggle();
   }
 
   onLoginClick() {
@@ -44,7 +42,7 @@ export class NavbarComponent {
   // Navigate to a specific route and close sidebar
   handleViewSelection(route: string) {
     this.router.navigate([route]);
-    this.showSidebar = false;
+    this.profileSidebar.close();
   }
 
   openPopup() {
