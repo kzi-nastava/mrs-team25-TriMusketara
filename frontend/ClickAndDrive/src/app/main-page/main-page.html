@@ -7,10 +7,14 @@
 
 </app-map-view>
 
+<router-outlet></router-outlet>
+
 <div class="overlay" [class.open]="ridePopup.isOpen()" (click)="onOverlayClick()"></div>
 
 <!-- POPUP -->
 @if (ridePopup.isOpen()) {
+  <!-- GUEST -->
+  @if (auth.userType() === 'guest') {
   <form class="popup" [class.open]="ridePopup.isOpen()" (click)="$event.stopPropagation()">
     <p>Ride data</p>
 
@@ -25,4 +29,13 @@
 
     <button type="button" class="route-btn" (click)="onShowRoute()">Show route & ETA</button>
   </form>
+}
+
+<!-- Pop-up ride ordering form for registered user -->
+<!-- REGISTERED USER -->
+@if (auth.userType() === 'user') {
+  <div class="ride-overlay" (click)="ridePopup.close()">
+    <app-ride-ordering (click)="$event.stopPropagation()"></app-ride-ordering>
+  </div>
+  }
 }

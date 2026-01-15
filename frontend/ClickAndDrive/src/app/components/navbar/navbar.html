@@ -9,10 +9,10 @@
 
   <!-- CENTER: Welcome message  -->
   <div class="nav-center">
-    @if (userType !== 'guest') {
-      <span class="welcome-text">Hi, {{ userName() }}</span>
+    @if (auth.userType() !== 'guest') {
+      <span class="welcome-text">Hi, {{ auth.userName() }}</span>
     }
-    @if (userType == 'guest'){
+    @if (auth.userType() == 'guest'){
       <button class="btn-white center" (click)="openPopup()">Let's Ride!</button>
     }
   </div>
@@ -21,14 +21,14 @@
   <div class="nav-right">
     
     <!-- GUEST NAVBAR -->
-    @if (userType === 'guest') {
+    @if (auth.userType() === 'guest') {
       <button class="btn-yellow" (click)="onLoginClick()">Log in</button>
       <button class="btn-yellow" (click)="onRegisterClick()">Register</button>
     }
 
     <!-- DRIVER NAVBAR -->
-    @if (userType === 'driver') {
-      @if (inDrive) {
+    @if (auth.userType() === 'driver') {
+      @if (auth.inDrive()) {
         <button class="btn-red">PANIC</button>
       }
       <button class="user-circle-btn" (click)="onProfileClick()">
@@ -37,11 +37,11 @@
     }
 
     <!-- REGISTERED USER NAVBAR -->
-    @if (userType === 'user') {
-      @if (!inDrive) {
-        <button class="btn-white">Let's Ride!</button>
+    @if (auth.userType() === 'user') {
+      @if (!auth.inDrive()) {
+        <button class="btn-white" (click)="orderRideClick()">Let's Ride!</button>
       }
-      @if (inDrive) {
+      @if (auth.inDrive()) {
         <button class="btn-red">PANIC</button>
       }
       <button class="user-circle-btn" (click)="onProfileClick()">
@@ -50,7 +50,7 @@
     }
 
     <!-- ADMIN NAVBAR -->
-    @if (userType === 'admin') {
+    @if (auth.userType() === 'admin') {
       <button class="btn-red-wide">PANIC MESSAGES</button> 
       <button class="user-circle-btn" (click)="onProfileClick()">
         <img src="user-icon.png" alt="Profile">
@@ -61,14 +61,14 @@
 </nav>
 
 <!-- Profile sidebars -->
-@if (showSidebar && userType === 'user') {
+@if (showSidebar && auth.userType() === 'user') {
   <app-passenger-profile></app-passenger-profile>
 }
 
-@if (showSidebar && userType === 'driver') {
+@if (showSidebar && auth.userType() === 'driver') {
   <app-driver-profile></app-driver-profile>
 }
 
-@if (showSidebar && userType === 'admin') {
+@if (showSidebar && auth.userType() === 'admin') {
   <app-admin-profile></app-admin-profile>
 }

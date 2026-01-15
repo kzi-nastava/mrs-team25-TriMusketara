@@ -128,6 +128,15 @@
   pointer-events: auto;
 }
 
+.ride-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
 .btn-cancel {
   width: 130px;
   height: 35px;
@@ -145,3 +154,4 @@
 .btn-cancel:hover {
   background-color: #f55c5cd2;
 }
+

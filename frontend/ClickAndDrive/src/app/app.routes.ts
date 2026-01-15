@@ -11,7 +11,7 @@ import { MainPageComponent } from './main-page/main-page';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'map', pathMatch: 'full' },
-  { path: 'map', component: MainPageComponent },
+  { path: 'map', component: MainPageComponent},
   { path: 'change-information-page',component: ChangeInfoPage },
   { path: 'driver-history', component: DriverHistory },
   { path: 'scheduled-rides', component: ScheduledRides },
@@ -21,5 +21,5 @@ export const routes: Routes = [
   { path: 'support', component: MapViewComponent },
   { path: 'login', component: LoginPage },
   { path: 'register', component: RegistrationPage },
-  { path: 'drive-in-progress', component: DriveInProgress }
+  { path: 'drive-in-progress', component: DriveInProgress },
 ];
