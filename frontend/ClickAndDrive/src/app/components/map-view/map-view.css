@@ -24,3 +24,9 @@
 .map-rectangle.small {
   height: 92%;
 }
+
+.taxi-marker {
+  font-size: 100px;
+  text-align: center;
+  line-height: 1;
+}

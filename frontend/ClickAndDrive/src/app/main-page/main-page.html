@@ -1,8 +1,10 @@
-<app-map-view size="large">
+<app-map-view #mapView size="large" (etaCalculated)="onEtaReceived($event)">
   <div class="ride-data" [class.visible]="showRideData()">
     <p><span class="w-clr">Driver</span> arrival: <span class="driver-arrival-data">6 minutes</span></p>
-    <p>Estimated <span class="w-clr">time</span>: <span class="estimated-time-data">20 minutes</span></p>
+    <p>Estimated <span class="w-clr">time</span>: <span class="estimated-time-data">{{ etaMinutes !== null ? (etaMinutes + ' minutes') : '--' }}</span></p>
+    <button class="btn-cancel">Cancel ride</button>
   </div>
+
 </app-map-view>
 
 <router-outlet></router-outlet>
@@ -18,11 +20,11 @@
 
     <div class="form-group">
         <label for="origin">Origin:</label>
-        <input name="origin" type="text">
+        <input name="origin" type="text" [(ngModel)]="originAddress">
     </div>
     <div class="form-group">
         <label for="destination">Destination:</label>
-        <input name="destination" type="text">
+        <input name="destination" type="text" [(ngModel)]="destinationAddress">
     </div>
 
     <button type="button" class="route-btn" (click)="onShowRoute()">Show route & ETA</button>
