@@ -32,6 +32,8 @@
 <!-- Pop-up ride ordering form for registered user -->
 <!-- REGISTERED USER -->
 @if (auth.userType() === 'user') {
-  <app-ride-ordering (click)="$event.stopPropagation()"></app-ride-ordering>
+  <div class="ride-overlay" (click)="ridePopup.close()">
+    <app-ride-ordering (click)="$event.stopPropagation()"></app-ride-ordering>
+  </div>
   }
 }

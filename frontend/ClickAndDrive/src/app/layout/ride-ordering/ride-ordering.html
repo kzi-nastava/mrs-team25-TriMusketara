@@ -6,7 +6,34 @@
 
     <div class="form-container">
         <form action="">
-            @for (field of fields; track field.label) {
+            @for (field of topFields; track field.label) {
+                <div class="form-row">
+                    <label [for]="field.label">{{field.text}}</label>
+                        <input
+                        [id]="field.label"
+                        [name]="field.label"
+                        [type]="field.type"
+                        [placeholder]="field.placeholder"
+                        [class.invalid]="isFieldInvalid(field.label)"
+                    />
+                </div>
+            }
+
+            <div class="form-row">
+                <label>Additional stops:</label>
+                <button type="button" class="additions-btn" (click)="openStopsModal()">
+                  + Add stops
+                </button>
+             </div>
+              
+            <div class="form-row">
+                <label>Linked passengers:</label>
+                <button type="button" class="additions-btn" (click)="openPassengerModal()">
+                  + Add passengers
+                </button>
+            </div>
+              
+            @for (field of bottomFields; track field.label) {
                 <div class="form-row">
                     <label [for]="field.label">{{field.text}}</label>
 
@@ -32,6 +59,56 @@
                 </div>
             }
         </form>
+
+        @if (showStopsModal) {
+            <div class="modal-backdrop">
+              <div class="modal">
+                <p>Additional stops</p>
+          
+                @for (stop of additionalStops; track $index) {
+                  <div class="dynamic-row">
+                    <input [(ngModel)]="additionalStops[$index]" placeholder="Stop" />
+          
+                    @if ($index === 0) {
+                      <button (click)="addStop()">+</button>
+                    } @else {
+                      <button (click)="removeStop($index)">−</button>
+                    }
+                  </div>
+                }
+          
+                <div class="modal-actions">
+                  <button class="cancel-stops-addition-btn" (click)="closeStopsModal()">Cancel</button>
+                  <button class="save-stops-addition-btn" (click)="closeStopsModal()">Save</button>
+                </div>
+              </div>
+            </div>
+        }
+
+        @if (showPassengerModal) {
+            <div class="modal-backdrop">
+              <div class="modal">
+                <p>Link passengers</p>
+          
+                @for (stop of linkedPassengers; track $index) {
+                  <div class="dynamic-row">
+                    <input [(ngModel)]="linkedPassengers[$index]" placeholder="Email" />
+          
+                    @if ($index === 0) {
+                      <button (click)="addPassenger()">+</button>
+                    } @else {
+                      <button (click)="removePassenger($index)">−</button>
+                    }
+                  </div>
+                }
+          
+                <div class="modal-actions">
+                  <button class="cancel-linking-passengers-btn" (click)="closePassengerModal()">Cancel</button>
+                  <button class="save-linking-passengers-btn" (click)="closePassengerModal()">Save</button>
+                </div>
+              </div>
+            </div>
+        }
     </div>
 
     <div class="button-container">
