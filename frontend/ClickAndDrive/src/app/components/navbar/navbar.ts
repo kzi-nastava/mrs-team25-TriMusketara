@@ -15,8 +15,6 @@ import { AuthService } from '../../services/auth.service';
   imports: [PassengerProfile, DriverProfile, AdminProfile, RouterOutlet] // <-- RouterModule dodan
 })
 export class NavbarComponent {
-  // Flag to show profile sidebar
-  showSidebar = false;
 
   constructor(
     private router: Router,
@@ -27,8 +25,7 @@ export class NavbarComponent {
     ) {}
 
   onProfileClick() {
-    this.showSidebar = !this.showSidebar;
-    console.log('Opening user profile:', this.auth.userName());
+    this.profileSidebar.toggle();
   }
 
   onLoginClick() {
