@@ -60,14 +60,14 @@
   </div>
 </nav>
 
-@if (showSidebar && auth.userType() === 'user') {
+@if (profileSidebar.isOpen() && auth.userType() === 'user') {
   <app-passenger-profile></app-passenger-profile>
 }
 
-@if (showSidebar && auth.userType() === 'driver') {
+@if (profileSidebar.isOpen() && auth.userType() === 'driver') {
   <app-driver-profile></app-driver-profile>
 }
 
-@if (showSidebar && auth.userType() === 'admin') {
+@if (profileSidebar.isOpen() && auth.userType() === 'admin') {
   <app-admin-profile></app-admin-profile>
 }
