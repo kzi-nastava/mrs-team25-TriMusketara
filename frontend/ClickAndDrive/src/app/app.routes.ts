@@ -12,7 +12,7 @@ import { DriverRegistration } from './layout/driver-registration/driver-registra
 
 export const routes: Routes = [
   { path: '', redirectTo: 'map', pathMatch: 'full' },
-  { path: 'map', component: MainPageComponent },
+  { path: 'map', component: MainPageComponent},
   { path: 'change-information-page',component: ChangeInfoPage },
   { path: 'driver-history', component: DriverHistory },
   { path: 'scheduled-rides', component: ScheduledRides },
