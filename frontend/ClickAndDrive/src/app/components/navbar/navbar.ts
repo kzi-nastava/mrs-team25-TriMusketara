@@ -4,6 +4,7 @@ import { PassengerProfile } from '../../layout/passenger-profile/passenger-profi
 import { DriverProfile } from '../../layout/driver-profile/driver-profile';
 import { AdminProfile } from '../../layout/admin-profile/admin-profile';
 import { RidePopup } from '../../shared/ride-popup';
+import { ProfileSidebarService } from '../../services/profile-sidebar.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -20,9 +21,10 @@ export class NavbarComponent {
   constructor(
     private router: Router,
     private ridePopup: RidePopup,
+    public profileSidebar: ProfileSidebarService,
     private route: ActivatedRoute,
     public auth: AuthService // public so you have it in HTML
-  ) {}
+    ) {}
 
   onProfileClick() {
     this.showSidebar = !this.showSidebar;
@@ -40,7 +42,7 @@ export class NavbarComponent {
   // Navigate to a specific route and close sidebar
   handleViewSelection(route: string) {
     this.router.navigate([route]);
-    this.showSidebar = false;
+    this.profileSidebar.close();
   }
 
   openPopup() {

@@ -1,0 +1,64 @@
+<div class="page-wrapper">
+    <div class="title-container">
+        <p class="title">Driver registration</p>
+    </div>
+    <div class="form-container">
+        <div class="driver-info" [class.hidden]="showVehicleInfo">
+            <p>Driver info</p>
+            <form class="driver-form" action="">
+                @for (field of driverFields; track field.label) {
+                    <div class="form-row">
+                        <label [for]="field.label">{{field.text}}</label>
+                        <input
+                            [id]="field.label"
+                            [name]="field.label"
+                            [type]="field.type"
+                            [placeholder]="field.placeholder"
+                            [class.invalid]="isFieldInvalid(field.label)"
+                        />
+                    </div>
+                }
+            </form>
+            <button class="mobile-next" (click)="goNext()">Next</button>
+        </div>
+
+        <div class="vehicle-info" [class.hidden]="!showVehicleInfo">
+            <p>Vehicle info</p>
+            <form class="vehicle-form" action="">
+                @for (field of vehicleFields; track field.label) {
+                    <div class="form-row">
+                        <label [for]="field.label">{{field.text}}</label>
+
+                        <!-- Select field is needed for dropdown when reigstering the vehicles type -->
+                        @if (field.type === 'select') {
+                            <select [id]="field.label" 
+                                    [name]="field.label"
+                                    [class.invalid]="isFieldInvalid(field.label)"
+                            >
+                                @for (option of field.options; track option) {
+                                    <option [value]="option">{{option}}</option>
+                                }
+                            </select>
+                        <!-- Otherwise, use regular input field -->
+                        } @else {
+                            <input
+                            [id]="field.label"
+                            [name]="field.label"
+                            [type]="field.type"
+                            [placeholder]="field.placeholder"
+                            [min]="field.min"
+                            [max]="field.max"
+                            [class.invalid]="isFieldInvalid(field.label)"
+                        />
+                        }
+                    </div>
+                }
+            </form>
+            <button class="mobile-back" (click)="goBack()">Back</button>
+        </div>
+    </div>
+    <div class="buttons-container">
+        <button class="cancel-driver-registration" (click)="closeRegistrationForm()">Cancel</button>
+        <button class="register-driver" (click)="registerDriver()">Register !</button>
+    </div>
+</div>

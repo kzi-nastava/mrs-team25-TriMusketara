@@ -7,6 +7,7 @@ import { RegistrationPage } from './layout/registration-page/registration-page';
 import { ScheduledRides } from './layout/scheduled-rides/scheduled-rides';
 import { DriveInProgress } from './layout/drive-in-progress/drive-in-progress';
 import { MainPageComponent } from './main-page/main-page';
+import { DriverRegistration } from './layout/driver-registration/driver-registration';
 
 
 export const routes: Routes = [
@@ -22,4 +23,5 @@ export const routes: Routes = [
   { path: 'login', component: LoginPage },
   { path: 'register', component: RegistrationPage },
   { path: 'drive-in-progress', component: DriveInProgress },
+  { path: 'driver-registration', component: DriverRegistration }
 ];
