@@ -31,6 +31,16 @@ export class DriverRegistration {
 
   invalidFields: string[] = []; // List of invalid form fields
 
+  showVehicleInfo = false; // This flag is used for page responsiveness 768px and 480px 
+
+  goNext() {
+    this.showVehicleInfo = true; // When the 'next' button is pressed in the form, continue to register the drivers vehicle
+  }
+
+  goBack() {
+    this.showVehicleInfo = false; // When the 'back' button is pressed in the form, return to driver information form
+  }
+
 
   // When canceling driver registration go to main page , but also open the profile sidebar
   closeRegistrationForm() {

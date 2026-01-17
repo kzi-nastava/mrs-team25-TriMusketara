@@ -134,7 +134,7 @@
     background-color: #5CF56A;
 }
 
-.cancel-.cancel-driver-registration {
+.cancel-driver-registration {
     background-color: #f55c5cbc;
 }
 
@@ -144,4 +144,316 @@
 
 .invalid {
     border: 2px solid red !important;
+}
+
+/* When in 'desktop' resolution hide the button*/
+.mobile-next {
+    display: none;
+}
+.mobile-back {
+    display: none;
+}
+
+@media (min-width: 480px) {
+    .hidden {
+        display: none;
+    }
+
+    .mobile-next {
+        display: block;
+        margin-left: auto;
+        margin-right: 15px;
+        background: transparent;
+        color: #F5CB5C;
+        font-style: italic;
+        font-weight: 400;
+        font-size: 16.5px;
+        text-decoration: underline;
+        border: none;
+        border-radius: 5%;
+        cursor: pointer;
+    }
+
+    .mobile-back {
+        display: block;
+        margin-left: 15px;
+        margin-right: auto;
+        background: transparent;
+        color: #F5CB5C;
+        font-style: italic;
+        font-weight: 400;
+        font-size: 16.5px;
+        text-decoration: underline;
+        border: none;
+        border-radius: 5%;
+        cursor: pointer;
+    }
+    
+    .title-container {
+        /* border: 1px solid red; */
+    }
+
+    .title {
+        font-size: 30px;
+    }
+
+    .form-container {
+        /* border: 1px solid blue; */
+        padding: .7% 13%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .driver-info {
+        /* border: 1px solid lawngreen; */
+        width: 95%;
+    }
+
+    .driver-info label,
+    .vehicle-info label {
+        font-size: 18px;
+    }
+
+    .driver-info p,
+    .vehicle-info p {
+        /* border: 1px solid orchid; */
+        font-size: 22px;
+        padding: 0;
+        margin-bottom: 15px;
+    }
+
+    .vehicle-info {
+        /* border: 1px solid yellow; */
+        width: 95%;
+    }
+
+    .form-row {
+        /* border: 1px solid pink; */
+    }
+
+    .buttons-container {
+        /* border: 1px solid coral; */
+    }
+
+    .buttons-container button {
+        width: 22%;
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 768px) {
+    .hidden {
+        display: none;
+    }
+
+    .mobile-next {
+        display: block;
+        margin-left: auto;
+        margin-right: 15px;
+        background: transparent;
+        color: #F5CB5C;
+        font-style: italic;
+        font-weight: 400;
+        font-size: 16.5px;
+        text-decoration: underline;
+        border: none;
+        border-radius: 5%;
+        cursor: pointer;
+    }
+
+    .mobile-back {
+        display: block;
+        margin-left: 15px;
+        margin-right: auto;
+        background: transparent;
+        color: #F5CB5C;
+        font-style: italic;
+        font-weight: 400;
+        font-size: 16.5px;
+        text-decoration: underline;
+        border: none;
+        border-radius: 5%;
+        cursor: pointer;
+    }
+    
+    .title-container {
+        /* border: 1px solid red; */
+    }
+
+    .title {
+        font-size: 36px;
+    }
+
+    .form-container {
+        /* border: 1px solid blue; */
+        padding: .7% 13%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .driver-info {
+        /* border: 1px solid lawngreen; */
+        width: 70%;
+    }
+
+    .driver-info label,
+    .vehicle-info label {
+        font-size: 20px;
+    }
+
+    .driver-info p,
+    .vehicle-info p {
+        /* border: 1px solid orchid; */
+        font-size: 25px;
+        padding: 0;
+        margin-bottom: 15px;
+    }
+
+    .vehicle-info {
+        /* border: 1px solid yellow; */
+        width: 70%;
+    }
+
+    .form-row {
+        /* border: 1px solid pink; */
+    }
+
+    .buttons-container {
+        /* border: 1px solid coral; */
+    }
+
+    .buttons-container button {
+        width: 15%;
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 1024px) {
+
+    .hidden {
+        display: block !important;
+    }
+
+    .mobile-next {
+        display: none;
+    }
+    .mobile-back {
+        display: none;
+    }
+
+    .title-container {
+        /* border: 1px solid red; */
+    }
+
+    .title {
+        font-size: 37px;
+    }
+
+    .form-container {
+        /* border: 1px solid blue; */
+        padding: .7% 10%;
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
+    }
+
+    .driver-info {
+        /* border: 1px solid lawngreen; */
+        display: block;
+        width: 43%;
+    }
+
+    .driver-info label,
+    .vehicle-info label {
+        font-size: 18.5px;
+    }
+
+    .driver-info p,
+    .vehicle-info p {
+        /* border: 1px solid orchid; */
+        font-size: 22px;
+        padding: 0;
+        margin-bottom: 15px;
+    }
+
+    .vehicle-info {
+        /* border: 1px solid yellow; */
+        display: block;
+        width: 43%;
+    }
+
+    .form-row {
+        /* border: 1px solid pink; */
+    }
+
+    .buttons-container {
+        /* border: 1px solid coral; */
+    }
+
+    .buttons-container button {
+        width: 12%;
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 1280px) {
+    
+    .mobile-next {
+        display: none;
+    }
+    .mobile-back {
+        display: none;
+    }
+
+    .title-container {
+        /* border: 1px solid red; */
+    }
+
+    .title {
+        font-size: 46px;
+    }
+
+    .form-container {
+        /* border: 1px solid blue; */
+        padding: .7% 13%;
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
+    }
+
+    .driver-info {
+        /* border: 1px solid lawngreen; */
+        width: 43%;
+    }
+
+    .driver-info label,
+    .vehicle-info label {
+        font-size: 22.5px;
+    }
+
+    .driver-info p,
+    .vehicle-info p {
+        /* border: 1px solid orchid; */
+        font-size: 25px;
+        padding: 0;
+        margin-bottom: 15px;
+    }
+
+    .vehicle-info {
+        /* border: 1px solid yellow; */
+        width: 43%;
+    }
+
+    .form-row {
+        /* border: 1px solid pink; */
+    }
+
+    .buttons-container {
+        /* border: 1px solid coral; */
+    }
+
+    .buttons-container button {
+        width: 12%;
+        font-size: 18.5px;
+    }
 }

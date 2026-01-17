@@ -3,7 +3,7 @@
         <p class="title">Driver registration</p>
     </div>
     <div class="form-container">
-        <div class="driver-info">
+        <div class="driver-info" [class.hidden]="showVehicleInfo">
             <p>Driver info</p>
             <form class="driver-form" action="">
                 @for (field of driverFields; track field.label) {
@@ -19,9 +19,10 @@
                     </div>
                 }
             </form>
+            <button class="mobile-next" (click)="goNext()">Next</button>
         </div>
 
-        <div class="vehicle-info">
+        <div class="vehicle-info" [class.hidden]="!showVehicleInfo">
             <p>Vehicle info</p>
             <form class="vehicle-form" action="">
                 @for (field of vehicleFields; track field.label) {
@@ -53,6 +54,7 @@
                     </div>
                 }
             </form>
+            <button class="mobile-back" (click)="goBack()">Back</button>
         </div>
     </div>
     <div class="buttons-container">
