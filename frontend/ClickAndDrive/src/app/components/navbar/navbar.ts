@@ -1,9 +1,11 @@
 import { Component, signal } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet, ActivatedRoute } from '@angular/router';
 import { PassengerProfile } from '../../layout/passenger-profile/passenger-profile'
 import { DriverProfile } from '../../layout/driver-profile/driver-profile';
 import { AdminProfile } from '../../layout/admin-profile/admin-profile';
 import { RidePopup } from '../../shared/ride-popup';
+import { ProfileSidebarService } from '../../services/profile-sidebar.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -13,24 +15,17 @@ import { RidePopup } from '../../shared/ride-popup';
   imports: [PassengerProfile, DriverProfile, AdminProfile, RouterOutlet] // <-- RouterModule dodan
 })
 export class NavbarComponent {
-  // Can be changed manually to test: 'guest', 'user', 'admin'
-  userType: 'guest' | 'user' | 'driver' |'admin' = 'driver';
-
-  inDrive: boolean = false;
-
-  userName = signal('TriMusketara');
-
-  // Flag to show profile sidebar
-  showSidebar = false;
 
   constructor(
     private router: Router,
-    private ridePopup: RidePopup
-  ) {}
+    private ridePopup: RidePopup,
+    public profileSidebar: ProfileSidebarService,
+    private route: ActivatedRoute,
+    public auth: AuthService // public so you have it in HTML
+    ) {}
 
   onProfileClick() {
-    this.showSidebar = !this.showSidebar;
-    console.log('Opening user profile:', this.userName());
+    this.profileSidebar.toggle();
   }
 
   onLoginClick() {
@@ -44,10 +39,15 @@ export class NavbarComponent {
   // Navigate to a specific route and close sidebar
   handleViewSelection(route: string) {
     this.router.navigate([route]);
-    this.showSidebar = false;
+    this.profileSidebar.close();
   }
 
   openPopup() {
+    this.ridePopup.open();
+  }
+
+  // Order route navigation
+  orderRideClick() {
     this.ridePopup.open();
   }
 }

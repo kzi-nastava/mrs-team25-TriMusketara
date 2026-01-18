@@ -16,7 +16,9 @@
         <div class="buttons-frame">
             <div class="left-side-buttons">
                 @for (btn of leftButtons; track btn.label) {
-                    <button>{{btn.label}}</button>
+                    <button
+                        (click)="onButtonClick(btn.route)"
+                    >{{btn.label}}</button>
                 }
             </div>
             <div class="right-side-buttons">

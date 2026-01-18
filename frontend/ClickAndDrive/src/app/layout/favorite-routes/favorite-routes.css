@@ -1,0 +1,375 @@
+:host {
+    position: relative;
+    display: block;
+    height: 100vh;
+  }
+
+  hr {
+    margin: 0;
+  }
+  
+  /*put the whole div below nav bar*/
+  .page-wrapper {
+    position: fixed;   
+    top: 80px;            
+    left: 0;            
+    width: 100vw;          
+    height: calc(100vh - 80px);
+
+    background-image: linear-gradient(rgba(36, 36, 35, 0.45), rgba(36, 36, 35, 0.45)), url(../../../../public/favorite-routes-background.jpg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  .inner-container {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* border: 1px solid green; */
+  }
+
+  .container {
+    width: 90%;
+    min-height: 92%;
+    max-height: 92%;
+    height: 92%;
+    /* border: 2px solid red; */
+    background-color: rgba(36, 36, 35, 0.25);
+    /* height: calc((100vh - 80px) * 0.9); */
+  }
+  
+  .title {
+    /* border: 2px solid salmon; */
+    width: 100%;
+    height: 15%;
+    box-sizing: border-box;
+    padding-top: 2%;
+  }
+
+  .title p {
+    color: white;
+    text-decoration: underline;
+    font-size: 40px;
+    margin-left: 10%;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .card-container {
+    /* border: 2px solid blue; */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    height: 75%;
+    box-sizing: border-box;
+    gap: 15px;
+  }
+
+  .card-container .card {
+    /* border: 2px solid darkgreen; */
+    margin-left: 5%;
+    width: 68%;
+    height: 28%;
+    border-radius: 8px;
+    background-color: rgba(36, 36, 35, 0.4);
+  }
+
+  .top-card-part {
+    width: 100%;
+    height: 50%;
+    /* border: 1px solid yellow; */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .info {
+    width: 75%;
+    height: 100%;
+    /* border: 1px solid violet; */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .location-pin {
+    height: 50px;
+    width: 50px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background-color: #F5CB5C;
+    background-image: url(../../../../public/location-pin.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-left: 10px;
+    /* border: 1px solid red; */
+  }
+
+  .route-info {
+    height: 100%;
+    width: auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    /* border: 1px solid rebeccapurple; */
+    margin-left: 10px;
+  }
+
+  .route-info p {
+    color: white;
+    font-size: 20px;
+    margin-left: 10px;
+  }
+
+  .interactable {
+    width: 25%;
+    height: 100%;
+    /* border: 1px solid orange; */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: end;
+    gap: 20px;
+  }
+
+  .interactable button {
+    width: auto;
+    height: auto;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    background-color: #242423;
+    font-weight: 500;
+    cursor: pointer;
+    transition: .3s;
+  }
+
+  .interactable .fav-button {
+    width: 34px;
+    height: 34px;
+    margin-right: 20px;
+  }
+
+  .interactable button:hover {
+    color: #242423;
+    background-color: white;
+  }
+
+  .bottom-card-part {
+    width: 100%;
+    height: 50%;
+    /* border: 1px solid violet; */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+  }
+
+  .bottom-card-part .distance {
+    /* border: 1px solid gold; */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .bottom-card-part .duration {
+    /* border: 1px solid salmon; */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .bottom-card-part .times-used {
+    /* border: 1px solid forestgreen; */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .bottom-card-part img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .bottom-card-part p {
+    color: white;
+    margin: 0;
+    padding: 0;
+  }
+
+
+  .button-container {
+    /* border: 2px solid orange; */
+    box-sizing: border-box;
+    width: 100%;
+    height: 10%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .button-container button {
+    width: 16%;
+    height: auto;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background-color: rgba(245, 203, 92, 0.8);
+    font-size: 16px;
+    cursor: pointer;
+    transition: .3s;
+  }
+
+
+
+  @media (max-width: 1200px) {
+    .title p {
+      font-size: 36px;
+      margin-left: 10%;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .location-pin {
+      height: 44px;
+      width: 44px;
+      margin-left: 10px;
+    }
+  }
+
+  @media (max-width: 992px) {
+    .title {
+      padding-top: 2.4%;
+    }
+
+    .route-info p {
+      font-size: 18px;
+    }
+
+    .card-container .card {
+      margin-left: 3%;
+      width: 82%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .title {
+      padding-top: 3.5%;
+    }
+
+    .title p {
+      font-size: 34px;
+    }
+
+    .card-container .card {
+      margin-left: 3%;
+      width: 92%;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .title {
+      padding-top: 4%;;
+    }
+
+    .title p {
+      font-size: 30px;
+    }
+
+    .route-info p {
+      font-size: 14px;
+      margin-left: 10px;
+    }
+
+    .location-pin {
+      display: none;
+    }
+
+    .interactable {
+      gap: 10px;
+    }
+
+    .interactable button {
+      padding: 8px 12px;
+    }
+
+    .bottom-card-part .distance {
+      font-size: 14px;
+    }
+  
+    .bottom-card-part .duration {
+      /* border: 1px solid salmon; */
+      font-size: 14px;
+    }
+  
+    .bottom-card-part .times-used {
+      font-size: 14px;
+    }
+
+    .button-container button {
+      width: 16%;
+      padding: 8px;
+      font-size: 14px;
+    }
+  }
+
+  @media (max-width: 400px) {
+
+    hr {
+      display: none;
+    }
+
+    .title {
+      padding-top: 7%;
+    }
+
+    .card-container .card {
+      margin-left: 2%;
+      margin-right: 2%;
+      width: auto;
+    }
+
+    .top-card-part {
+      flex-direction: column;
+    }
+
+    .interactable {
+      margin-top: 10px;
+      margin-left: 53px;
+    }
+
+    .bottom-card-part {
+      justify-content: end;
+      gap: 10px;
+    }
+
+    .bottom-card-part .duration {
+      margin-right: 20px;
+    }
+
+    .bottom-card-part .times-used {
+      display: none;
+    }
+
+    .button-container button {
+      width: 22%;
+      padding: 8px;
+      font-size: 14px;
+    }
+  }

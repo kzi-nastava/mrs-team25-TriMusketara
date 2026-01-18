@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 })
 export class AdminProfile {
   adminButtons = [
+    {label: "Driver registration", route: 'driver-registration'},
     {label: 'Check current rides'},
     {label: 'Change prices'},
     {label: 'Ride history'},
@@ -24,11 +25,11 @@ export class AdminProfile {
   constructor(private router: Router) {}
 
   get leftButtons() {
-    return this.adminButtons.slice(0, 4);
+    return this.adminButtons.slice(0, 5);
   }
 
   get rightButtons() {
-    return this.adminButtons.slice(4);
+    return this.adminButtons.slice(5);
   }
 
   onButtonClick(route: string | undefined) {

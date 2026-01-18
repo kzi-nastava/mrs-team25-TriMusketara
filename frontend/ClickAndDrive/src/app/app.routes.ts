@@ -7,11 +7,13 @@ import { RegistrationPage } from './layout/registration-page/registration-page';
 import { ScheduledRides } from './layout/scheduled-rides/scheduled-rides';
 import { DriveInProgress } from './layout/drive-in-progress/drive-in-progress';
 import { MainPageComponent } from './main-page/main-page';
+import { DriverRegistration } from './layout/driver-registration/driver-registration';
+import { FavoriteRoutes } from './layout/favorite-routes/favorite-routes';
 
 
 export const routes: Routes = [
   { path: '', redirectTo: 'map', pathMatch: 'full' },
-  { path: 'map', component: MainPageComponent },
+  { path: 'map', component: MainPageComponent},
   { path: 'change-information-page',component: ChangeInfoPage },
   { path: 'driver-history', component: DriverHistory },
   { path: 'scheduled-rides', component: ScheduledRides },
@@ -21,5 +23,7 @@ export const routes: Routes = [
   { path: 'support', component: MapViewComponent },
   { path: 'login', component: LoginPage },
   { path: 'register', component: RegistrationPage },
-  { path: 'drive-in-progress', component: DriveInProgress }
+  { path: 'drive-in-progress', component: DriveInProgress },
+  { path: 'driver-registration', component: DriverRegistration },
+  { path: 'favorite-routes', component: FavoriteRoutes }
 ];

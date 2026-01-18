@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 })
 export class PassengerProfile {
   passengerButtons = [
-    {label: 'Favorite routes'},
+    {label: 'Favorite routes', route: 'favorite-routes'},
     {label: 'Ride history'},
     {label: 'Change information', route: 'change-information-page'},
     {label: 'Reports'},
