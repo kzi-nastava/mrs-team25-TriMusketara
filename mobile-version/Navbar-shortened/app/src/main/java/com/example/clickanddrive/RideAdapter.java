@@ -33,15 +33,15 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.RideViewHolder
     public void onBindViewHolder(@NonNull RideViewHolder holder, int position) {
         DriverHistorySampleDTO ride = rideList.get(position);
 
-        // Osnovni podaci
+        // Base data
         holder.tvDate.setText(ride.getFormattedDate());
         holder.tvRoute.setText(ride.getDepartureAddress() + " -> " + ride.getDestinationAddress());
         holder.tvPrice.setText(ride.getTotalPrice() + " RSD");
 
-        // Panic dugme/text
+        // Panic
         holder.tvPanic.setVisibility(ride.isPanicPressed() ? View.VISIBLE : View.GONE);
 
-        // Prikaz putnika
+        // Passangers
         if (ride.getPassengerEmails() != null && !ride.getPassengerEmails().isEmpty()) {
             // String.join radi na API 26+, ako dobiješ grešku, koristi for-petlju
             String emails = String.join(", ", ride.getPassengerEmails());
@@ -50,17 +50,15 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.RideViewHolder
             holder.tvPassengers.setText("No passengers info.");
         }
 
-        // Upravljanje proširenjem (vidljivost layout-a)
+        // Managing expansion
         boolean isExpanded = ride.isExpanded();
         holder.layoutDetails.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
-
-        // Rotacija strelice: 0 stepeni (dole), 180 stepeni (gore)
         holder.ivArrow.setRotation(isExpanded ? 180f : 0f);
 
-        // Klik na celu stavku menja stanje
+        // Click changes everything
         holder.itemView.setOnClickListener(v -> {
             ride.setExpanded(!ride.isExpanded());
-            notifyItemChanged(position); // Osvežava samo tu stavku sa animacijom
+            notifyItemChanged(position);
         });
     }
 
@@ -71,7 +69,7 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.RideViewHolder
 
     public static class RideViewHolder extends RecyclerView.ViewHolder {
         TextView tvDate, tvRoute, tvPrice, tvPanic, tvPassengers;
-        View layoutDetails; // Može i LinearLayout layoutDetails;
+        View layoutDetails;
         ImageView ivArrow;
 
         public RideViewHolder(@NonNull View itemView) {
