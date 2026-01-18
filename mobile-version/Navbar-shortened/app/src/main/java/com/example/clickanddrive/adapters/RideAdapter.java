@@ -1,8 +1,10 @@
-package com.example.clickanddrive.adapters;
+package com.example.clickanddrive;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,16 +35,33 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.RideViewHolder
     public void onBindViewHolder(@NonNull RideViewHolder holder, int position) {
         DriverHistorySampleDTO ride = rideList.get(position);
 
-        // Setting data
+        // Base data
         holder.tvDate.setText(ride.getFormattedDate());
         holder.tvRoute.setText(ride.getDepartureAddress() + " -> " + ride.getDestinationAddress());
         holder.tvPrice.setText(ride.getTotalPrice() + " RSD");
 
-        if (ride.isPanicPressed()) {
-            holder.tvPanic.setVisibility(View.VISIBLE);
+        // Panic
+        holder.tvPanic.setVisibility(ride.isPanicPressed() ? View.VISIBLE : View.GONE);
+
+        // Passangers
+        if (ride.getPassengerEmails() != null && !ride.getPassengerEmails().isEmpty()) {
+            // String.join radi na API 26+, ako dobiješ grešku, koristi for-petlju
+            String emails = String.join(", ", ride.getPassengerEmails());
+            holder.tvPassengers.setText(emails);
         } else {
-            holder.tvPanic.setVisibility(View.GONE);
+            holder.tvPassengers.setText("No passengers info.");
         }
+
+        // Managing expansion
+        boolean isExpanded = ride.isExpanded();
+        holder.layoutDetails.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+        holder.ivArrow.setRotation(isExpanded ? 180f : 0f);
+
+        // Click changes everything
+        holder.itemView.setOnClickListener(v -> {
+            ride.setExpanded(!ride.isExpanded());
+            notifyItemChanged(position);
+        });
     }
 
     @Override
@@ -51,7 +70,9 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.RideViewHolder
     }
 
     public static class RideViewHolder extends RecyclerView.ViewHolder {
-        TextView tvDate, tvRoute, tvPrice, tvPanic;
+        TextView tvDate, tvRoute, tvPrice, tvPanic, tvPassengers;
+        View layoutDetails;
+        ImageView ivArrow;
 
         public RideViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -59,6 +80,11 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.RideViewHolder
             tvRoute = itemView.findViewById(R.id.tvRoute);
             tvPrice = itemView.findViewById(R.id.tvPrice);
             tvPanic = itemView.findViewById(R.id.tvPanic);
+            tvPassengers = itemView.findViewById(R.id.tvPassengers);
+
+
+            layoutDetails = itemView.findViewById(R.id.layoutDetails);
+            ivArrow = itemView.findViewById(R.id.ivArrow);
         }
     }
 }
