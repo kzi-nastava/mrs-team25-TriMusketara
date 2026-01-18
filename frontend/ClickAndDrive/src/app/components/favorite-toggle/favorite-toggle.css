@@ -1,0 +1,20 @@
+.heart-icon {
+    width: 34px;
+    height: 34px;
+    color: #e53935;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .heart-icon path {
+    transition: fill 0.2s ease;
+  }
+  
+  .heart-icon.filled path {
+    fill: currentColor;
+  }
+  
+  .heart-icon:hover {
+    transform: scale(1.15);
+  }
+  
