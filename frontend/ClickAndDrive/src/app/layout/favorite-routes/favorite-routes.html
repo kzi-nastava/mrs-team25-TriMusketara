@@ -5,13 +5,40 @@
                 <p>Favorite routes</p>
             </div>
             <div class="card-container">
-                <!-- Ovde ce ici @for koji prolazi kroz sacuvane rute korisnika -->
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
+                @for (route of routes; track route.id) {
+                    <div class="card">
+                        <div class="top-card-part">
+                            <!-- The card part where we have the Origin: Destination: -->
+                            <div class="info">
+                                <div class="location-pin"></div>
+                                <div class="route-info">
+                                    <p><b>Origin:</b> {{route.from}}</p>
+                                    <p><b>Destination:</b> {{route.to}}</p>
+                                </div>
+                            </div>
+                            <!-- The card part where the button and heart are -->
+                            <div class="interactable">
+                                <button>Order</button>
+                                <app-favorite-toggle class="fav-button" [active]="route.favorite" (toggled)="onFavoriteToggle(route, $event)"></app-favorite-toggle>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="bottom-card-part">
+                            <div class="distance">
+                                <img src="location-arrow.svg" alt="Location arrow">
+                                <p>{{route.distance}}km</p>
+                            </div>
+                            <div class="duration">
+                                <img src="clock.svg" alt="Clock">
+                                <p>{{route.duration}}min</p>
+                            </div>
+                            <div class="times-used">
+                                <img src="routes-num.svg" alt="Route num">
+                                <p>{{route.timesUsed}}x</p>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
             <div class="button-container">
                 <button>Previous</button>

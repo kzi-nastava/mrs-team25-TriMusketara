@@ -3,6 +3,10 @@
     display: block;
     height: 100vh;
   }
+
+  hr {
+    margin: 0;
+  }
   
   /*put the whole div below nav bar*/
   .page-wrapper {
@@ -26,25 +30,25 @@
     justify-content: center;
     align-items: center;
 
-    border: 1px solid green;
+    /* border: 1px solid green; */
   }
 
   .container {
     width: 90%;
-    min-height: 88%;
-    max-height: 88%;
-    height: 88%;
-    border: 2px solid red;
+    min-height: 92%;
+    max-height: 92%;
+    height: 92%;
+    /* border: 2px solid red; */
     background-color: rgba(36, 36, 35, 0.25);
     /* height: calc((100vh - 80px) * 0.9); */
   }
   
   .title {
-    border: 2px solid salmon;
+    /* border: 2px solid salmon; */
     width: 100%;
     height: 15%;
     box-sizing: border-box;
-    padding-top: 1.5%;
+    padding-top: 2%;
   }
 
   .title p {
@@ -57,25 +61,159 @@
   }
 
   .card-container {
-    border: 2px solid blue;
-    box-sizing: border-box;
+    /* border: 2px solid blue; */
     display: flex;
     flex-direction: column;
     justify-content: center;
     width: 100%;
     height: 75%;
+    box-sizing: border-box;
     gap: 15px;
   }
 
-  .card-container div {
+  .card-container .card {
+    /* border: 2px solid darkgreen; */
     margin-left: 5%;
     width: 70%;
-    height: 15%;
+    height: 28%;
+    border-radius: 8px;
     background-color: rgba(36, 36, 35, 0.4);
   }
-  
+
+  .top-card-part {
+    width: 100%;
+    height: 50%;
+    /* border: 1px solid yellow; */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .info {
+    width: 75%;
+    height: 100%;
+    /* border: 1px solid violet; */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .location-pin {
+    height: 50px;
+    width: 50px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background-color: #F5CB5C;
+    background-image: url(../../../../public/location-pin.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-left: 10px;
+    /* border: 1px solid red; */
+  }
+
+  .route-info {
+    height: 100%;
+    width: auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    /* border: 1px solid rebeccapurple; */
+    margin-left: 10px;
+  }
+
+  .route-info p {
+    color: white;
+    font-size: 18px;
+    margin-left: 10px;
+  }
+
+  .interactable {
+    width: 25%;
+    height: 100%;
+    /* border: 1px solid orange; */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: end;
+    gap: 20px;
+  }
+
+  .interactable button {
+    width: auto;
+    height: auto;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    background-color: #242423;
+    font-weight: 500;
+    cursor: pointer;
+    transition: .3s;
+  }
+
+  .interactable .fav-button {
+    width: 34px;
+    height: 34px;
+    margin-right: 20px;
+  }
+
+  .interactable button:hover {
+    color: #242423;
+    background-color: white;
+  }
+
+  .bottom-card-part {
+    width: 100%;
+    height: 50%;
+    /* border: 1px solid violet; */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+  }
+
+  .bottom-card-part .distance {
+    /* border: 1px solid gold; */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .bottom-card-part .duration {
+    /* border: 1px solid salmon; */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .bottom-card-part .times-used {
+    /* border: 1px solid forestgreen; */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .bottom-card-part img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .bottom-card-part p {
+    color: white;
+    margin: 0;
+    padding: 0;
+  }
+
+
   .button-container {
-    border: 2px solid orange;
+    /* border: 2px solid orange; */
     box-sizing: border-box;
     width: 100%;
     height: 10%;
@@ -88,8 +226,8 @@
 
   .button-container button {
     width: 16%;
-    height: 80%;
-    margin-top: 6px;
+    height: auto;
+    padding: 10px;
     border: none;
     border-radius: 10px;
     background-color: rgba(245, 203, 92, 0.8);
