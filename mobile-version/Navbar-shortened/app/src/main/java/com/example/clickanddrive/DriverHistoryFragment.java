@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class DriverHistoryFragment extends Fragment {
@@ -55,37 +56,23 @@ public class DriverHistoryFragment extends Fragment {
 
 
         allRides.add(new DriverHistorySampleDTO(
-                1L, LocalDateTime.now().minusHours(2), "Bulevar oslobođenja 4", "Futoška 12", 1250.0, false
+                1L, LocalDateTime.now().minusHours(2), "Bulevar oslobođenja 4", "Futoška 12", 1250.0, false,
+                Arrays.asList("marko.m@gmail.com", "ana.b@yahoo.com")
         ));
 
-
         allRides.add(new DriverHistorySampleDTO(
-                2L, LocalDateTime.now().minusDays(1).minusHours(5), "Subotička 1", "Trg Slobode 3", 800.0, true
+                2L, LocalDateTime.now().minusDays(1).minusHours(5), "Subotička 1", "Trg Slobode 3", 800.0, true,
+                Arrays.asList("stefan.care@gmail.com")
         ));
 
-
         allRides.add(new DriverHistorySampleDTO(
-                3L, LocalDateTime.now().minusDays(2).withHour(23).withMinute(15), "Liman 4", "Petrovaradin", 1550.0, false
+                3L, LocalDateTime.now().minusDays(2).withHour(23).withMinute(15), "Liman 4", "Petrovaradin", 1550.0, false,
+                Arrays.asList("ivana99@gmail.com", "petar_p@outlook.com")
         ));
 
-
         allRides.add(new DriverHistorySampleDTO(
-                4L, LocalDateTime.now().minusDays(3).withHour(10).withMinute(30), "Sremska 2", "Železnička stanica", 450.0, false
-        ));
-
-
-        allRides.add(new DriverHistorySampleDTO(
-                5L, LocalDateTime.now().minusWeeks(1).withDayOfMonth(20), "Veternik", "Centar", 2100.0, false
-        ));
-
-
-        allRides.add(new DriverHistorySampleDTO(
-                6L, LocalDateTime.now().minusWeeks(1).minusDays(1), "Futoški put 10", "Telep", 950.0, true
-        ));
-
-
-        allRides.add(new DriverHistorySampleDTO(
-                7L, LocalDateTime.now().minusWeeks(2), "Dunavska 1", "Promenada", 700.0, false
+                4L, LocalDateTime.now().minusDays(3).withHour(10).withMinute(30), "Sremska 2", "Železnička stanica", 450.0, false,
+                new ArrayList<>() // Prazna lista
         ));
 
 

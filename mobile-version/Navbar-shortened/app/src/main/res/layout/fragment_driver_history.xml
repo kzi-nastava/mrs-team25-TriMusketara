@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginBottom="16dp"
-        android:weightSum="3.4">
+        android:weightSum="3.6">
 
         <EditText
             android:id="@+id/etFromDate"
@@ -47,9 +47,9 @@
             android:id="@+id/btnClearFilters"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.4"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:backgroundTint="#F55C5C"
+            android:layout_weight="0.6"
+            android:src="@android:drawable/ic_menu_revert"
+            android:backgroundTint="@color/nav_bg"
             android:layout_marginStart="4dp"/>
 
     </LinearLayout>
