@@ -95,3 +95,37 @@
 .origin, .destination, .time {
   color: #F5CB5C;
 }
+.report, .rate {
+  height: 45px;
+  outline: none;
+  border: none;
+  border-radius: 100px;
+  font-size: 17px;
+  cursor: pointer;
+  transition: .3s;
+  font-weight: bold;
+}
+
+/* REPORT button */
+.report {
+  width: 200px; 
+  background-color: #F55C5C; 
+  color: white;
+  text-transform: uppercase;
+}
+
+.report:hover {
+  background-color: #f55c5cd0;
+  transform: scale(1.02);
+}
+
+/* RATE button - maybe not necessary */
+.rate {
+  width: 200px;
+  background-color: #F5CB5C;
+  color: #242423;
+}
+
+.rate:hover {
+  background-color: #f5cc5ccf;
+}

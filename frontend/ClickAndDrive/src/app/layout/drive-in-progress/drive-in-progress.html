@@ -1,4 +1,5 @@
 <app-map-view size="small">
+    <!-- Podaci o vožnji (Origin/Destination) -->
     <div class="ride-data">
         <p>Origin: <span class="origin">Bulevar oslobodjenja 45</span></p>
         <p>Destination: <span class="destination">Cara Dušana 12</span></p>
@@ -8,6 +9,19 @@
 </app-map-view>
 
 <div class="buttons">
-    <button class="stop">Stop drive</button>
-    <button class="finish">Finish drive</button>
+    <!--  DRIVER  -->
+    @if (auth.userType() === 'driver') {
+        <button class="stop">Stop drive</button>
+        <button class="finish">Finish drive</button>
+    }
+
+    <!--  PASSENGER  -->
+    @if (auth.userType() === 'user') {
+        @if (auth.inDrive()) {
+            <button class="report" (click)="onReport()">REPORT</button>
+        } @else {
+            <!-- Button for rating after the ride (Point 2.8) -->
+            <button class="finish" style="width: 300px" (click)="onRate()">RATE RIDE</button>
+        }
+    }
 </div>
