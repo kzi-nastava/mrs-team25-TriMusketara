@@ -74,7 +74,7 @@
   .card-container .card {
     /* border: 2px solid darkgreen; */
     margin-left: 5%;
-    width: 70%;
+    width: 68%;
     height: 28%;
     border-radius: 8px;
     background-color: rgba(36, 36, 35, 0.4);
@@ -125,7 +125,7 @@
 
   .route-info p {
     color: white;
-    font-size: 18px;
+    font-size: 20px;
     margin-left: 10px;
   }
 
@@ -234,4 +234,142 @@
     font-size: 16px;
     cursor: pointer;
     transition: .3s;
+  }
+
+
+
+  @media (max-width: 1200px) {
+    .title p {
+      font-size: 36px;
+      margin-left: 10%;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .location-pin {
+      height: 44px;
+      width: 44px;
+      margin-left: 10px;
+    }
+  }
+
+  @media (max-width: 992px) {
+    .title {
+      padding-top: 2.4%;
+    }
+
+    .route-info p {
+      font-size: 18px;
+    }
+
+    .card-container .card {
+      margin-left: 3%;
+      width: 82%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .title {
+      padding-top: 3.5%;
+    }
+
+    .title p {
+      font-size: 34px;
+    }
+
+    .card-container .card {
+      margin-left: 3%;
+      width: 92%;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .title {
+      padding-top: 4%;;
+    }
+
+    .title p {
+      font-size: 30px;
+    }
+
+    .route-info p {
+      font-size: 14px;
+      margin-left: 10px;
+    }
+
+    .location-pin {
+      display: none;
+    }
+
+    .interactable {
+      gap: 10px;
+    }
+
+    .interactable button {
+      padding: 8px 12px;
+    }
+
+    .bottom-card-part .distance {
+      font-size: 14px;
+    }
+  
+    .bottom-card-part .duration {
+      /* border: 1px solid salmon; */
+      font-size: 14px;
+    }
+  
+    .bottom-card-part .times-used {
+      font-size: 14px;
+    }
+
+    .button-container button {
+      width: 16%;
+      padding: 8px;
+      font-size: 14px;
+    }
+  }
+
+  @media (max-width: 400px) {
+
+    hr {
+      display: none;
+    }
+
+    .title {
+      padding-top: 7%;
+    }
+
+    .card-container .card {
+      margin-left: 2%;
+      margin-right: 2%;
+      width: auto;
+    }
+
+    .top-card-part {
+      flex-direction: column;
+    }
+
+    .interactable {
+      margin-top: 10px;
+      margin-left: 53px;
+    }
+
+    .bottom-card-part {
+      justify-content: end;
+      gap: 10px;
+    }
+
+    .bottom-card-part .duration {
+      margin-right: 20px;
+    }
+
+    .bottom-card-part .times-used {
+      display: none;
+    }
+
+    .button-container button {
+      width: 22%;
+      padding: 8px;
+      font-size: 14px;
+    }
   }
