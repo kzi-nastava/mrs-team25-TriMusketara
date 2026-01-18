@@ -1,4 +1,4 @@
-package com.example.clickanddrive;
+package com.example.clickanddrive.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
