@@ -1,11 +1,24 @@
 <app-map-view size="small">
-    <!-- Podaci o vožnji (Origin/Destination) -->
+    <!-- Ride data (Origin/Destination) -->
     <div class="ride-data">
         <p>Origin: <span class="origin">Bulevar oslobodjenja 45</span></p>
         <p>Destination: <span class="destination">Cara Dušana 12</span></p>
         <p>Estimated time:</p>
         <p class="time">20 MINUTES</p>
     </div>
+
+    <!-- POST-RIDE NOTIFICATION  -->
+    @if (showFinishNotification()) {
+        <div class="notification-overlay">
+            <div class="notification-toast">
+                <p>Ride successfully finished and paid!</p>
+                <div class="toast-actions">
+                    <button class="finish" (click)="openRating()">Rate Ride</button>
+                    <button class="stop" (click)="resetToOrder()">Order New</button>
+                </div>
+            </div>
+        </div>
+    }
 </app-map-view>
 
 <div class="buttons">
@@ -19,9 +32,7 @@
     @if (auth.userType() === 'user') {
         @if (auth.inDrive()) {
             <button class="report" (click)="onReport()">REPORT</button>
-        } @else {
-            <!-- Button for rating after the ride (Point 2.8) -->
-            <button class="finish" style="width: 300px" (click)="onRate()">RATE RIDE</button>
+            <button class="finish" (click)="onFinishPassenger()" style="margin-top: 10px;">Simulate End</button>
         }
     }
 </div>

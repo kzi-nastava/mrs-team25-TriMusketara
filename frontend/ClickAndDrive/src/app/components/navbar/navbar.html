@@ -1,9 +1,9 @@
 <nav class="navbar">
   <!-- LEFT: Logo and name -->
   <div class="nav-left">
-    <div class="logo-circle">
-      <img src="logo.png" alt="Logo" class="logo-img">
-    </div>
+    <button class="user-circle-btn" (click)="goToHome()">
+        <img src="logo.png" alt="Logo">
+    </button>
     <span class="brand-name">Click&Drive</span>
   </div>
 
@@ -29,7 +29,7 @@
     <!-- DRIVER NAVBAR -->
     @if (auth.userType() === 'driver') {
       @if (auth.inDrive()) {
-        <button class="btn-red">PANIC</button>
+        <button class="btn-red" (click)="onPanic()">PANIC</button>
       }
       <button class="user-circle-btn" (click)="onProfileClick()">
         <img src="user-icon.png" alt="Profile">
@@ -42,7 +42,7 @@
         <button class="btn-white" (click)="orderRideClick()">Let's Ride!</button>
       }
       @if (auth.inDrive()) {
-        <button class="btn-red">PANIC</button>
+        <button class="btn-red" (click)="onPanic()">PANIC</button>
       }
       <button class="user-circle-btn" (click)="onProfileClick()">
         <img src="user-icon.png" alt="Profile">
