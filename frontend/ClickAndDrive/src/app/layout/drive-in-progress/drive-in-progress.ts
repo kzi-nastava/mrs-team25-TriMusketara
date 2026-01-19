@@ -1,7 +1,8 @@
-import { Component, inject, signal } from '@angular/core'; // Added signal to imports
+import { Component, inject, signal, ViewChild, AfterViewInit } from '@angular/core';
 import { MapViewComponent } from '../../components/map-view/map-view';
 import { RouterOutlet, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service'; 
+import { Map } from '../../services/map'; // Import your map service
 
 @Component({
   selector: 'app-drive-in-progress',
@@ -10,12 +11,49 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './drive-in-progress.html',
   styleUrl: './drive-in-progress.css',
 })
-export class DriveInProgress {
+export class DriveInProgress implements AfterViewInit {
   auth = inject(AuthService);
   router = inject(Router);
+  private mapService = inject(Map); // Inject Map service
 
-  // Signal for showing/hiding the post-ride notification
+  // Access the child map component
+  @ViewChild(MapViewComponent) mapView!: MapViewComponent;
+
   showFinishNotification = signal(false);
+
+  // ngAfterViewInit runs after the HTML (and the map) is ready
+  async ngAfterViewInit() {
+    // Check if we have addresses stored in the service
+    if (this.auth.origin() && this.auth.destination()) {
+      await this.drawRouteOnLoad();
+    }
+  }
+
+  // Private helper to geocode and draw the line
+  private async drawRouteOnLoad() {
+    try {
+      // 1. Convert address strings to coordinates using the Map service
+      const originCoords = await this.mapService.geocodeAddress(this.auth.origin());
+      const destCoords = await this.mapService.geocodeAddress(this.auth.destination());
+
+      // 2. We must wait a tiny bit to ensure Mapbox has fully loaded its internal layers
+      // Mapbox can be picky if you try to add a layer the exact millisecond it's created
+      setTimeout(() => {
+        if (this.mapView && this.mapView.map) {
+          this.mapView.drawRouteAndCalculateETA(originCoords, destCoords);
+        }
+      }, 500); 
+
+    } catch (err) {
+      console.error('Failed to draw route on load:', err);
+    }
+  }
+
+  // Update ETA when the child map finishes calculation
+  onEtaReceived(minutes: number) {
+    this.auth.eta.set(minutes);
+  }
+
 
   // Method to handle when the passenger simulates/detects ride end 
   onFinishPassenger() {

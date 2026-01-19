@@ -1,10 +1,10 @@
-<app-map-view size="small">
-    <!-- Ride data (Origin/Destination) -->
+<app-map-view size="small" (etaCalculated)="onEtaReceived($event)">
     <div class="ride-data">
-        <p>Origin: <span class="origin">Bulevar oslobodjenja 45</span></p>
-        <p>Destination: <span class="destination">Cara Dušana 12</span></p>
+        <!-- Using signals for dynamic data -->
+        <p>Origin: <span class="origin">{{ auth.origin() }}</span></p>
+        <p>Destination: <span class="destination">{{ auth.destination() }}</span></p>
         <p>Estimated time:</p>
-        <p class="time">20 MINUTES</p>
+        <p class="time">{{ auth.eta() }} MINUTES</p>
     </div>
 
     <!-- POST-RIDE NOTIFICATION  -->

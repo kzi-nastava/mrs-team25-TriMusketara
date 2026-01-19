@@ -110,10 +110,17 @@ export class RideOrdering {
   this.additionalStops = this.additionalStops.filter(s => s.trim() !== '');
   this.linkedPassengers = this.linkedPassengers.filter(p => p.trim() !== '');
 
-  // Activating the driving state in the service
+  // Storing ride data in AuthService
+
+  // Get values from input fields
+  const originVal = (document.getElementById('origin') as HTMLInputElement).value;
+  const destVal = (document.getElementById('destination') as HTMLInputElement).value;
+
+  // Save them to authService so DriveInProgress can see them
+  this.authService.setRideData(originVal, destVal);
   this.authService.setInDrive(true);
 
-  // Navigating to the drive-in-progress page
+  // Navigate to drive-in-progress page
   this.router.navigate(['/drive-in-progress']);
 }
 

@@ -159,3 +159,20 @@ button {
     width: 50px;
     pointer-events: none; /* Image does not interfere with button click */
 }
+
+
+@media (max-width: 768px) {
+    .welcome-text {
+        display: none !important;
+    }
+}
+@media (max-width: 480px) {
+    .brand-name {
+        font-size: 20px;
+    }
+
+    .btn-white, .btn-yellow, .btn-red, .btn-red-wide {
+        padding: 0 20px;
+        font-size: 16px;
+    }
+}
