@@ -129,3 +129,45 @@
 .rate:hover {
   background-color: #f5cc5ccf;
 }
+
+/* --- RIDE COMPLETION UI --- */
+
+.notification-overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Dim the map */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  border-radius: 2px; /* Match map border radius */
+}
+
+.notification-toast {
+  background-color: #242423;
+  border: 2px solid #F5CB5C;
+  padding: 25px;
+  border-radius: 15px;
+  text-align: center;
+  color: white;
+  width: 80%;
+}
+
+.notification-toast p {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #F5CB5C;
+  font-weight: bold;
+}
+
+.toast-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* We reuse .stop and .finish classes for consistency */
+.toast-actions button {
+  width: 140px;
+}

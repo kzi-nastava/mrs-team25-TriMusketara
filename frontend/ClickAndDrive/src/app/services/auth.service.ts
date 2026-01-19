@@ -11,7 +11,7 @@ export class AuthService {
     // Username
     userName = signal('TriMusketara');
 
-    //
+    // In-drive status
     inDrive = signal(false);
 
     // Set which user

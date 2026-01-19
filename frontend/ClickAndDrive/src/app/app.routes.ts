@@ -9,6 +9,7 @@ import { DriveInProgress } from './layout/drive-in-progress/drive-in-progress';
 import { MainPageComponent } from './main-page/main-page';
 import { DriverRegistration } from './layout/driver-registration/driver-registration';
 import { FavoriteRoutes } from './layout/favorite-routes/favorite-routes';
+import { RideRating } from './layout/ride-rating/ride-rating';
 
 
 export const routes: Routes = [
@@ -25,5 +26,6 @@ export const routes: Routes = [
   { path: 'register', component: RegistrationPage },
   { path: 'drive-in-progress', component: DriveInProgress },
   { path: 'driver-registration', component: DriverRegistration },
-  { path: 'favorite-routes', component: FavoriteRoutes }
+  { path: 'favorite-routes', component: FavoriteRoutes },
+  { path: 'rate-ride', component: RideRating}
 ];

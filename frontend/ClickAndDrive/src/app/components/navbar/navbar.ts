@@ -50,4 +50,15 @@ export class NavbarComponent {
   orderRideClick() {
     this.ridePopup.open();
   }
+
+  goToHome() {
+    this.auth.setInDrive(false);
+    this.router.navigate(['/map']);
+  }
+
+  // Logic for PANIC button 
+  onPanic() {
+    console.log("Panic triggered!");
+    alert("Emergency notification sent to administrator!");
+  }
 }

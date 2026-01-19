@@ -1,11 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core'; // Added signal to imports
 import { MapViewComponent } from '../../components/map-view/map-view';
 import { RouterOutlet, Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service'; // Putanja do tvog servisa
+import { AuthService } from '../../services/auth.service'; 
 
 @Component({
   selector: 'app-drive-in-progress',
-  standalone: true, // Ako koristite standalone
+  standalone: true, 
   imports: [RouterOutlet, MapViewComponent],
   templateUrl: './drive-in-progress.html',
   styleUrl: './drive-in-progress.css',
@@ -14,19 +14,32 @@ export class DriveInProgress {
   auth = inject(AuthService);
   router = inject(Router);
 
-  // Your methods (Student 2)
-  onPanic() {
-    console.log("Panic triggered!");
-    // Logic for PANIC (2.6.3)
-  }
+  // Signal for showing/hiding the post-ride notification
+  showFinishNotification = signal(false);
 
-  onReportInconsistency() {
-    const reason = prompt("Enter inconsistency reason:");
-    console.log("Reported:", reason);
+  // Method to handle when the passenger simulates/detects ride end 
+  onFinishPassenger() {
+    // 1. Update global state to stop the drive tracking
+    this.auth.setInDrive(false);
     
+    // 2. Show the post-ride notification overlay
+    this.showFinishNotification.set(true);
   }
 
-  // Funkcija za Report dugme (MORA SE ZVATI onReport jer je tako u HTML-u)
+  // Method called from the notification to start rating the ride
+  openRating() {
+    this.showFinishNotification.set(false);
+    console.log("Opening rating screen...");
+    this.router.navigate(['/rate-ride']);
+  }
+
+  // Method to return to home/order screen 
+  resetToOrder() {
+    this.showFinishNotification.set(false);
+    this.router.navigate(['/map']); 
+  }
+
+  // Logic for reporting route inconsistency
   onReport() {
     const reason = prompt("Why is the route inconsistent?");
     if (reason) {
@@ -35,15 +48,5 @@ export class DriveInProgress {
     }
   }
 
-  // Funkcija za Rate dugme (MORA SE ZVATI onRate jer je tako u HTML-u)
-  onRate() {
-    console.log("Navigating to rating screen...");
-    //this.router.navigate(['/rating']); // Otkomentariši kada napraviš rutu za ocenjivanje
-    alert("Redirecting to rating page...");
-  }
-
   
-  goToRating() {
-    this.router.navigate(['/rate-ride']);
-  }
 }
