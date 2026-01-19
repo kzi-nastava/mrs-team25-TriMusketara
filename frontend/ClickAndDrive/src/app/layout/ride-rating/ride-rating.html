@@ -1,1 +1,39 @@
-<p>ride-rating works!</p>
+<div class="modal-overlay">
+  <div class="rating-card">
+    
+    <!-- Driver Rating Section -->
+    <div class="rating-group">
+      <p class="question">Would you like to rate the driver for this ride?</p>
+      <div class="star-container">
+        @for (star of stars; track star) {
+          <span class="star" 
+                [class.selected]="star <= driverRating()" 
+                (click)="setDriverRating(star)">★</span>
+        }
+      </div>
+    </div>
+
+    <!-- Vehicle Rating Section -->
+    <div class="rating-group">
+      <p class="question">Would you like to rate the vehicle used on this drive?</p>
+      <div class="star-container">
+        @for (star of stars; track star) {
+          <span class="star" 
+                [class.selected]="star <= vehicleRating()" 
+                (click)="setVehicleRating(star)">★</span>
+        }
+      </div>
+    </div>
+
+    <!-- Comment Section -->
+    <div class="comment-group">
+      <p class="question">Would you like to provide more information?</p>
+      <textarea class="comment-box" [(ngModel)]="comment"></textarea>
+    </div>
+
+    <!-- Action Buttons -->
+    <button class="submit-btn" (click)="onSubmit()">Submit</button>
+    <p class="no-thanks" (click)="onDismiss()">No, thanks!</p>
+
+  </div>
+</div>
