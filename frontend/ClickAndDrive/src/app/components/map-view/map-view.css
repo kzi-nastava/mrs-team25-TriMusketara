@@ -2,9 +2,9 @@
 :host {
   display: block;
   width: 100%;
-  max-width: 1235px; /* Maximum width from Figma */
+  max-width: 100vw; /* Maximum width from Figma */
   height: 100%;      
-  max-height: 674px; /* Figma height limit */
+  max-height: 100vh; /* Figma height limit */
   margin: auto;      /* Final centering safety */
 }
 

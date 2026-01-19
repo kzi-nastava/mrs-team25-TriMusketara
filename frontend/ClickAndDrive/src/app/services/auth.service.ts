@@ -14,6 +14,11 @@ export class AuthService {
     // In-drive status
     inDrive = signal(false);
 
+    // Signals to store the current ride data
+    origin = signal('');
+    destination = signal('');
+    eta = signal(0); 
+
     // Set which user
     setUserType(type: 'guest' | 'user' | 'driver' | 'admin') {
         this.userType.set(type);
@@ -26,5 +31,11 @@ export class AuthService {
 
     setInDrive(status: boolean) {
         this.inDrive.set(status);
+    }
+
+    // Method to update current ride details
+    setRideData(origin: string, destination: string) {
+        this.origin.set(origin);
+        this.destination.set(destination);
     }
 }

@@ -66,4 +66,20 @@ export class Map {
       this.etaMinutes = Math.round(durationSeconds / 60);
     });
   }
+
+  async geocodeAddress(address: string): Promise<[number, number]> {
+  const token = 'pk.eyJ1IjoicmliaWNuaWtvbGEiLCJhIjoiY21qbTJvNHFlMmV6OTNncXhpOGNiaTVnayJ9.Bhzo0Euk2D923K3smmoVaQ';
+  const bbox = [19.75, 45.20, 19.95, 45.30];
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json` + 
+              `?access_token=${token}&limit=1&bbox=${bbox.join(',')}`;
+
+  const response = await fetch(url);
+  const data = await response.json();
+
+  if (!data.features || !data.features.length) {
+    throw new Error(address);
+  }
+
+  return data.features[0].center as [number, number];
+}
 }
