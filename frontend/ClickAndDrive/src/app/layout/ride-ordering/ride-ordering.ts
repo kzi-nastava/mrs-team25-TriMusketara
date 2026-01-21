@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service'; 
@@ -11,8 +11,15 @@ import { AuthService } from '../../services/auth.service';
 })
 export class RideOrdering {
   //services
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  // private authService = inject(AuthService);
+  // private router = inject(Router);
+
+  @Output()
+  rideRequested = new EventEmitter<{
+    origin: string;
+    destination: string;
+    stops: string[];
+  }>
 
   // These are static fields, we have one value and one input
   topFields = [
@@ -77,51 +84,54 @@ export class RideOrdering {
   }  
 
   onFinishOrder() {
-  this.invalidFields = []; 
+    // Reset invalid fields list
+    this.invalidFields = []; 
 
-  // Validation logic
-  this.allFields.forEach(field => {
-    if (field.required) {
-      const element = document.getElementById(field.label) as HTMLInputElement | HTMLSelectElement;
+    // Validation logic
+    this.allFields.forEach(field => {
+      if (field.required) {
+        const element = document.getElementById(field.label) as HTMLInputElement | HTMLSelectElement;
 
-      if (field.type === 'checkbox') {
-        const checkbox = element as HTMLInputElement;
-        if (!checkbox.checked) {
-          this.invalidFields.push(field.label);
-        }
-      } else {
-        if (!element || !element.value || element.value.trim() === '') {
-          this.invalidFields.push(field.label);
+        if (field.type === 'checkbox') {
+          const checkbox = element as HTMLInputElement;
+          if (!checkbox.checked) {
+            this.invalidFields.push(field.label);
+          }
+        } else {
+          if (!element || !element.value || element.value.trim() === '') {
+            this.invalidFields.push(field.label);
+          }
         }
       }
+    });
+
+    // If there are invalid fields, stop the method here (do not navigate)
+    if (this.invalidFields.length > 0) {
+      console.log("Validation failed for fields:", this.invalidFields);
+      return; 
     }
-  });
 
-  // If there are invalid fields, stop the method here (do not navigate)
-  if (this.invalidFields.length > 0) {
-    console.log("Validation failed for fields:", this.invalidFields);
-    return; 
-  }
+    // Clear empty entries from dynamic fields (additional stops and passengers)
+    const cleanedStops = this.additionalStops.map(s => s.trim()).filter(s => s !== '');
+    this.linkedPassengers = this.linkedPassengers.filter(p => p.trim() !== '');
 
-  // If validation passed (invalidFields is empty), continue:
-  console.log("Validation passed! Ordering ride...");
+    // Get values from input fields
+    const origin = (document.getElementById('origin') as HTMLInputElement).value.trim();
+    const destination = (document.getElementById('destination') as HTMLInputElement).value.trim();
 
-  // Clear empty entries from dynamic fields (additional stops and passengers)
-  this.additionalStops = this.additionalStops.filter(s => s.trim() !== '');
-  this.linkedPassengers = this.linkedPassengers.filter(p => p.trim() !== '');
+    // Emitting event to MainPage 
+    this.rideRequested.emit({
+      origin,
+      destination,
+      stops: cleanedStops
+    });
 
-  // Storing ride data in AuthService
+    // // Save them to authService so DriveInProgress can see them
+    // this.authService.setRideData(originVal, destVal);
+    // this.authService.setInDrive(true);
 
-  // Get values from input fields
-  const originVal = (document.getElementById('origin') as HTMLInputElement).value;
-  const destVal = (document.getElementById('destination') as HTMLInputElement).value;
-
-  // Save them to authService so DriveInProgress can see them
-  this.authService.setRideData(originVal, destVal);
-  this.authService.setInDrive(true);
-
-  // Navigate to drive-in-progress page
-  this.router.navigate(['/drive-in-progress']);
+    // // Navigate to drive-in-progress page
+    // this.router.navigate(['/drive-in-progress']);
 }
 
   isFieldInvalid(label: string): boolean {

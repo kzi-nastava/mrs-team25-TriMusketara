@@ -48,10 +48,13 @@ export class MainPageComponent {
     this.ridePopup.close();
   }
 
+  // Converts text, example: Novi Sad, into map coordinates [lng, lat] using Mapbox Geocoding API
   private async geocodeAddress(address: string): Promise<[number, number]> {
     const token = 'pk.eyJ1IjoicmliaWNuaWtvbGEiLCJhIjoiY21qbTJvNHFlMmV6OTNncXhpOGNiaTVnayJ9.Bhzo0Euk2D923K3smmoVaQ';
     const bbox = [19.75, 45.20, 19.95, 45.30];
     const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json` + `?access_token=${token}&limit=1&bbox=${bbox.join(',')}`;
+
+    // const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${token}&limit=1`;
 
     const response = await fetch(url);
     const data = await response.json();
@@ -60,10 +63,60 @@ export class MainPageComponent {
       throw new Error(address);
     }
 
+
     return data.features[0].center as [number, number];
   }
 
   onEtaReceived(minutes: number) {
     this.etaMinutes = minutes;
   }
+
+  // Takes an ordered list of addresses and converts them into a list of coordinates
+  private async geocodeAddressesSequentialy(addresses: string[]): Promise<[number, number][]> {
+    const coordinates: [number, number][] = [];
+
+    for (const address of addresses) {
+      try {
+        const coords = await this.geocodeAddress(address);
+        coordinates.push(coords);
+      } catch (err) {
+        console.error('Failed to geocode:', address);
+        throw err;
+      }
+    }
+
+    return coordinates;
+  }
+
+  // Requested ride data from registered user form
+  async onUserRideRequested(data: {
+    origin: string,
+    destination: string,
+    stops: string[];
+    }) {
+      console.log('Ride requested:', data);
+
+      // Making an ordered list
+      const allAddresses: string[] = [data.origin, ...data.stops, data.destination];
+
+      console.log('All addresses in order:', allAddresses);
+
+      try {
+        // Geocode addresses
+        const coordinates = await this.geocodeAddressesSequentialy(allAddresses);
+
+        console.log(coordinates);
+
+        if (this.mapView) {
+          this.mapView.drawRouteWithStops(coordinates);
+        }
+
+        this.showRideData.set(true);
+
+      } catch (err) {
+        alert('One of the addresses could not be found');
+      }
+  }
 }
+
+
