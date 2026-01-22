@@ -12,10 +12,16 @@
                         <input
                         [id]="field.label"
                         [name]="field.label"
+                        [(ngModel)] = "formData[field.label]"
                         [type]="field.type"
                         [placeholder]="field.placeholder"
                         [class.invalid]="isFieldInvalid(field.label)"
                     />
+                    @if (fieldErrors[field.label]) {
+                      <small class="error-text">
+                        {{ fieldErrors[field.label] }}
+                      </small>
+                    }                    
                 </div>
             }
 
@@ -26,7 +32,12 @@
                 </button>
              </div>
               
-            <div class="form-row">
+            <div class="form-row linked-passengers-row">
+                @if (fieldErrors['linkedPassengers']) {
+                  <span class="error-text">
+                    {{ fieldErrors['linkedPassengers'] }}
+                  </span>
+                }
                 <label>Linked passengers:</label>
                 <button type="button" class="additions-btn" (click)="openPassengerModal()">
                   + Add passengers
@@ -41,6 +52,7 @@
                     @if (field.type === 'select') {
                         <select [id]="field.label" 
                                 [name]="field.label"
+                                [(ngModel)] = "formData[field.label]"
                                 [class.invalid]="isFieldInvalid(field.label)">
                             @for (option of field.options; track option) {
                                 <option [value]="option">{{option}}</option>
@@ -51,11 +63,17 @@
                         <input
                         [id]="field.label"
                         [name]="field.label"
+                        [(ngModel)] = "formData[field.label]"
                         [type]="field.type"
                         [placeholder]="field.placeholder"
                         [class.invalid]="isFieldInvalid(field.label)"
                     />
                     }
+                    @if (fieldErrors[field.label]) {
+                      <small class="error-text">
+                        {{ fieldErrors[field.label] }}
+                      </small>
+                    }                    
                 </div>
             }
         </form>
@@ -101,7 +119,6 @@
                     }
                   </div>
                 }
-          
                 <div class="modal-actions">
                   <button class="cancel-linking-passengers-btn" (click)="closePassengerModal()">Cancel</button>
                   <button class="save-linking-passengers-btn" (click)="closePassengerModal()">Save</button>
