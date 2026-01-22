@@ -6,13 +6,13 @@ import {Injectable, signal} from '@angular/core';
 
 export class AuthService {
     // Signal for user type
-    userType = signal<'guest' | 'user' | 'driver' | 'admin'>('admin');
+    userType = signal<'guest' | 'user' | 'driver' | 'admin'>('user');
 
     // Username
     userName = signal('TriMusketara');
 
     // In-drive status
-    inDrive = signal(true);
+    inDrive = signal(false);
 
     // Signals to store the current ride data
     origin = signal('');

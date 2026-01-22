@@ -35,7 +35,7 @@
 <!-- REGISTERED USER -->
 @if (auth.userType() === 'user') {
   <div class="ride-overlay" (click)="ridePopup.close()">
-    <app-ride-ordering (click)="$event.stopPropagation()" (rideRequested)="onUserRideRequested($event)"></app-ride-ordering>
+    <app-ride-ordering (click)="$event.stopPropagation()" (rideRequested)="onUserRideRequested($event)" (closeRequested)="ridePopup.close()"></app-ride-ordering>
   </div>
   }
 }
