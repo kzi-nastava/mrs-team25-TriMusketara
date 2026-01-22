@@ -30,6 +30,9 @@ export class RideOrdering {
     stops: string[];
   }>
 
+  @Output()
+  closeRequested = new EventEmitter<void>();  
+
   // These are static fields, we have one value and one input
   topFields = [
     {label: 'origin', text: 'Origin:', type: 'text', placeholder: 'Zabalj', required: true},
@@ -214,22 +217,23 @@ export class RideOrdering {
     if (isFormValid === false) {
       return;
     }
-    else {
-      // Get values from input fields
-      const origin = (document.getElementById('origin') as HTMLInputElement).value.trim();
-      const destination = (document.getElementById('destination') as HTMLInputElement).value.trim();
-
-      // Emitting event to MainPage 
-      this.rideRequested.emit({
-        origin,
-        destination,
-        stops: cleanedStops
-      });
-    }
 
     // Clear empty entries from dynamic fields (additional stops and passengers)
-    this.additionalStops = this.additionalStops.filter(s => s.trim() !== '');
+    const cleanedStops = this.additionalStops.filter(s => s.trim() !== '');
     this.linkedPassengers = this.linkedPassengers.filter(p => p.trim() !== '');
+
+    // Get values from input fields
+    const origin = this.formData.origin.trim();
+    const destination = this.formData.destination.trim();
+
+    // Emitting event to MainPage 
+    this.rideRequested.emit({
+      origin,
+      destination,
+      stops: cleanedStops
+    });
+
+    this.closeRequested.emit();
   }
 
   isFieldInvalid(label: string): boolean {
