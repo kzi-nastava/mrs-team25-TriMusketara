@@ -23,10 +23,21 @@ export class DriveInProgress implements AfterViewInit {
 
   // ngAfterViewInit runs after the HTML (and the map) is ready
   async ngAfterViewInit() {
-    // Check if we have addresses stored in the service
-    if (this.auth.origin() && this.auth.destination()) {
-      await this.drawRouteOnLoad();
-    }
+    const coordinates: [number, number][] = [
+      [19.8335, 45.2671],
+      [19.3956, 45.2497],
+      [19.6667, 46.1000] 
+    ];
+  
+    setTimeout(() => {
+      if (this.mapView && this.mapView.map) {
+        this.mapView.drawRouteWithStops(coordinates);
+      }
+    }, 400);
+    // // Check if we have addresses stored in the service
+    // if (this.auth.origin() && this.auth.destination()) {
+    //   await this.drawRouteOnLoad();
+    // }
   }
 
   // Private helper to geocode and draw the line

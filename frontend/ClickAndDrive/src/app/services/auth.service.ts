@@ -12,7 +12,7 @@ export class AuthService {
     userName = signal('TriMusketara');
 
     // In-drive status
-    inDrive = signal(false);
+    inDrive = signal(true);
 
     // Signals to store the current ride data
     origin = signal('');
