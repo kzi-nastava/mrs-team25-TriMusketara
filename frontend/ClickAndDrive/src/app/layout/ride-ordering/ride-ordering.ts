@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service'; 
@@ -20,8 +20,15 @@ interface FormField {
 })
 export class RideOrdering {
   //services
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  // private authService = inject(AuthService);
+  // private router = inject(Router);
+
+  @Output()
+  rideRequested = new EventEmitter<{
+    origin: string;
+    destination: string;
+    stops: string[];
+  }>
 
   // These are static fields, we have one value and one input
   topFields = [
@@ -164,7 +171,7 @@ export class RideOrdering {
   validateForm(): boolean {
     this.invalidFields = [];
     this.fieldErrors = {};
-
+    
     for (let i = 0; i < this.allFields.length; i++) {
         const field = this.allFields[i];
 
@@ -206,6 +213,18 @@ export class RideOrdering {
 
     if (isFormValid === false) {
       return;
+    }
+    else {
+      // Get values from input fields
+      const origin = (document.getElementById('origin') as HTMLInputElement).value.trim();
+      const destination = (document.getElementById('destination') as HTMLInputElement).value.trim();
+
+      // Emitting event to MainPage 
+      this.rideRequested.emit({
+        origin,
+        destination,
+        stops: cleanedStops
+      });
     }
 
     // Clear empty entries from dynamic fields (additional stops and passengers)

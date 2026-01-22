@@ -30,3 +30,13 @@
   text-align: center;
   line-height: 1;
 }
+
+.destination-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.destination-marker svg {
+  display: block;
+}
