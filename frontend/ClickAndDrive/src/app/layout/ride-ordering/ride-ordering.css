@@ -55,6 +55,7 @@
 
 .form-row {
     /* border: 1px solid cyan; */
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -252,6 +253,25 @@
 .invalid {
     border: 2px solid red !important;
 }
+
+.error-text {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin-right: 10.5%;
+  transform: translateY(-40%);
+
+  font-size: 11px;
+  color: red;
+  white-space: nowrap;
+
+  pointer-events: none;
+}
+
+.linked-passengers-row {
+  position: relative;
+}
+
 
 @media (min-width: 480px) {
     .container {
