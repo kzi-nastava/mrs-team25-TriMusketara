@@ -3,6 +3,15 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service'; 
 
+interface FormField {
+  label: string;
+  text: string;
+  type: string;
+  placeholder: string;
+  options: string[];
+  required: boolean;
+}
+
 @Component({
   selector: 'app-ride-ordering',
   imports: [FormsModule],
@@ -34,8 +43,44 @@ export class RideOrdering {
     {label: 'pet-friendly', text: 'Pet friendly:', type: 'checkbox', placeholder: '', required: false}
   ]
 
+  // Form data
+  // Here we will save real data the user inputs into the form
+  formData: any = {};
+
+  // Error messages for each field, if that field is invalid
+  fieldErrors: Record<string, string> = {};
+
+  // These are dynamic fields, the user can add more values to these inputs
+  additionalStops: string[] = ['']; // additional stops list
+  linkedPassengers: string[] = ['']; // linked passengers list
+
+  invalidFields: string[] = []; // List of invalid form fields
+
+  // Control for when showing pop-ups for addition of additional stops, or linking other passenger emails
   showStopsModal = false;
   showPassengerModal = false;
+
+  // ngOnInit is a method that is called when a component is loaded
+  // Here we will initialize our form data with empty values which will later contain real values the user inputs
+  ngOnInit() {
+    const allFieldsCombined = [...this.topFields, ...this.bottomFields];
+
+    for (let i = 0; i < allFieldsCombined.length; i++) {
+      const field = allFieldsCombined[i];
+
+      // If field is checkbox, the initial value should be false (it isnt checked)
+      if (field.type === 'checkbox') {
+        this.formData[field.label] = false;
+      }
+      else {
+        this.formData[field.label] = '';
+      }
+    }
+  }
+
+  get allFields() {
+    return [...this.topFields, ...this.bottomFields];
+  }
 
   openStopsModal() {
     this.showStopsModal = true;
@@ -43,6 +88,17 @@ export class RideOrdering {
 
   closeStopsModal() {
     this.showStopsModal = false;
+  }
+
+  addStop() {
+    this.additionalStops.push('');
+  }
+
+  removeStop(index: number) {
+    // Allow removal if there are more than one additional stop
+    if (this.additionalStops.length > 1) {
+      this.additionalStops.splice(index, 1);
+    }
   }
 
   openPassengerModal() {
@@ -53,22 +109,6 @@ export class RideOrdering {
     this.showPassengerModal = false;
   }
 
-  // These are dynamic fields, the user can add more values to these inputs
-  additionalStops: string[] = ['']; // additional stops list
-  linkedPassengers: string[] = ['']; // linked passengers list
-
-  invalidFields: string[] = []; // List of invalid form fields
-
-  addStop() {
-    this.additionalStops.push('');
-  }
-
-  removeStop(index: number) {
-    if (this.additionalStops.length > 1) {
-      this.additionalStops.splice(index, 1);
-    }
-  }
-
   addPassenger() {
     this.linkedPassengers.push('');
   }
@@ -77,62 +117,120 @@ export class RideOrdering {
     if (this.linkedPassengers.length > 1) {
       this.linkedPassengers.splice(index, 1);
     }
-  }
-
-  get allFields() {
-    return [...this.topFields, ...this.bottomFields];
   }  
 
-  onFinishOrder() {
-    // Reset invalid fields list
-    this.invalidFields = []; 
+  // Validating a single field
+  // Taking in the label of the input, and the value of the user, if everything seems okay we return true, else false
+  validateField(label: string, value: any): boolean {
+    // Find label
+    const fieldDefinition = this.allFields.find(f => f.label === label);
 
-    // Validation logic
-    this.allFields.forEach(field => {
-      if (field.required) {
-        const element = document.getElementById(field.label) as HTMLInputElement | HTMLSelectElement;
+    delete this.fieldErrors[label];
 
-        if (field.type === 'checkbox') {
-          const checkbox = element as HTMLInputElement;
-          if (!checkbox.checked) {
-            this.invalidFields.push(field.label);
-          }
-        } else {
-          if (!element || !element.value || element.value.trim() === '') {
-            this.invalidFields.push(field.label);
-          }
+    if (fieldDefinition === undefined) {
+      return true;
+    }
+
+    if (fieldDefinition.type === 'checkbox') return true;
+
+    // Check if the field is required
+    if (fieldDefinition.required === true) {
+      // Required field cannot be empty, (origin, destination, time...)
+      if (!value || value.toString().trim() === '') {
+        this.fieldErrors[label] = 'This field is required';
+        return false;
+      }
+    }
+
+    // Origin and destination cannot be the same
+    if (label === 'destination') {
+      if (this.formData.origin && value && this.formData.origin.trim() === value.trim()) {
+        this.fieldErrors[label] = 'Origin and destination locations must be different';
+        return false;
+      }
+    }
+
+    // Time validation 
+    if (label === 'time' && value) {
+      const now = new Date();
+      const selectedTime = new Date();
+
+      const [hours, minutes] = value.split(':').map(Number);
+      selectedTime.setHours(hours, minutes, 0, 0);
+
+      if (selectedTime <= now) {
+        this.fieldErrors[label] = 'Time has passed';
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Validate the entire form now
+  // Call the function above for all form fields
+  validateForm(): boolean {
+    this.invalidFields = [];
+    this.fieldErrors = {};
+    
+    for (let i = 0; i < this.allFields.length; i++) {
+        const field = this.allFields[i];
+
+        // Get current value
+        const currentValue = this.formData[field.label];
+
+        const isValid = this.validateField(field.label, currentValue);
+
+        if (isValid === false) {
+          // Add field label to list o finvalid fields
+          this.invalidFields.push(field.label);
         }
       }
-    });
 
-    // If there are invalid fields, stop the method here (do not navigate)
-    if (this.invalidFields.length > 0) {
-      console.log("Validation failed for fields:", this.invalidFields);
-      return; 
+      const invalidEmails = this.linkedPassengers.filter(email => email.trim() !== '' && !this.isValidEmail(email));
+
+      if (invalidEmails.length > 0) {
+        this.fieldErrors['linkedPassengers'] = 'One or more emails are invalid';
+        return false;
+      }
+
+      // If the list is empty, all fields are valid
+      if (this.invalidFields.length === 0) {
+        return true;
+      }
+      else {
+        return false;
+      }
+  }
+
+  // Helper for email form validation
+  isValidEmail(email: string): boolean {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  }
+
+  onFinishOrder() {
+    const isFormValid = this.validateForm();
+
+    if (isFormValid === false) {
+      return;
+    }
+    else {
+      // Get values from input fields
+      const origin = (document.getElementById('origin') as HTMLInputElement).value.trim();
+      const destination = (document.getElementById('destination') as HTMLInputElement).value.trim();
+
+      // Emitting event to MainPage 
+      this.rideRequested.emit({
+        origin,
+        destination,
+        stops: cleanedStops
+      });
     }
 
     // Clear empty entries from dynamic fields (additional stops and passengers)
-    const cleanedStops = this.additionalStops.map(s => s.trim()).filter(s => s !== '');
+    this.additionalStops = this.additionalStops.filter(s => s.trim() !== '');
     this.linkedPassengers = this.linkedPassengers.filter(p => p.trim() !== '');
-
-    // Get values from input fields
-    const origin = (document.getElementById('origin') as HTMLInputElement).value.trim();
-    const destination = (document.getElementById('destination') as HTMLInputElement).value.trim();
-
-    // Emitting event to MainPage 
-    this.rideRequested.emit({
-      origin,
-      destination,
-      stops: cleanedStops
-    });
-
-    // // Save them to authService so DriveInProgress can see them
-    // this.authService.setRideData(originVal, destVal);
-    // this.authService.setInDrive(true);
-
-    // // Navigate to drive-in-progress page
-    // this.router.navigate(['/drive-in-progress']);
-}
+  }
 
   isFieldInvalid(label: string): boolean {
     return this.invalidFields.includes(label);

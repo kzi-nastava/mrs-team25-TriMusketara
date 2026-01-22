@@ -20,5 +20,12 @@ public class Passenger extends User {
     @Column(name = "email")
     private List<String> linkedEmails;
 
+    @ManyToMany
+    @JoinTable(
+            name = "passenger_favorite_routes",
+            joinColumns = @JoinColumn(name = "passenger_id"),
+            inverseJoinColumns = @JoinColumn(name = "route_id")
+    )
+    // ManyToMany znaci da ce se napraviti posebna tabela sa id-jem putnika i rute koja mu je omiljena
     private List<Route> favoriteRoutes;
 }

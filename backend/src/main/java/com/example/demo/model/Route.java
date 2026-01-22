@@ -22,8 +22,11 @@ public class Route {
     @ManyToOne
     private Location destination;
 
-    @ManyToMany
-    private List<Location> stops;
+    private int duration;
+
+    private int distance;
+
+    private int timesUsed;
 
     private int estimatedTime;
 }

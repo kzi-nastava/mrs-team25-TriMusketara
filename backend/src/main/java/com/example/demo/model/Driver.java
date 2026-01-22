@@ -19,5 +19,6 @@ public class Driver extends User {
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
 
+    @OneToMany(mappedBy = "driver")
     private List<Ride> rides;
 }
