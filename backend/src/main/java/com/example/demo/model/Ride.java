@@ -47,6 +47,9 @@ public class Ride {
 
     private double price;
 
+    @ManyToMany
+    private List<Location> stops;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "review_id")
     private Review review;

@@ -1,17 +1,12 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.LocationDTO;
-import com.example.demo.dto.request.RideFromFavoritesRequestDTO;
-import com.example.demo.dto.request.RideRequestDTO;
+import com.example.demo.dto.request.*;
 import com.example.demo.dto.response.RideResponseDTO;
+import com.example.demo.dto.response.RouteFromFavoritesResponseDTO;
 import com.example.demo.model.RideStatus;
-import com.example.demo.dto.request.RideCancellationRequestDTO;
-import com.example.demo.dto.request.RideRequestUnregisteredDTO;
-import com.example.demo.dto.request.RideStopRequestDTO;
 import com.example.demo.dto.response.RideEstimateResponseDTO;
 import com.example.demo.dto.response.RideTrackingResponseDTO;
-import com.example.demo.dto.request.InconsistencyReportRequestDTO;
-import com.example.demo.dto.request.ReviewRequestDTO;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,13 +45,28 @@ public class RideController {
 
     // Ordering ride from favorites
     @PostMapping("/favorites")
-    public ResponseEntity<RideResponseDTO> createRideFromFavorites(
-            @RequestBody RideFromFavoritesRequestDTO request) {
-        RideResponseDTO response = new RideResponseDTO(
-                2L,
-                RideStatus.CREATED,
-                600.0
+    public ResponseEntity<RouteFromFavoritesResponseDTO> createRideFromFavorites(
+            @RequestBody RouteFromFavoritesRequestDTO request) {
+        LocationDTO origin = new LocationDTO(
+                45.2671,
+                19.8335,
+                "Novi Sad"
         );
+
+        LocationDTO destination = new LocationDTO(
+                44.7866,
+                20.4489,
+                "Beograd"
+        );
+
+        RouteFromFavoritesResponseDTO response =
+                new RouteFromFavoritesResponseDTO(
+                        origin,
+                        destination,
+                        100,
+                        90,
+                        5
+                );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
