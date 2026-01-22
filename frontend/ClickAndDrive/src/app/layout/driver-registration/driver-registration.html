@@ -12,10 +12,16 @@
                         <input
                             [id]="field.label"
                             [name]="field.label"
+                            [(ngModel)]="formData[field.label]"
                             [type]="field.type"
                             [placeholder]="field.placeholder"
                             [class.invalid]="isFieldInvalid(field.label)"
                         />
+                        @if (fieldErrors[field.label]) {
+                            <span class="error-text">
+                              {{ fieldErrors[field.label] }}
+                            </span>
+                          }                          
                     </div>
                 }
             </form>
@@ -33,6 +39,7 @@
                         @if (field.type === 'select') {
                             <select [id]="field.label" 
                                     [name]="field.label"
+                                    [(ngModel)]="formData[field.label]"
                                     [class.invalid]="isFieldInvalid(field.label)"
                             >
                                 @for (option of field.options; track option) {
@@ -44,6 +51,7 @@
                             <input
                             [id]="field.label"
                             [name]="field.label"
+                            [(ngModel)]="formData[field.label]"
                             [type]="field.type"
                             [placeholder]="field.placeholder"
                             [min]="field.min"
@@ -51,6 +59,11 @@
                             [class.invalid]="isFieldInvalid(field.label)"
                         />
                         }
+                        @if (fieldErrors[field.label]) {
+                            <span class="error-text">
+                              {{ fieldErrors[field.label] }}
+                            </span>
+                          }                          
                     </div>
                 }
             </form>
