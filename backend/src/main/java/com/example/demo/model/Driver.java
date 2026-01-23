@@ -15,10 +15,16 @@ public class Driver extends User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DriverStatus status;
+
     @OneToOne
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
 
     @OneToMany(mappedBy = "driver")
     private List<Ride> rides;
+
+    // For now, only to see if driver registration works
+    // Will be changed when others finish authorization
+    @Column(name = "registration_token")
+    private String registrationToken;
 }

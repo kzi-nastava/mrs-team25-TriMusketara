@@ -9,6 +9,9 @@ import com.example.demo.dto.response.RideHistoryResponseDTO;
 import com.example.demo.dto.response.AdminRideStateResponseDTO;
 import com.example.demo.dto.VehiclePriceDTO;
 
+import com.example.demo.services.interfaces.DriverService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,19 +23,19 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
+@CrossOrigin(origins = "http://localhost:4200")
+@RequiredArgsConstructor
 public class AdminController {
+
+    // Services
+    private final DriverService driverService;
 
     @PostMapping("/drivers")
     public ResponseEntity<DriverRegistrationResponseDTO> registerDriver(
-            @RequestBody DriverRegistrationRequestDTO request) {
+            @Valid @RequestBody DriverRegistrationRequestDTO request) {
 
-        DriverRegistrationResponseDTO response = new DriverRegistrationResponseDTO(
-                1L,
-                request.getEmail(),
-                request.getName(),
-                request.getSurname(),
-                DriverStatus.ACTIVE
-        );
+        // Call service function to register a new driver into the app
+        DriverRegistrationResponseDTO response = driverService.registerDriver(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

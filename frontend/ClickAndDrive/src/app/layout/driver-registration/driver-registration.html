@@ -9,7 +9,20 @@
                 @for (field of driverFields; track field.label) {
                     <div class="form-row">
                         <label [for]="field.label">{{field.text}}</label>
-                        <input
+                        <!-- Select field is needed for dropdown when reigstering drivers gender -->
+                        @if (field.type === 'select') {
+                            <select [id]="field.label" 
+                                    [name]="field.label"
+                                    [(ngModel)]="formData[field.label]"
+                                    [class.invalid]="isFieldInvalid(field.label)"
+                            >
+                                @for (option of field.options; track option) {
+                                    <option [value]="option">{{option}}</option>
+                                }
+                            </select>
+                        <!-- Otherwise, use regular input field -->
+                        } @else {
+                            <input
                             [id]="field.label"
                             [name]="field.label"
                             [(ngModel)]="formData[field.label]"
@@ -17,11 +30,12 @@
                             [placeholder]="field.placeholder"
                             [class.invalid]="isFieldInvalid(field.label)"
                         />
+                        }
                         @if (fieldErrors[field.label]) {
                             <span class="error-text">
                               {{ fieldErrors[field.label] }}
                             </span>
-                          }                          
+                          }                                    
                     </div>
                 }
             </form>
