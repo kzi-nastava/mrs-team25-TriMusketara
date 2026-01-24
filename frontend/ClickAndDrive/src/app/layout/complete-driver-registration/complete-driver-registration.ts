@@ -56,7 +56,7 @@ export class CompleteDriverRegistration {
       const hasUpperCase = /[A-Z]/.test(value);
       const hasNumber = /[0-9]/.test(value);
 
-      if (!hasUpperCase && !hasNumber) {
+      if (!hasUpperCase || !hasNumber) {
         this.fieldErrors[fieldName] = 'Password must contain at least one uppercase letter and one number';
         return false;
       }
