@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProfileSidebarService } from '../../services/profile-sidebar.service';
 import { FormsModule } from '@angular/forms';
+import { DriverService } from '../../services/driver.service';
+import { DriverCreate } from '../../services/models/driver-create';
 
 @Component({
   selector: 'app-driver-registration',
@@ -14,20 +16,22 @@ export class DriverRegistration {
     {label: 'fname', text: 'First name:', type: 'text', placeholder: 'Jane', required: true},
     {label: 'lname', text: 'Last name:', type: 'text', placeholder: 'Doe', required: true},
     {label: 'email', text: 'Email:', type: 'email', placeholder: 'janedoe@gmail.com', required: true},
+    {label: 'gender', text: 'Gender:', type: 'select', options: ['MALE', 'FEMALE'], required: true},
     {label: 'address', text: 'Address:', type: 'text', placeholder: 'Las Noches, Hueco Mundo', required: true},
     {label: 'mobile', text: 'Mobile:', type: 'text', placeholder: '123456789', required: true},
   ];
 
   vehicleFields = [
     {label: 'model', text: 'Model:', type: 'text', placeholder: 'Model', required: true},
-    {label: 'type', text: 'Type:', type: 'select', options: ['Luxury', 'Standard', 'Van'], required: true},
+    {label: 'type', text: 'Type:', type: 'select', options: ['LUXURY', 'STANDARD', 'VAN'], required: true},
     {label: 'licence', text: 'Plate number:', type: 'text', placeholder: 'NS319KK', required: true},
     {label: 'seats', text: 'Num. of seats:', type: 'number', placeholder: '', min: 4, max: 12, required: true},
     {label: 'baby-friendly', text: 'Baby friendly:', type: 'checkbox', placeholder: '', required: false},
     {label: 'pet-friendly', text: 'Pet friendly:', type: 'checkbox', placeholder: '', required: false},
   ];
 
-  public constructor(private router: Router, public profileSidebar: ProfileSidebarService) {}
+  // Add driver service to constructor
+  public constructor(private router: Router, public profileSidebar: ProfileSidebarService, private driverService: DriverService) {}
 
   formData: Record<string, any> = {};
 
@@ -178,18 +182,60 @@ export class DriverRegistration {
       return;
     }
 
-    console.log('Driver data:', this.formData);
+    // Get created driver object
+    const obj = this.buildDriver();
+
+    // If true - register driver
+    // Subscribe to method
+    console.log('Payload to send:', obj);
+    this.driverService.registerDriver(obj).subscribe({
+      next: (res) => {
+          console.log('Driver registered successfully:', res);
+          this.resetForm();
+          alert(`Driver ${res.name} ${res.surname} registered successfully!`);
+        },
+        error: (err) => {
+          console.error("Driver registration failed", err);
+        }
+      });
+    }
+
+  // Reset registration form
+  private resetForm() {
+    this.formData = {}
+    this.ngOnInit();
+    this.showVehicleInfo = false;
+  }
+  
+  // When canceling driver registration go to main page , but also open the profile sidebar
+  closeRegistrationForm() {
+    this.router.navigate(['/']).then(() => {
+      this.profileSidebar.open();
+    })
   }
 
   isFieldInvalid(label: string): boolean {
     return this.invalidFields.includes(label);
   }
 
-   // When canceling driver registration go to main page , but also open the profile sidebar
-   closeRegistrationForm() {
-    this.router.navigate(['/']).then(() => {
-      this.profileSidebar.open();
-    })
+  // Create driver object with users inputs
+  private buildDriver(): DriverCreate {
+    return {
+      name: this.formData['fname'],
+      surname: this.formData['lname'],
+      email: this.formData['email'],
+      gender: this.formData['gender'],
+      address: this.formData['address'],
+      phone: this.formData['mobile'],
+      vehicle: {
+        model: this.formData['model'],
+        type: this.formData['type'],
+        registration: this.formData['licence'],
+        seats: Number(this.formData['seats']),
+        babyFriendly: this.formData['baby-friendly'],
+        petFriendly: this.formData['pet-friendly']
+      }
+    };
   }
 
 }

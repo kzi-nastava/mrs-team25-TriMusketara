@@ -17,8 +17,9 @@ export class App {
 
   constructor(public router: Router) {}
 
+  // Here im using .includes to remove navbar from password input when registering driver, remember this!
   showNavbar(): boolean {
     return this.router.url !== '/login' && this.router.url !== '/register'
-          && this.router.url !== '/driver-registration';
+          && this.router.url !== '/driver-registration' && !this.router.url.includes('/complete-registration');
   }
 }
