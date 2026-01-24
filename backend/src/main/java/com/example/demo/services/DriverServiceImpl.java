@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.dto.request.CompleteRegistrationRequestDTO;
 import com.example.demo.dto.request.DriverRegistrationRequestDTO;
 import com.example.demo.dto.response.DriverRegistrationResponseDTO;
 import com.example.demo.model.Driver;
@@ -11,6 +12,7 @@ import com.example.demo.repositories.VehicleRepository;
 import com.example.demo.services.interfaces.DriverService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -23,6 +25,7 @@ public class DriverServiceImpl implements DriverService {
     private final DriverRepository driverRepository;
     private final VehicleRepository vehicleRepository;
     private final EmailServiceImpl emailService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public DriverRegistrationResponseDTO registerDriver(DriverRegistrationRequestDTO request) {
@@ -40,6 +43,7 @@ public class DriverServiceImpl implements DriverService {
         Vehicle vehicle = new Vehicle();
         vehicle.setModel(request.getVehicle().getModel());
         vehicle.setType(request.getVehicle().getType());
+        vehicle.setRegistration(request.getVehicle().getRegistration());
         vehicle.setSeats(request.getVehicle().getSeats());
         vehicle.setIsBabyFriendly(request.getVehicle().isBabyFriendly());
         vehicle.setIsPetFriendly(request.getVehicle().isPetFriendly());
@@ -54,7 +58,7 @@ public class DriverServiceImpl implements DriverService {
         driver.setGender(request.getGender());
         driver.setAddress(request.getAddress());
         driver.setPhone(request.getPhone());
-        driver.setStatus(DriverStatus.ACTIVE);
+        driver.setStatus(DriverStatus.PENDING);
         driver.setVehicle(vehicle); // set vehicle
         // Random token to keep track which driver is being registered
         driver.setRegistrationToken(UUID.randomUUID().toString());
@@ -83,5 +87,47 @@ public class DriverServiceImpl implements DriverService {
                 saved.getSurname(),
                 saved.getStatus()
         );
+    }
+
+    @Override
+    public void completeRegistration(CompleteRegistrationRequestDTO request) {
+        // Validation
+        // Are password and confirmPassword the same
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            try {
+                throw new BadRequestException("Password and confirm password are not the same");
+            } catch (BadRequestException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // Find driver by registration token
+        try {
+            Driver driver = driverRepository.findByRegistrationToken(request.getToken()).orElseThrow(() -> new BadRequestException("Invalid or expired token"));
+
+            // Validation
+            // Check if password is already set
+            if (driver.getRegistrationToken() == null) {
+                throw new BadRequestException("You are already registered");
+            }
+
+            // Set password
+            driver.setPassword(passwordEncoder.encode(request.getPassword()));
+
+            // Delete registration token
+            driver.setRegistrationToken(null);
+
+            driver.setStatus(DriverStatus.ACTIVE);
+
+            driverRepository.save(driver);
+
+        } catch (BadRequestException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean isTokenValid(String token) {
+        return driverRepository.findByRegistrationToken(token).isPresent();
     }
 }

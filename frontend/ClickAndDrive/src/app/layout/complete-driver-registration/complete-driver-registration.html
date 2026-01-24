@@ -1,0 +1,67 @@
+<div class="wrapper">
+<div class="page-wrapper">
+    <div class="title-container">
+      <h2>Complete Your Registration</h2>
+      <p>Please set your password to complete your driver registration</p>
+    </div>
+  
+    <!-- Global Error Message -->
+    <div class="error-banner" *ngIf="errorMessage">
+      <p>{{ errorMessage }}</p>
+    </div>
+  
+    <div class="form-container">
+      <form (ngSubmit)="onSubmit()" #registrationForm="ngForm">
+        
+        <!-- Password Field -->
+        <div class="form-row">
+          <label for="password">Password *</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            [(ngModel)]="password"
+            placeholder="Enter your password"
+            [class.invalid]="isFieldInvalid('password')"
+            (blur)="validateField('password', password)"
+            required
+          />
+          <span class="error-text" *ngIf="fieldErrors['password']">
+            {{ fieldErrors['password'] }}
+          </span>
+          <small class="hint">At least 8 characters, one uppercase letter and one number</small>
+        </div>
+  
+        <!-- Confirm Password Field -->
+        <div class="form-row">
+          <label for="confirmPassword">Confirm Password *</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            [(ngModel)]="confirmPassword"
+            placeholder="Confirm your password"
+            [class.invalid]="isFieldInvalid('confirmPassword')"
+            (blur)="validateField('confirmPassword', confirmPassword)"
+            required
+          />
+          <span class="error-text" *ngIf="fieldErrors['confirmPassword']">
+            {{ fieldErrors['confirmPassword'] }}
+          </span>
+        </div>
+  
+        <!-- Submit Button -->
+        <div class="buttons-container">
+          <button 
+            type="submit" 
+            class="submit-btn"
+            [disabled]="isLoading"
+          >
+            <span *ngIf="!isLoading">Complete Registration</span>
+            <span *ngIf="isLoading">Processing...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

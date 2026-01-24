@@ -2,16 +2,23 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { DriverCreate } from "./models/driver-create";
 import { Observable } from "rxjs";
+import { CompleteRegistration } from "./models/complete-driver-registration";
 
 @Injectable({providedIn: 'root'})
 export class DriverService {
 
     constructor(private http: HttpClient) {}
 
-    private apiUrl = 'http://localhost:8080/api/admin';
+    private adminUrl = 'http://localhost:8080/api/admin';
+    private driverUrl = "http://localhost:8080/api/drivers";
 
     // Register driver function
     registerDriver(data: DriverCreate): Observable<DriverCreate> {
-        return this.http.post<DriverCreate>(`${this.apiUrl}/drivers`, data);
+        return this.http.post<DriverCreate>(`${this.adminUrl}/drivers`, data);
+    }
+
+    // Complete driver registration
+    completeRegistration(request: CompleteRegistration): Observable<string> {
+        return this.http.post(`${this.driverUrl}/complete-registration`, request, {responseType: 'text'});
     }
 }

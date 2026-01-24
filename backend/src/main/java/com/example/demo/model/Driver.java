@@ -16,7 +16,7 @@ public class Driver extends User {
     @Column(nullable = false)
     private DriverStatus status;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
 
