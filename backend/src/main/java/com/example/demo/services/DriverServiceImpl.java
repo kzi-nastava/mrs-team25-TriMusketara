@@ -72,9 +72,10 @@ public class DriverServiceImpl implements DriverService {
         email.setSubject("Complete your registration");
         email.setMsgBody(
                 "Hello " + driver.getName() + ",\n\n" +
-                        "Please complete your registration by setting your password using the following link:\n" +
+                        "Welcome to ClickAndDrive! Please complete your registration by setting your password:\n\n" +
                         "http://localhost:4200/complete-registration?token=" + driver.getRegistrationToken() + "\n\n" +
-                        "Thank you! ClickAndDrive"
+                        "This link will expire in 24 hours.\n\n" +
+                        "Best regards,\nClickAndDrive Team"
         );
 
         emailService.sendsSimpleMail(email);
@@ -120,6 +121,17 @@ public class DriverServiceImpl implements DriverService {
             driver.setStatus(DriverStatus.ACTIVE);
 
             driverRepository.save(driver);
+
+            // Send email to confirm successful registration
+            EmailDetails confirmEmail = new EmailDetails();
+            confirmEmail.setRecipient(driver.getEmail());
+            confirmEmail.setSubject("Registration completed");
+            confirmEmail.setMsgBody(
+                    "Hello " + driver.getName() + ",\n\n" +
+                            "Your registration is now complete! You can log in to ClickAndDrive.\n\n" +
+                            "Best regards,\nClickAndDrive Team"
+            );
+            emailService.sendsSimpleMail(confirmEmail);
 
         } catch (BadRequestException e) {
             throw new RuntimeException(e);
