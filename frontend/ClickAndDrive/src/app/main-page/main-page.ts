@@ -5,6 +5,7 @@ import { RidePopup } from '../shared/ride-popup';
 import { RideOrdering } from '../layout/ride-ordering/ride-ordering';
 import { AuthService } from '../services/auth.service';
 import { FormsModule } from '@angular/forms';
+import { Location } from '../services/models/location';
 
 
 @Component({
@@ -22,6 +23,12 @@ export class MainPageComponent {
   originAddress = '';
   destinationAddress = '';
   etaMinutes: number | null = null;
+
+  resolvedLocations?: {
+    origin: Location;
+    destination: Location;
+    stops: Location[];
+  };  
 
   showRideData = signal(false);
 
@@ -104,6 +111,22 @@ export class MainPageComponent {
       try {
         // Geocode addresses
         const coordinates = await this.geocodeAddressesSequentialy(allAddresses);
+
+        // Create Location objects to send to Ride object
+        const locations: Location[] = allAddresses.map((address, i) => ({
+          address,
+          longitude: coordinates[i][0],
+          latitude: coordinates[i][1]
+        }));
+        const origin = locations[0];
+        const destination = locations[locations.length - 1];
+        const stops = locations.slice(1, -1);
+
+        this.resolvedLocations = {
+          origin,
+          destination,
+          stops
+        };
 
         console.log(coordinates);
 

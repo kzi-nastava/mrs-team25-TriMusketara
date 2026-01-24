@@ -6,7 +6,7 @@ import {Injectable, signal} from '@angular/core';
 
 export class AuthService {
     // Signal for user type
-    userType = signal<'guest' | 'user' | 'driver' | 'admin'>('admin');
+    userType = signal<'guest' | 'user' | 'driver' | 'admin'>('user');
 
     // Username
     userName = signal('TriMusketara');

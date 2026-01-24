@@ -18,7 +18,7 @@ public class Ride {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Location currentLocation;
 
     @Enumerated(EnumType.STRING)
@@ -46,6 +46,8 @@ public class Ride {
     private Route route;
 
     private double price;
+    private boolean isBabyFriendly;
+    private boolean isPetFriendly;
 
     @ManyToMany
     private List<Location> stops;

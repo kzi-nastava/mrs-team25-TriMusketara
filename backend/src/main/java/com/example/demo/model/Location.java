@@ -18,8 +18,8 @@ public class Location {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private double xCoord;
-    private double yCoord;
+    private double longitude;
+    private double latitude;
     private String address;
 
 }

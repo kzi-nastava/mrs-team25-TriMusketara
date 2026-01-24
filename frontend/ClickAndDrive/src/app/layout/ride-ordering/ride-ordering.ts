@@ -1,7 +1,10 @@
-import { Component, inject, Output, EventEmitter } from '@angular/core';
+import { Component, inject, OnChanges , Output, EventEmitter, Input, SimpleChange } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service'; 
+import { RideOrderingService } from '../../services/ride.service';
+import { RideOrderCreate } from '../../services/models/ride-order-create';
+import { Location } from '../../services/models/location';
 
 interface FormField {
   label: string;
@@ -18,10 +21,17 @@ interface FormField {
   templateUrl: './ride-ordering.html',
   styleUrl: './ride-ordering.css',
 })
-export class RideOrdering {
+export class RideOrdering implements OnChanges {
   //services
   // private authService = inject(AuthService);
   // private router = inject(Router);
+
+  // Needed to get longitude and latitude coords from mainpage where we geolocate
+  @Input() resolvedLocations?: {
+    origin: Location;
+    destination: Location;
+    stops: Location[];
+  };  
 
   @Output()
   rideRequested = new EventEmitter<{
@@ -33,6 +43,8 @@ export class RideOrdering {
   @Output()
   closeRequested = new EventEmitter<void>();  
 
+  constructor (private rideOrderService: RideOrderingService) {}
+
   // These are static fields, we have one value and one input
   topFields = [
     {label: 'origin', text: 'Origin:', type: 'text', placeholder: 'Zabalj', required: true},
@@ -40,7 +52,7 @@ export class RideOrdering {
   ];
 
   bottomFields = [
-    {label: 'type', text: 'Vehicle type:', type: 'select', options: ['Luxury', 'Standard', 'Van'], required: true},
+    {label: 'type', text: 'Vehicle type:', type: 'select', options: ['LUXURY', 'STANDARD', 'VAN'], required: true},
     {label: 'time', text: 'Set time:', type: 'time', placeholder: '', required: true},
     {label: 'baby-friendly', text: 'Baby friendly:', type: 'checkbox', placeholder: '', required: false},
     {label: 'pet-friendly', text: 'Pet friendly:', type: 'checkbox', placeholder: '', required: false}
@@ -232,10 +244,60 @@ export class RideOrdering {
       destination,
       stops: cleanedStops
     });
-
-    this.closeRequested.emit();
   }
 
+  ngOnChanges(changes: { [propName: string]: SimpleChange<any>; }): void {
+    if (changes['resolvedLocations'] && this.resolvedLocations) {
+      console.log("Locations arrived, building ride");
+
+      const ride = this.buildRide();
+
+      this.rideOrderService.createRide(ride).subscribe({
+        next: () => {
+          console.log("Ride created");
+          this.closeRequested.emit();
+        },
+        error: err => console.log(err)
+      });
+    }
+  }
+
+  // Build ride object to send
+  buildRide(): RideOrderCreate {
+
+    if (!this.resolvedLocations) {
+      console.log('Resolved locations:', this.resolvedLocations);
+      throw new Error("Locations not resolved");
+    }
+
+    return {
+      origin: this.resolvedLocations.origin,
+      destination: this.resolvedLocations.destination,
+      stops: this.resolvedLocations.stops,
+      passengerEmails: this.linkedPassengers.filter(p => p.trim() !== ''),
+      vehicleType: this.formData['type'],
+      scheduledTime: this.buildScheduledDateTime(this.formData['time']),
+      babyFriendly: this.formData['baby-friendly'],
+      petFriendly: this.formData['pet-friendly']
+    };
+  }
+
+  // Helper function, because "time" returns HH:mm but we need to map it to backend LocalDateTime
+  buildScheduledDateTime(time: string): string {
+    const now = new Date();
+    const [hours, minutes] = time.split(':').map(Number);
+  
+    const scheduled = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      hours,
+      minutes,
+      0
+    );
+    return scheduled.toISOString();
+  }
+  
   isFieldInvalid(label: string): boolean {
     return this.invalidFields.includes(label);
   }
