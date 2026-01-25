@@ -12,5 +12,4 @@ public class RideResponseDTO {
     private Long id;
     private RideStatus status;
     private double price;
-
 }

@@ -1,4 +1,4 @@
-<app-map-view size="small" (etaCalculated)="onEtaReceived($event)">
+<app-map-view size="small" (routeCalculated)="onRouteCalculated($event)">
     <div class="ride-data">
         <!-- Using signals for dynamic data -->
         <p>Origin: <span class="origin">{{ auth.origin() }}</span></p>

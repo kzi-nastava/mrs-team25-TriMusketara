@@ -5,6 +5,7 @@ import { RidePopup } from '../shared/ride-popup';
 import { RideOrdering } from '../layout/ride-ordering/ride-ordering';
 import { AuthService } from '../services/auth.service';
 import { FormsModule } from '@angular/forms';
+import { Location } from '../services/models/location';
 
 
 @Component({
@@ -21,7 +22,17 @@ export class MainPageComponent {
 
   originAddress = '';
   destinationAddress = '';
-  etaMinutes: number | null = null;
+  
+  routeInfo?: {
+    durationMinutes: number;
+    distanceKm: number;
+  }
+
+  resolvedLocations?: {
+    origin: Location;
+    destination: Location;
+    stops: Location[];
+  };  
 
   showRideData = signal(false);
 
@@ -31,6 +42,8 @@ export class MainPageComponent {
     try {
       const originCoords = await this.geocodeAddress(this.originAddress);
       const destCoords = await this.geocodeAddress(this.destinationAddress);
+
+      console.log(' Coordinates:', { originCoords, destCoords }); 
 
       if (this.mapView) {
         this.mapView.drawRouteAndCalculateETA(originCoords, destCoords);
@@ -67,8 +80,13 @@ export class MainPageComponent {
     return data.features[0].center as [number, number];
   }
 
-  onEtaReceived(minutes: number) {
-    this.etaMinutes = minutes;
+  // onEtaReceived(minutes: number) {
+  //   this.etaMinutes = minutes;
+  // }
+
+  onRouteCalculated(info: {durationMinutes: number; distanceKm: number}) {
+    console.log(' Route calculated:', info);
+    this.routeInfo = info;
   }
 
   // Takes an ordered list of addresses and converts them into a list of coordinates
@@ -104,6 +122,24 @@ export class MainPageComponent {
       try {
         // Geocode addresses
         const coordinates = await this.geocodeAddressesSequentialy(allAddresses);
+
+        console.log(' All coordinates:', coordinates); // ← DEBUG
+
+        // Create Location objects to send to Ride object
+        const locations: Location[] = allAddresses.map((address, i) => ({
+          address,
+          longitude: coordinates[i][0],
+          latitude: coordinates[i][1]
+        }));
+        const origin = locations[0];
+        const destination = locations[locations.length - 1];
+        const stops = locations.slice(1, -1);
+
+        this.resolvedLocations = {
+          origin,
+          destination,
+          stops
+        };
 
         console.log(coordinates);
 

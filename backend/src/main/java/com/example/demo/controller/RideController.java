@@ -8,38 +8,27 @@ import com.example.demo.model.RideStatus;
 import com.example.demo.dto.response.RideEstimateResponseDTO;
 import com.example.demo.dto.response.RideTrackingResponseDTO;
 
+import com.example.demo.services.interfaces.RideService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/rides")
+@CrossOrigin(origins = "http://localhost:4200")
+@RequiredArgsConstructor
 public class RideController {
 
-    @PostMapping
+    // Service
+    private final RideService rideService;
+
+    @PostMapping("/create-ride")
     public ResponseEntity<RideResponseDTO> createRide(
-            @RequestBody RideRequestDTO request) {
+            @Valid @RequestBody CreateRideRequestDTO request) {
 
-        boolean hasAvailableDriver = true;
-        double price = 500.0;
-
-        // No drivers available
-        if(!hasAvailableDriver){
-            RideResponseDTO response = new RideResponseDTO(
-                    null,
-                    RideStatus.FAILED,
-                    0
-            );
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-
-        // Some driver is available
-        RideResponseDTO response = new RideResponseDTO(
-                1L,
-                RideStatus.CREATED,
-                price
-        );
-
+        RideResponseDTO response = rideService.createRide(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

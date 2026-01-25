@@ -24,7 +24,7 @@ public class Route {
 
     private int duration;
 
-    private int distance;
+    private double distance;
 
     private int timesUsed;
 

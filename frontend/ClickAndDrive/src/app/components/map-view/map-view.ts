@@ -13,7 +13,8 @@ import mapboxgl from 'mapbox-gl';
 export class MapViewComponent implements AfterViewInit {
 
   @Input() size: 'large' | 'small' = 'large';
-  @Output() etaCalculated = new EventEmitter<number>();
+  //@Output() etaCalculated = new EventEmitter<number>();
+  @Output() routeCalculated = new EventEmitter<{durationMinutes: number, distanceKm: number}>(); // Send to front both duration and distance for given route
 
   @ViewChild('mapContainer', { static: true }) mapContainer!: ElementRef<HTMLDivElement>;
 
@@ -67,10 +68,16 @@ export class MapViewComponent implements AfterViewInit {
       if (!res.routes || !res.routes.length) return;
 
       const route = res.routes[0].geometry;
-      const durationSeconds = res.routes[0].duration;
-      const etaMinutes = Math.round(durationSeconds / 60);
+      const durationSeconds = res.routes[0].duration; // s
+      const distanceMeters = res.routes[0].distance;  // m
+      //const etaMinutes = Math.round(durationSeconds / 60);
+      const durationMinutes = Math.round(durationSeconds / 60);
+      const distanceKm = Math.round((distanceMeters/1000) * 100) / 100; 
 
-      this.etaCalculated.emit(etaMinutes);
+      // Sending both to backend
+      console.log(' Emitting from map:', { durationMinutes, distanceKm }); 
+      this.routeCalculated.emit({durationMinutes, distanceKm});
+      //this.etaCalculated.emit(etaMinutes);
 
       if (this.map.getSource('route')) {
         this.map.removeLayer('route');
@@ -102,7 +109,7 @@ export class MapViewComponent implements AfterViewInit {
   drawRouteWithStops(coordinates: [number, number][]) {
     if (coordinates.length < 2) return;
 
-    const coordsString = coordinates
+    const coordsString = coordinates 
     .map(c => `${c[0]},${c[1]}`)
     .join(';');
 
@@ -116,10 +123,15 @@ export class MapViewComponent implements AfterViewInit {
 
       const route = res.routes[0].geometry;
       const durationSeconds = res.routes[0].duration;
-      const etaMinutes = Math.round(durationSeconds / 60);
+      const distanceMeters = res.routes[0].distance;
+      //const etaMinutes = Math.round(durationSeconds / 60);
+      const durationMinutes = Math.round(durationSeconds / 60);
+      const distanceKm = Math.round((distanceMeters / 1000) * 100) / 100;
 
       // Emit
-      this.etaCalculated.emit(etaMinutes);
+      console.log('Emitting from map:', { durationMinutes, distanceKm }); 
+      this.routeCalculated.emit({durationMinutes, distanceKm});
+      //this.etaCalculated.emit(etaMinutes);
 
       // Clear old route if exists
       if (this.map.getSource('route')) {
