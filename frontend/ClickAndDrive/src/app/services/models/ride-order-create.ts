@@ -10,4 +10,6 @@ export interface RideOrderCreate {
     scheduledTime: string;
     babyFriendly: boolean;
     petFriendly: boolean;
+    durationMinutes: number;
+    distanceKm: number;
 }

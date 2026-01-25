@@ -33,6 +33,13 @@ export class RideOrdering implements OnChanges {
     stops: Location[];
   };  
 
+  @Input() routeInfo?: {
+    durationMinutes: number;
+    distanceKm: number;
+  }
+
+  private rideSubmitted = false;
+
   @Output()
   rideRequested = new EventEmitter<{
     origin: string;
@@ -247,17 +254,30 @@ export class RideOrdering implements OnChanges {
   }
 
   ngOnChanges(changes: { [propName: string]: SimpleChange<any>; }): void {
-    if (changes['resolvedLocations'] && this.resolvedLocations) {
-      console.log("Locations arrived, building ride");
+    if (this.resolvedLocations && this.routeInfo && !this.rideSubmitted) {
+      console.log("Both locations and route info available, building ride");
+
+      this.rideSubmitted = true;
 
       const ride = this.buildRide();
 
+      console.log('Final ride object:', ride);
       this.rideOrderService.createRide(ride).subscribe({
         next: () => {
-          console.log("Ride created");
+          console.log("Ride created successfully");
+          this.rideSubmitted = false; 
           this.closeRequested.emit();
         },
-        error: err => console.log(err)
+        error: (err) => {
+          console.error('Ride creation failed:', err);
+          this.rideSubmitted = false; 
+        }
+      });
+    } else {
+      console.log('Waiting for all data...', {
+        hasLocations: !!this.resolvedLocations,
+        hasRouteInfo: !!this.routeInfo,
+        alreadySubmitted: this.rideSubmitted
       });
     }
   }
@@ -278,7 +298,9 @@ export class RideOrdering implements OnChanges {
       vehicleType: this.formData['type'],
       scheduledTime: this.buildScheduledDateTime(this.formData['time']),
       babyFriendly: this.formData['baby-friendly'],
-      petFriendly: this.formData['pet-friendly']
+      petFriendly: this.formData['pet-friendly'],
+      durationMinutes: this.routeInfo?.durationMinutes || 0,
+      distanceKm: this.routeInfo?.distanceKm || 0
     };
   }
 
@@ -293,10 +315,16 @@ export class RideOrdering implements OnChanges {
       now.getDate(),
       hours,
       minutes,
+      0,
       0
     );
-    return scheduled.toISOString();
+  
+    const pad = (n: number) => n.toString().padStart(2, '0');
+  
+    return `${scheduled.getFullYear()}-${pad(scheduled.getMonth() + 1)}-${pad(scheduled.getDate())}`
+         + `T${pad(scheduled.getHours())}:${pad(scheduled.getMinutes())}:00`;
   }
+  
   
   isFieldInvalid(label: string): boolean {
     return this.invalidFields.includes(label);

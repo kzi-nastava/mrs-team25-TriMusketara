@@ -12,14 +12,6 @@ import java.util.List;
 @DiscriminatorValue("PASSENGER")
 public class Passenger extends User {
 
-    @ElementCollection
-    @CollectionTable(
-            name = "passenger_linked_emails",
-            joinColumns = @JoinColumn(name = "passenger_id")
-    )
-    @Column(name = "email")
-    private List<String> linkedEmails;
-
     @ManyToMany
     @JoinTable(
             name = "passenger_favorite_routes",

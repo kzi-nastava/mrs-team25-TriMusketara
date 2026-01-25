@@ -41,4 +41,10 @@ public class CreateRideRequestDTO {
 
     private boolean babyFriendly;
     private boolean petFriendly;
+
+    @NotNull(message = "Duration cannot be null")
+    private int durationMinutes;
+
+    @NotNull(message = "Distance cannot be null")
+    private double distanceKm;
 }

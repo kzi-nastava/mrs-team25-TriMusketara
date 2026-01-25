@@ -3,10 +3,8 @@ package com.example.demo.services;
 import com.example.demo.dto.LocationDTO;
 import com.example.demo.dto.request.CreateRideRequestDTO;
 import com.example.demo.dto.response.RideResponseDTO;
-import com.example.demo.model.Location;
-import com.example.demo.model.Ride;
-import com.example.demo.model.RideStatus;
-import com.example.demo.model.Route;
+import com.example.demo.model.*;
+import com.example.demo.repositories.DriverRepository;
 import com.example.demo.repositories.LocationRepository;
 import com.example.demo.repositories.RideRepository;
 import com.example.demo.repositories.RouteRepository;
@@ -27,7 +25,9 @@ public class RideServiceImpl implements RideService {
     private final RideRepository rideRepository;
     private final LocationRepository locationRepository;
     private final RouteRepository routeRepository;
+    private final DriverRepository driverRepository;
 
+    // Ride creation
     @Override
     public RideResponseDTO createRide(CreateRideRequestDTO request) {
 
@@ -70,16 +70,37 @@ public class RideServiceImpl implements RideService {
         Route route = new Route();
         route.setOrigin(origin);
         route.setDestination(destination);
+        route.setDistance(request.getDistanceKm());
+        route.setDuration(request.getDurationMinutes());
         routeRepository.save(route);
+
+        // Update drivers status based on work hours
+        updateDriverStatuses();
+
+        // Find suitable driver for ride
+        List<Driver> drivers = driverRepository.filterAvailableDrivers(DriverStatus.ACTIVE ,request.isBabyFriendly(), request.isPetFriendly());
+        Driver driver = findDriver(drivers);
 
         // Create ride
         Ride ride = new Ride();
         ride.setStatus(RideStatus.CREATED);
         ride.setScheduledTime(request.getScheduledTime());
         ride.setStops(createStops(request.getStops()));
+        //ride.setLinkedPassengerEmails(request.getPassengerEmails());
         ride.setRoute(route);
         ride.setBabyFriendly(request.isBabyFriendly());
         ride.setPetFriendly(request.isPetFriendly());
+
+        // Assign driver to ride
+        if (driver == null) {
+            ride.setStatus(RideStatus.FAILED); // later send notification
+        }
+        else {
+            ride.setStatus(RideStatus.SCHEDULED);
+            ride.setDriver(driver);
+            driver.getScheduledRides().add(ride);
+        }
+
 
         rideRepository.save(ride);
 
@@ -101,9 +122,55 @@ public class RideServiceImpl implements RideService {
             location.setLongitude(loc.getLongitude());
             location.setLatitude(loc.getLatitude());
             location.setAddress(loc.getAddress());
+            locationRepository.save(location);
             list.add(location);
         }
         return list;
+    }
+
+    // Find suitable driver
+    private Driver findDriver(List<Driver> drivers) {
+        LocalDateTime now = LocalDateTime.now();
+        int marginMinutes = 10;
+
+        List<Driver> freeDrivers = new ArrayList<>();
+        List<Driver> nearlyFreeDrivers = new ArrayList<>();
+
+        for (Driver d : drivers) {
+            // Completely free
+            if (d.getScheduledRides().isEmpty()) {
+                freeDrivers.add(d);
+                continue;
+            }
+
+            // Has drives scheduled
+            Ride nextRide = d.getScheduledRides().get(0);
+            if (nextRide.getStatus() == RideStatus.STARTED) {
+                LocalDateTime finishTime = nextRide.getScheduledTime().plusMinutes(nextRide.getRoute().getDuration());
+
+                if (finishTime.isBefore(now.plusMinutes(marginMinutes))) {
+                    nearlyFreeDrivers.add(d);
+                }
+            }
+        }
+
+        // Priority have free drivers
+        if (!freeDrivers.isEmpty()) {
+            return freeDrivers.get(0); // later will be updated based on position
+        }
+
+        // Then nearly free drivers
+        if (!nearlyFreeDrivers.isEmpty()) {
+            return nearlyFreeDrivers.get(0);
+        }
+
+        // No available drivers
+        return null;
+    }
+
+    public void updateDriverStatuses() {
+        int marginMinutes = 15;
+        driverRepository.updateDriverStatus(8 * 60 + marginMinutes);
     }
 
 }

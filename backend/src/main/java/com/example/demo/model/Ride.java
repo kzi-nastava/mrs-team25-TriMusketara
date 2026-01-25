@@ -18,6 +18,10 @@ public class Ride {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "creator_id")
+    private Passenger rideCreator;
+
     @ManyToOne(cascade = CascadeType.PERSIST)
     private Location currentLocation;
 
@@ -38,8 +42,13 @@ public class Ride {
 
     private String cancellationReason;
 
-    @ManyToMany
-    private List<Passenger> passengers;
+//    @ElementCollection
+//    @CollectionTable(
+//            name = "passenger_linked_emails",
+//            joinColumns = @JoinColumn(name = "ride_id")
+//    )
+//    @Column(name = "email")
+//    private List<String> linkedPassengerEmails;
     
     @ManyToOne
     @JoinColumn(name = "route_id")
