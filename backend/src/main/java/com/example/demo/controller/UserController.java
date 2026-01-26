@@ -18,6 +18,7 @@ import com.example.demo.services.interfaces.UserService;
 import java.util.Locale;
 
 @RestController
+@RequestMapping("/api/user")
 public class UserController {
 
     private final UserService userService;
@@ -138,10 +139,8 @@ public class UserController {
 
     // POST: Registracija korisnika
     @PostMapping("/auth/register")
-    public ResponseEntity<UserProfileResponseDTO> registerUser(
-            @RequestBody UserRegistrationRequestDTO request
-    ) {
-        UserProfileResponseDTO response = new UserProfileResponseDTO();
+    public ResponseEntity<UserProfileResponseDTO> registerUser(@RequestBody UserRegistrationRequestDTO request) {
+        UserProfileResponseDTO response = userService.registerPassenger(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

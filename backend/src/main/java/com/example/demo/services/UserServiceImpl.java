@@ -1,7 +1,9 @@
 package com.example.demo.services;
 
 import com.example.demo.dto.request.LoginRequestDTO;
+import com.example.demo.dto.request.UserRegistrationRequestDTO;
 import com.example.demo.dto.response.LoginResponseDTO;
+import com.example.demo.dto.response.UserProfileResponseDTO;
 import com.example.demo.model.Administrator;
 import com.example.demo.model.Driver;
 import com.example.demo.model.Passenger;
@@ -14,8 +16,10 @@ import com.example.demo.repositories.UserRepository;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.services.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -23,14 +27,17 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final PassengerRepository passengerRepository;
     private final JwtUtil jwtUtil;
 
     public UserServiceImpl(
             PasswordEncoder passwordEncoder,
             UserRepository userRepository,
+            PassengerRepository passengerRepository,
             JwtUtil jwtUtil) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
+        this.passengerRepository = passengerRepository;
         this.jwtUtil = jwtUtil;
     }
 
@@ -55,4 +62,43 @@ public class UserServiceImpl implements UserService {
 
         return new LoginResponseDTO(user.getId(), user.getEmail(), role, token);
     }
+
+    public UserProfileResponseDTO registerPassenger(UserRegistrationRequestDTO dto) {
+
+        if (!dto.getPassword().equals(dto.getConfirmPassword())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Passwords do not match"
+            );
+        }
+
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Email already exists"
+            );
+        }
+
+        Passenger passenger = new Passenger();
+        passenger.setName(dto.getName());
+        passenger.setSurname(dto.getLastName());
+        passenger.setEmail(dto.getEmail());
+        passenger.setPassword(passwordEncoder.encode(dto.getPassword()));
+        passenger.setAddress(dto.getAddress());
+        passenger.setPhone(dto.getPhoneNumber());
+        passenger.setGender(Gender.MALE);
+
+        Passenger saved = passengerRepository.save(passenger);
+
+        return new UserProfileResponseDTO(
+                saved.getId(),
+                saved.getEmail(),
+                saved.getName(),
+                saved.getSurname(),
+                saved.getGender(),
+                saved.getAddress(),
+                saved.getPhone()
+        );
+    }
+
 }
