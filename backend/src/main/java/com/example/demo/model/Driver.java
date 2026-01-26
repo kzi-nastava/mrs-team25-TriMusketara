@@ -3,6 +3,8 @@ package com.example.demo.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
+import org.springframework.core.annotation.Order;
 
 import java.util.List;
 
@@ -21,7 +23,14 @@ public class Driver extends User {
     private Vehicle vehicle;
 
     @OneToMany(mappedBy = "driver")
-    private List<Ride> rides;
+    @Where(clause = "status = 'SCHEDULED'")
+    @OrderBy("scheduledTime ASC")
+    private List<Ride> scheduledRides;
+
+    @OneToOne
+    private Ride activeRide;
+
+    private int workMinutes;
 
     // For now, only to see if driver registration works
     // Will be changed when others finish authorization

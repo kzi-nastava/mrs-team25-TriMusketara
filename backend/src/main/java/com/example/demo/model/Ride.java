@@ -19,6 +19,10 @@ public class Ride {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "creator_id")
+    private Passenger rideCreator;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Location currentLocation;
 
     @Enumerated(EnumType.STRING)
@@ -38,14 +42,21 @@ public class Ride {
 
     private String cancellationReason;
 
-    @ManyToMany
-    private List<Passenger> passengers;
+//    @ElementCollection
+//    @CollectionTable(
+//            name = "passenger_linked_emails",
+//            joinColumns = @JoinColumn(name = "ride_id")
+//    )
+//    @Column(name = "email")
+//    private List<String> linkedPassengerEmails;
     
     @ManyToOne
     @JoinColumn(name = "route_id")
     private Route route;
 
     private double price;
+    private boolean isBabyFriendly;
+    private boolean isPetFriendly;
 
     @ManyToMany
     private List<Location> stops;

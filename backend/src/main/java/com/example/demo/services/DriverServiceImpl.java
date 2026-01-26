@@ -119,6 +119,7 @@ public class DriverServiceImpl implements DriverService {
             driver.setRegistrationToken(null);
 
             driver.setStatus(DriverStatus.ACTIVE);
+            driver.setWorkMinutes(0);
 
             driverRepository.save(driver);
 

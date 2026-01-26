@@ -61,8 +61,13 @@ export class DriveInProgress implements AfterViewInit {
   }
 
   // Update ETA when the child map finishes calculation
-  onEtaReceived(minutes: number) {
-    this.auth.eta.set(minutes);
+  // onEtaReceived(minutes: number) {
+  //   this.auth.eta.set(minutes);
+  // }
+
+  onRouteCalculated(info: { durationMinutes: number; distanceKm: number }) {
+    this.auth.eta.set(info.durationMinutes);
+    console.log('Route info:', info);
   }
 
 
