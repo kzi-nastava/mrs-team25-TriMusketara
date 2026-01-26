@@ -1,6 +1,6 @@
 <h1>Log in</h1>
 <div class="login-container">
-  <form (ngSubmit)="login()" class="login-form">
+  <form (submit)="login($event)" class="login-form">
     <div class="form-group">
       <label for="email">Email:</label>
       <input type="text" name="email" [(ngModel)]="email" required>

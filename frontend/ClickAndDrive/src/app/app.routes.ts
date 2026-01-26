@@ -20,14 +20,12 @@ export const routes: Routes = [
 
   // USER ROUTES
   { path: 'change-info', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'user' } },
-  { path: 'drive-in-progress', component: DriveInProgress, canActivate: [AuthGuard], data: { role: 'user' } },
   { path: 'favorite-routes', component: FavoriteRoutes, canActivate: [AuthGuard], data: { role: 'user' } },
   { path: 'rate-ride', component: RideRating, canActivate: [AuthGuard], data: { role: 'user' } },
 
   // DRIVER ROUTES
   { path: 'driver-history', component: DriverHistory, canActivate: [AuthGuard], data: { role: 'driver' } },
   { path: 'scheduled-rides', component: ScheduledRides, canActivate: [AuthGuard], data: { role: 'driver' } },
-  { path: 'drive-in-progress', component: DriveInProgress, canActivate: [AuthGuard], data: { role: 'driver' } },
 
   // ADMIN ROUTES
   { path: 'reports', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
@@ -40,6 +38,9 @@ export const routes: Routes = [
   { path: 'register', component: RegistrationPage },
   { path: 'change-information-page', component: ChangeInfoPage },
   { path: 'complete-registration', component: CompleteDriverRegistration },
+
+  //SHARED ROUTES
+  { path: 'drive-in-progress', component: DriveInProgress, canActivate: [AuthGuard], data: { roles: ['user', 'driver'] } },
 
   // CATCH ALL
   { path: '**', redirectTo: 'map' }
