@@ -17,7 +17,7 @@
             <div class="left-side-buttons">
                 @for (btn of leftButtons; track btn.label) {
                     <button
-                        (click)="onButtonClick(btn.route)"
+                        (click)="onButtonClick(btn)"
                     >{{btn.label}}</button>
                 }
             </div>
@@ -25,7 +25,7 @@
                 @for (btn of rightButtons; track btn.label) {
                     <button
                         [class.redText]="btn.redText"
-                        (click)="onButtonClick(btn.route)"
+                        (click)="onButtonClick(btn)"
                     >{{btn.label}}</button>
                 }
             </div>

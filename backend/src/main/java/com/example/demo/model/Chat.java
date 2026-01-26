@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /// This class represents one chat with customer support.
@@ -24,10 +26,10 @@ public class Chat {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_sender_id")
-    private List<Message> sentMessages;
+    private List<Message> sentMessages = new ArrayList<>();;
 
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_receiver_id")
-    private List<Message> receivedMessages;
+    private List<Message> receivedMessages = new ArrayList<>();
 }

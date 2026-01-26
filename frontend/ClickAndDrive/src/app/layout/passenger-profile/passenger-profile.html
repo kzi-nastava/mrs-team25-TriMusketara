@@ -17,7 +17,7 @@
             @for (btn of passengerButtons; track btn.label) {
                 <button
                     [class.redText]="btn.redText"
-                    (click)="onButtonClick(btn.route)"
+                    (click)="onButtonClick(btn)"
                 >
                     {{btn.label}}
                 </button>
