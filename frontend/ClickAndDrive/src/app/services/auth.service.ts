@@ -6,7 +6,7 @@ import {Injectable, signal} from '@angular/core';
 
 export class AuthService {
     // Signal for user type
-    userType = signal<'guest' | 'user' | 'driver' | 'admin'>('admin');
+    userType = signal<'guest' | 'user' | 'driver' | 'admin'>('guest');
 
     // Username
     userName = signal('TriMusketara');
@@ -37,5 +37,15 @@ export class AuthService {
     setRideData(origin: string, destination: string) {
         this.origin.set(origin);
         this.destination.set(destination);
+    }
+
+    logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        // this.currentUser.set(null);
+    }
+
+    isLoggedIn(): boolean {
+        return !!localStorage.getItem('token');
     }
 }

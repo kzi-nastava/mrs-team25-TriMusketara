@@ -3,15 +3,34 @@ package com.example.demo.controller;
 import com.example.demo.dto.request.*;
 import com.example.demo.dto.response.LoginResponseDTO;
 import com.example.demo.dto.response.UserProfileResponseDTO;
+import com.example.demo.model.Administrator;
 import com.example.demo.model.Gender;
+import com.example.demo.model.User;
+import com.example.demo.repositories.AdministratorRepository;
+import com.example.demo.repositories.UserRepository;
+import com.example.demo.security.JwtUtil;
+import com.example.demo.services.interfaces.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.demo.services.interfaces.UserService;
 
 import java.util.Locale;
 
 @RestController
 public class UserController {
+
+    private final UserService userService;
+    private final AdministratorRepository administratorRepository;
+    private final JwtUtil jwtUtil;
+    private final UserRepository userRepository;
+
+    public UserController(UserService userService, AdministratorRepository administratorRepository, JwtUtil jwtUtil, UserRepository userRepository){
+        this.userService = userService;
+        this.administratorRepository = administratorRepository;
+        this.jwtUtil = jwtUtil;
+        this.userRepository = userRepository;
+    }
 
     // GET profile
     @GetMapping("/{id}/profile")
@@ -47,10 +66,47 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<LoginResponseDTO> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        if (!jwtUtil.isTokenValid(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Long userId = jwtUtil.extractUserId(token);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        LoginResponseDTO response = new LoginResponseDTO(
+                user.getId(),
+                user.getEmail(),
+                user.getClass().getSimpleName(),
+                token
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
     // POST: Login korisnika
     @PostMapping("/auth/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
-        return ResponseEntity.ok(new LoginResponseDTO());
+        return ResponseEntity.ok(userService.login(request));
+    }
+
+    @GetMapping("/auth/test")
+    public String test() {
+        return "Test endpoint radi!";
+    }
+
+    @GetMapping("/auth/secure-test")
+    public String secureTest() {
+        return "Secure endpoint radi, JWT potreban!";
+    }
+
+    @PostMapping("/test-admin")
+    public String testAdmin() {
+        Administrator admin = administratorRepository.findAll().get(0);
+        return admin.getEmail();
     }
 
     // POST: Logout korisnika

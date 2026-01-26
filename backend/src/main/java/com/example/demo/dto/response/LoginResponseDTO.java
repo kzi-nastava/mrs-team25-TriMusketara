@@ -1,5 +1,6 @@
 package com.example.demo.dto.response;
 
+import com.example.demo.model.Gender;
 import com.example.demo.model.RideStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class LoginResponseDTO {
     private Long userId;
+    private String email;
     private String role;
-    private boolean active;
+    private String token;
 }

@@ -11,23 +11,36 @@ import { DriverRegistration } from './layout/driver-registration/driver-registra
 import { FavoriteRoutes } from './layout/favorite-routes/favorite-routes';
 import { RideRating } from './layout/ride-rating/ride-rating';
 import { CompleteDriverRegistration } from './layout/complete-driver-registration/complete-driver-registration';
+import { AuthGuard } from './services/auth.guard';
 
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'map', pathMatch: 'full' },
-  { path: 'map', component: MainPageComponent},
-  { path: 'change-information-page',component: ChangeInfoPage },
-  { path: 'driver-history', component: DriverHistory },
-  { path: 'scheduled-rides', component: ScheduledRides },
-  { path: 'change-info', component: MapViewComponent },
-  { path: 'reports', component: MapViewComponent },
-  { path: 'notes', component: MapViewComponent },
-  { path: 'support', component: MapViewComponent },
+   { path: '', redirectTo: 'map', pathMatch: 'full' },
+  { path: 'map', component: MainPageComponent },
+
+  // USER ROUTES
+  { path: 'change-info', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'user' } },
+  { path: 'drive-in-progress', component: DriveInProgress, canActivate: [AuthGuard], data: { role: 'user' } },
+  { path: 'favorite-routes', component: FavoriteRoutes, canActivate: [AuthGuard], data: { role: 'user' } },
+  { path: 'rate-ride', component: RideRating, canActivate: [AuthGuard], data: { role: 'user' } },
+
+  // DRIVER ROUTES
+  { path: 'driver-history', component: DriverHistory, canActivate: [AuthGuard], data: { role: 'driver' } },
+  { path: 'scheduled-rides', component: ScheduledRides, canActivate: [AuthGuard], data: { role: 'driver' } },
+  { path: 'drive-in-progress', component: DriveInProgress, canActivate: [AuthGuard], data: { role: 'driver' } },
+
+  // ADMIN ROUTES
+  { path: 'reports', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
+  { path: 'notes', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
+  { path: 'support', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
+  { path: 'driver-registration', component: DriverRegistration, canActivate: [AuthGuard], data: { role: 'admin' } },
+  { path: 'complete-registration', component: CompleteDriverRegistration, canActivate: [AuthGuard], data: { role: 'admin' } },
+
+  // PUBLIC ROUTES
   { path: 'login', component: LoginPage },
   { path: 'register', component: RegistrationPage },
-  { path: 'drive-in-progress', component: DriveInProgress },
-  { path: 'driver-registration', component: DriverRegistration },
-  { path: 'favorite-routes', component: FavoriteRoutes },
-  { path: 'rate-ride', component: RideRating},
-  { path: 'complete-registration', component: CompleteDriverRegistration}
+  { path: 'change-information-page', component: ChangeInfoPage },
+
+  // CATCH ALL
+  { path: '**', redirectTo: 'map' }
 ];

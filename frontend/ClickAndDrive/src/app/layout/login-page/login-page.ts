@@ -1,17 +1,51 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { AuthService } from '../../services/auth.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-login-page',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './login-page.html',
-  styleUrl: './login-page.css',
+  styleUrls: ['./login-page.css'],
 })
-
 export class LoginPage {
-  constructor(private router: Router) {}
+  email = '';
+  password = '';
+
+  constructor(
+    private router: Router,
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
   goHome() {
-    this.router.navigate(['/']);
+    this.router.navigate(['/map']);
+  }
+
+  login() {
+    this.http.post('http://localhost:8080/auth/login', {
+      email: this.email,
+      password: this.password
+    }).subscribe({
+      next: (res: any) => {
+        if (!res.token) {
+          return;
+        }
+
+        localStorage.setItem('token', res.token);
+        this.authService.setUserType(res.role);
+        this.authService.setUsername(res.email);
+
+        this.router.navigate(['/']);  // redirect na početnu
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        console.log('Login failed: ' + (err.error?.message || 'Unknown error'));
+      }
+    });
   }
 }
