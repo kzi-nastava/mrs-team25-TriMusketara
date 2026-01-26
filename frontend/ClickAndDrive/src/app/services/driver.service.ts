@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { DriverCreate } from "./models/driver-create";
 import { Observable } from "rxjs";
@@ -19,6 +19,7 @@ export class DriverService {
 
     // Complete driver registration
     completeRegistration(request: CompleteRegistration): Observable<string> {
-        return this.http.post(`${this.driverUrl}/complete-registration`, request, {responseType: 'text'});
+        const headers = new HttpHeaders({ 'skip': 'true' }); // do not send token 
+        return this.http.post(`${this.driverUrl}/complete-registration`, request, { headers, responseType: 'text'});
     }
 }
