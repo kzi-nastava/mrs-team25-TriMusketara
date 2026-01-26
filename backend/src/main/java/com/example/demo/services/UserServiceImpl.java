@@ -47,6 +47,8 @@ public class UserServiceImpl implements UserService {
             role = "admin";
         } else if (role.equals("passenger")) {
             role = "user";
+        } else if (role.equals("driver")) {
+            role = "driver";
         }
 
         String token = jwtUtil.generateToken(user);

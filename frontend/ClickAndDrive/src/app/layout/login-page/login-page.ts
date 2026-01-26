@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
 
@@ -27,10 +27,12 @@ export class LoginPage {
   }
 
   login() {
+    const headers = new HttpHeaders({ 'skip': 'true' });
+    
     this.http.post('http://localhost:8080/auth/login', {
       email: this.email,
       password: this.password
-    }).subscribe({
+    }, {headers}).subscribe({
       next: (res: any) => {
         if (!res.token) {
           return;

@@ -12,8 +12,10 @@ import com.example.demo.repositories.VehicleRepository;
 import com.example.demo.services.interfaces.DriverService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -32,11 +34,7 @@ public class DriverServiceImpl implements DriverService {
 
         // Validation
         if (driverRepository.existsByEmail(request.getEmail())) {
-            try {
-                throw new BadRequestException("Email already exists");
-            } catch (BadRequestException e) {
-                throw new RuntimeException(e);
-            }
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
         }
 
         // Create Vehicle object
@@ -47,6 +45,7 @@ public class DriverServiceImpl implements DriverService {
         vehicle.setSeats(request.getVehicle().getSeats());
         vehicle.setIsBabyFriendly(request.getVehicle().isBabyFriendly());
         vehicle.setIsPetFriendly(request.getVehicle().isPetFriendly());
+        vehicleRepository.save(vehicle);
 
         // Create Driver object
         Driver driver = new Driver();

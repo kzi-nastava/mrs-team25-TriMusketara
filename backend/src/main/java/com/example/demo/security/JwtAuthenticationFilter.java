@@ -1,5 +1,8 @@
 package com.example.demo.security;
 
+import com.example.demo.model.Administrator;
+import com.example.demo.model.Driver;
+import com.example.demo.model.Passenger;
 import com.example.demo.model.User;
 import com.example.demo.repositories.UserRepository;
 import jakarta.servlet.FilterChain;
@@ -7,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -31,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         // preskoči filter za otvorene endpoint-e
-        if (path.startsWith("/auth/")) {
+        if (path.startsWith("/auth/") || path.equals("/api/drivers/complete-registration")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -43,13 +47,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Long userId = jwtUtil.extractUserId(token);
                 User user = userRepository.findById(userId).orElse(null);
                 if (user != null) {
+
+                    // Determine role based on class
+                    String tokenRole = jwtUtil.extractRole(token);
+                    String role = mapRoleFromToken(tokenRole);
+                    List<SimpleGrantedAuthority> authorities = List.of(
+                            new SimpleGrantedAuthority("ROLE_" + role)
+                    );
+
                     UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(user, null, List.of());
+                            new UsernamePasswordAuthenticationToken(user, null, authorities);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    System.out.println("User not found in DB");
                 }
             }
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    // Helper
+    private String mapRoleFromToken(String roleFromToken) {
+        switch(roleFromToken) {
+            case "Administrator": return "ADMIN";
+            case "Driver": return "DRIVER";
+            case "Passenger": return "USER";
+            default: return "";
+        }
     }
 }

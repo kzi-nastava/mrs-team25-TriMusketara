@@ -34,12 +34,12 @@ export const routes: Routes = [
   { path: 'notes', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
   { path: 'support', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
   { path: 'driver-registration', component: DriverRegistration, canActivate: [AuthGuard], data: { role: 'admin' } },
-  { path: 'complete-registration', component: CompleteDriverRegistration, canActivate: [AuthGuard], data: { role: 'admin' } },
 
   // PUBLIC ROUTES
   { path: 'login', component: LoginPage },
   { path: 'register', component: RegistrationPage },
   { path: 'change-information-page', component: ChangeInfoPage },
+  { path: 'complete-registration', component: CompleteDriverRegistration },
 
   // CATCH ALL
   { path: '**', redirectTo: 'map' }

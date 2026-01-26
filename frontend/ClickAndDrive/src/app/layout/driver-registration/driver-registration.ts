@@ -4,6 +4,7 @@ import { ProfileSidebarService } from '../../services/profile-sidebar.service';
 import { FormsModule } from '@angular/forms';
 import { DriverService } from '../../services/driver.service';
 import { DriverCreate } from '../../services/models/driver-create';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-driver-registration',
@@ -31,7 +32,7 @@ export class DriverRegistration {
   ];
 
   // Add driver service to constructor
-  public constructor(private router: Router, public profileSidebar: ProfileSidebarService, private driverService: DriverService) {}
+  public constructor(private router: Router, public profileSidebar: ProfileSidebarService, private driverService: DriverService, private toastr: ToastrService) {}
 
   formData: Record<string, any> = {};
 
@@ -190,11 +191,15 @@ export class DriverRegistration {
     console.log('Payload to send:', obj);
     this.driverService.registerDriver(obj).subscribe({
       next: (res) => {
+          this.toastr.success('Driver registered successfully', 'Success');
           console.log('Driver registered successfully:', res);
           this.resetForm();
           alert(`Driver ${res.name} ${res.surname} registered successfully!`);
         },
         error: (err) => {
+          console.log(err);
+          const errorMessage = err.error?.message || err.error || 'There was an error';
+          this.toastr.error(errorMessage, 'Error');
           console.error("Driver registration failed", err);
         }
       });
