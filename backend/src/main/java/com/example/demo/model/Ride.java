@@ -68,4 +68,6 @@ public class Ride {
     @OneToMany(mappedBy = "ride", cascade = CascadeType.ALL)
     private List<InconsistencyReport> inconsistencyReports;
 
+    private boolean panicPressed;
+
 }

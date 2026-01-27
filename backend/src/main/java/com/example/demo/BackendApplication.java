@@ -8,14 +8,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
 
 @SpringBootApplication
 public class BackendApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(BackendApplication.class, args);
 	}
@@ -27,13 +23,15 @@ public class BackendApplication {
 			DriverRepository driverRepository,
 			PassengerRepository passengerRepository,
 			VehicleRepository vehicleRepository,
+			RideRepository rideRepository,
+			LocationRepository locationRepository,
+			RouteRepository routeRepository,
 			PasswordEncoder passwordEncoder) {
 		return args -> {
 
 			// ------------------ ADMIN ------------------
 			if (administratorRepository.count() == 0) {
 				Chat chat = new Chat();
-
 				Administrator admin = new Administrator();
 				admin.setName("Admin");
 				admin.setSurname("Adminovic");
@@ -43,7 +41,6 @@ public class BackendApplication {
 				admin.setPhone("123456789");
 				admin.setGender(Gender.MALE);
 				admin.setChat(chat);
-
 				administratorRepository.save(admin);
 				System.out.println("Admin saved with ID: " + admin.getId());
 			}
@@ -59,16 +56,16 @@ public class BackendApplication {
 				vehicle.setBusy(false);
 				vehicle.setIsBabyFriendly(true);
 				vehicle.setIsPetFriendly(false);
-
 				vehicle = vehicleRepository.save(vehicle);
 				System.out.println("Vehicle saved with ID: " + vehicle.getId());
 			} else {
-				vehicle = vehicleRepository.findAll().get(0); // uzmi prvo vozilo ako postoji
+				vehicle = vehicleRepository.findAll().get(0);
 			}
 
 			// ------------------ DRIVER ------------------
+			Driver driver;
 			if (driverRepository.count() == 0) {
-				Driver driver = new Driver();
+				driver = new Driver();
 				driver.setName("Marko");
 				driver.setSurname("Markovic");
 				driver.setEmail("driver@demo.com");
@@ -76,11 +73,12 @@ public class BackendApplication {
 				driver.setAddress("Driver Street 2");
 				driver.setPhone("987654321");
 				driver.setGender(Gender.MALE);
-				driver.setVehicle(vehicle); // koristi managed entity
+				driver.setVehicle(vehicle);
 				driver.setStatus(DriverStatus.ACTIVE);
-
 				driverRepository.save(driver);
 				System.out.println("Driver saved with ID: " + driver.getId());
+			} else {
+				driver = driverRepository.findAll().get(0);
 			}
 
 			// ------------------ PASSENGER ------------------
@@ -93,11 +91,65 @@ public class BackendApplication {
 				passenger.setAddress("Passenger Street 3");
 				passenger.setPhone("555666777");
 				passenger.setGender(Gender.MALE);
-
 				passengerRepository.save(passenger);
 				System.out.println("Passenger saved with ID: " + passenger.getId());
 			}
+
+			// ---------------- RIDES, ROUTES & LOCATIONS ----------------
+
+
+
+			if (rideRepository.count() == 0) {
+				System.out.println("Initializing test rides...");
+
+				// ORIGIN
+				Location loc1 = new Location();
+				loc1.setAddress("Bulevar oslobođenja 45");
+				loc1.setLatitude(45.2485);
+				loc1.setLongitude(19.8331);
+				locationRepository.save(loc1);
+
+				// DESTINATION
+				Location loc2 = new Location();
+				loc2.setAddress("Cara Dušana 12");
+				loc2.setLatitude(45.2413);
+				loc2.setLongitude(19.8256);
+				locationRepository.save(loc2);
+
+				// ROUTES
+				Route route1 = new Route();
+				route1.setOrigin(loc1);
+				route1.setDestination(loc2);
+				routeRepository.save(route1);
+
+				Route route2 = new Route();
+				route2.setOrigin(loc2);
+				route2.setDestination(loc1);
+				routeRepository.save(route2);
+
+				// RIDES
+				Ride ride1 = new Ride();
+				ride1.setDriver(driver);
+				ride1.setRoute(route1);
+				ride1.setPrice(758.0);
+				ride1.setPanicPressed(false);
+				ride1.setStartTime(LocalDateTime.now().minusDays(1));
+				ride1.setStatus(RideStatus.FINISHED);
+				rideRepository.save(ride1);
+
+				Ride ride2 = new Ride();
+				ride2.setDriver(driver);
+				ride2.setRoute(route2);
+				ride2.setPrice(920.0);
+				ride2.setPanicPressed(true);
+				ride2.setStartTime(LocalDateTime.now().minusDays(2));
+				ride2.setStatus(RideStatus.FINISHED);
+				rideRepository.save(ride2);
+
+				System.out.println("Test rides initialized.");
+			} else {
+				System.out.println("Rides already exist, skipping initialization.");
+			}
 		};
 	}
-
 }
