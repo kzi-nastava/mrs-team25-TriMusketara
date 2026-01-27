@@ -15,7 +15,7 @@ public class DriverRideHistoryResponseDTO {
     private Long id;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private LocationDTO departure;
+    private LocationDTO origin;
     private LocationDTO destination;
     private double totalPrice;
 
