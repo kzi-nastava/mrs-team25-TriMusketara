@@ -2,14 +2,12 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.LocationDTO;
 import com.example.demo.dto.request.DriverRegistrationRequestDTO;
-import com.example.demo.dto.response.DriverRegistrationResponseDTO;
+import com.example.demo.dto.response.*;
 import com.example.demo.model.DriverStatus;
-import com.example.demo.dto.response.RideDetailsResponseDTO;
-import com.example.demo.dto.response.RideHistoryResponseDTO;
-import com.example.demo.dto.response.AdminRideStateResponseDTO;
 import com.example.demo.dto.VehiclePriceDTO;
 
 import com.example.demo.services.interfaces.DriverService;
+import com.example.demo.services.interfaces.PanicService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,6 +27,7 @@ public class AdminController {
 
     // Services
     private final DriverService driverService;
+    private final PanicService panicService;
 
     @PostMapping("/drivers")
     public ResponseEntity<DriverRegistrationResponseDTO> registerDriver(
@@ -83,4 +82,8 @@ public class AdminController {
                 request.getVanBasePrice(), request.getPricePerKm()));
     }
 
+    @GetMapping
+    public ResponseEntity<List<PanicResponseDTO>> getAllPanics() {
+        return ResponseEntity.ok(panicService.getAll());
+    }
 }

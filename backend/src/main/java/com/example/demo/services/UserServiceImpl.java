@@ -7,6 +7,18 @@ import com.example.demo.dto.response.LoginResponseDTO;
 import com.example.demo.dto.response.UserProfileResponseDTO;
 import com.example.demo.model.*;
 import com.example.demo.repositories.*;
+import com.example.demo.dto.request.UserRegistrationRequestDTO;
+import com.example.demo.dto.response.LoginResponseDTO;
+import com.example.demo.dto.response.UserProfileResponseDTO;
+import com.example.demo.model.Administrator;
+import com.example.demo.model.Driver;
+import com.example.demo.model.Passenger;
+import com.example.demo.model.Gender;
+import com.example.demo.model.User;
+import com.example.demo.repositories.AdministratorRepository;
+import com.example.demo.repositories.DriverRepository;
+import com.example.demo.repositories.PassengerRepository;
+import com.example.demo.repositories.UserRepository;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.services.interfaces.UserService;
 import org.apache.coyote.BadRequestException;
@@ -23,15 +35,20 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final PassengerRepository passengerRepository;
     private final JwtUtil jwtUtil;
     private final VehicleRepository vehicleRepository;
 
     public UserServiceImpl(
             PasswordEncoder passwordEncoder,
             UserRepository userRepository,
-            JwtUtil jwtUtil, VehicleRepository vehicleRepository) {
+            JwtUtil jwtUtil, 
+            VehicleRepository vehicleRepository,
+            PassengerRepository passengerRepository,
+            ) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
+        this.passengerRepository = passengerRepository;
         this.jwtUtil = jwtUtil;
         this.vehicleRepository = vehicleRepository;
     }
@@ -160,4 +177,43 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
     }
+      
+    public UserProfileResponseDTO registerPassenger(UserRegistrationRequestDTO dto) {
+
+        if (!dto.getPassword().equals(dto.getConfirmPassword())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Passwords do not match"
+            );
+        }
+
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Email already exists"
+            );
+        }
+
+        Passenger passenger = new Passenger();
+        passenger.setName(dto.getName());
+        passenger.setSurname(dto.getLastName());
+        passenger.setEmail(dto.getEmail());
+        passenger.setPassword(passwordEncoder.encode(dto.getPassword()));
+        passenger.setAddress(dto.getAddress());
+        passenger.setPhone(dto.getPhoneNumber());
+        passenger.setGender(Gender.MALE);
+
+        Passenger saved = passengerRepository.save(passenger);
+
+        return new UserProfileResponseDTO(
+                saved.getId(),
+                saved.getEmail(),
+                saved.getName(),
+                saved.getSurname(),
+                saved.getGender(),
+                saved.getAddress(),
+                saved.getPhone()
+        );
+    }
+
 }

@@ -27,6 +27,11 @@ public class Driver extends User {
     @OrderBy("scheduledTime ASC")
     private List<Ride> scheduledRides;
 
+    @OneToMany(mappedBy = "driver")
+    @Where(clause = "status = 'FINISHED'")
+    @OrderBy("scheduledTime DESC")
+    private List<Ride> finishedRides;
+
     @OneToOne
     private Ride activeRide;
 

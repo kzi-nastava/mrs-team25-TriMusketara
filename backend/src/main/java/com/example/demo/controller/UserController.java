@@ -88,7 +88,7 @@ public class UserController {
 
     // POST: Login korisnika
     @PostMapping("/auth/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
         return ResponseEntity.ok(userService.login(request));
     }
 
@@ -138,9 +138,9 @@ public class UserController {
     // POST: Registracija korisnika
     @PostMapping("/auth/register")
     public ResponseEntity<UserProfileResponseDTO> registerUser(
-            @RequestBody UserRegistrationRequestDTO request
+            @Valid @RequestBody UserRegistrationRequestDTO request
     ) {
-        UserProfileResponseDTO response = new UserProfileResponseDTO();
+        UserProfileResponseDTO response = userService.registerPassenger(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

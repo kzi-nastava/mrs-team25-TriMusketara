@@ -86,10 +86,22 @@ export class AuthService {
     logout() {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        // this.currentUser.set(null);
+        window.location.reload();
     }
 
     isLoggedIn(): boolean {
         return !!localStorage.getItem('token');
     }
+
+    getIdFromToken(): number | null {
+        const token = localStorage.getItem('token');
+        if (!token) return null;
+
+        try {
+          const payload = JSON.parse(atob(token.split('.')[0]));
+          return payload.id || null;
+        } catch {
+          return null;
+        }
+      }
 }

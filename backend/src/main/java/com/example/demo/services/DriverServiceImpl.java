@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.dto.LocationDTO;
 import com.example.demo.dto.request.CompleteRegistrationRequestDTO;
 import com.example.demo.dto.request.DriverRegistrationRequestDTO;
 import com.example.demo.dto.response.DriverRegistrationResponseDTO;
@@ -8,7 +9,10 @@ import com.example.demo.model.Driver;
 import com.example.demo.model.DriverStatus;
 import com.example.demo.model.EmailDetails;
 import com.example.demo.model.Vehicle;
+import com.example.demo.dto.response.DriverRideHistoryResponseDTO;
+import com.example.demo.model.*;
 import com.example.demo.repositories.DriverRepository;
+import com.example.demo.repositories.RideRepository;
 import com.example.demo.repositories.VehicleRepository;
 import com.example.demo.services.interfaces.DriverService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -30,6 +36,38 @@ public class DriverServiceImpl implements DriverService {
     private final VehicleRepository vehicleRepository;
     private final EmailServiceImpl emailService;
     private final PasswordEncoder passwordEncoder;
+    private final RideRepository rideRepository;
+
+    @Override
+    public List<DriverRideHistoryResponseDTO> getDriverRideHistory(Long driverId) {
+        List<Ride> rides = rideRepository.findAllByDriverId(driverId);
+        List<DriverRideHistoryResponseDTO> dtos = new ArrayList<>();
+
+        for (Ride ride : rides) {
+            if (ride.getStatus() != RideStatus.FINISHED){
+                continue;
+            }
+            // Status of a ride in history is always finished
+
+            DriverRideHistoryResponseDTO dto = new DriverRideHistoryResponseDTO();
+            dto.setId(ride.getId());
+            dto.setStartTime(ride.getStartTime());
+            dto.setEndTime(ride.getEndTime());
+            dto.setTotalPrice(ride.getPrice());
+            dto.setPanicPressed(ride.isPanicPressed());
+
+            // Map locations
+            if (ride.getRoute() != null) {
+                Location start = ride.getRoute().getOrigin();
+                Location end = ride.getRoute().getDestination();
+                dto.setOrigin(new LocationDTO(start.getLongitude(), start.getLatitude(), start.getAddress()));
+                dto.setDestination(new LocationDTO(end.getLongitude(), end.getLatitude(), end.getAddress()));
+            }
+
+            dtos.add(dto);
+        }
+        return dtos;
+    }
 
     @Override
     public DriverRegistrationResponseDTO registerDriver(DriverRegistrationRequestDTO request) {

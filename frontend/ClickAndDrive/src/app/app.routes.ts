@@ -26,7 +26,6 @@ export const routes: Routes = [
   // DRIVER ROUTES
   { path: 'driver-history', component: DriverHistory, canActivate: [AuthGuard], data: { role: 'driver' } },
   { path: 'scheduled-rides', component: ScheduledRides, canActivate: [AuthGuard], data: { role: 'driver' } },
-  { path: 'drive-in-progress', component: DriveInProgress, canActivate: [AuthGuard], data: { role: 'driver' } },
 
   // ADMIN ROUTES
   { path: 'reports', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
@@ -36,8 +35,8 @@ export const routes: Routes = [
 
   // SHARED ROUTES
   { path: 'change-information-page', component: ChangeInfoPage, canActivate: [AuthGuard], data: { roles: ['user', 'admin', 'driver'] } },
+  { path: 'drive-in-progress', component: DriveInProgress, canActivate: [AuthGuard], data: { roles: ['user', 'driver'] } },
   
-
   // PUBLIC ROUTES
   { path: 'login', component: LoginPage },
   { path: 'register', component: RegistrationPage },

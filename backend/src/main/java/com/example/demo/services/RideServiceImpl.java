@@ -2,16 +2,19 @@ package com.example.demo.services;
 
 import com.example.demo.dto.LocationDTO;
 import com.example.demo.dto.request.CreateRideRequestDTO;
+import com.example.demo.dto.request.RideCancellationRequestDTO;
+import com.example.demo.dto.request.RideRequestUnregisteredDTO;
+import com.example.demo.dto.request.RideStopRequestDTO;
+import com.example.demo.dto.response.RideEstimateResponseDTO;
 import com.example.demo.dto.response.RideResponseDTO;
 import com.example.demo.model.*;
-import com.example.demo.repositories.DriverRepository;
-import com.example.demo.repositories.LocationRepository;
-import com.example.demo.repositories.RideRepository;
-import com.example.demo.repositories.RouteRepository;
+import com.example.demo.repositories.*;
 import com.example.demo.services.interfaces.RideService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,6 +29,8 @@ public class RideServiceImpl implements RideService {
     private final LocationRepository locationRepository;
     private final RouteRepository routeRepository;
     private final DriverRepository driverRepository;
+    private final UserRepository userRepository;
+    private final PanicRepository panicRepository;
 
     // Ride creation
     @Override
@@ -171,6 +176,131 @@ public class RideServiceImpl implements RideService {
     public void updateDriverStatuses() {
         int marginMinutes = 15;
         driverRepository.updateDriverStatus(8 * 60 + marginMinutes);
+    }
+
+    @Override
+    public RideEstimateResponseDTO estimateRide(RideRequestUnregisteredDTO request) {
+        validateRideRequest(request);
+
+        //Logic that will later be implemented
+        RideEstimateResponseDTO response = new RideEstimateResponseDTO();
+        return response;
+    }
+
+    private void validateRideRequest(RideRequestUnregisteredDTO request) {
+        LocationDTO origin = request.getOrigin();
+        LocationDTO destination = request.getDestination();
+
+        if (origin.getLatitude() == destination.getLatitude() &&
+                origin.getLongitude() == destination.getLongitude()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Origin and destination cannot be the same"
+            );
+        }
+    }
+
+    @Override
+    public void cancelRide(Long rideId, RideCancellationRequestDTO request) {
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Ride not found"
+                ));
+
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "User not found"
+                ));
+
+        if (user instanceof Driver) {
+
+            if (request.getReason() == null || request.getReason().isBlank()) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Driver must provide cancellation reason"
+                );
+            }
+        }
+
+        if (user instanceof Passenger) {
+
+            LocalDateTime limit = ride.getStartTime().minusMinutes(10);
+            if (LocalDateTime.now().isAfter(limit)) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Passenger can cancel only 10 minutes before ride start"
+                );
+            }
+        }
+
+        ride.setStatus(RideStatus.CANCELED);
+        rideRepository.save(ride);
+    }
+
+    @Override
+    public void panic(Long rideId) {
+
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Ride not found"
+                ));
+
+        if (ride.getStatus() == RideStatus.CANCELED ||
+                ride.getStatus() == RideStatus.FINISHED) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Cannot trigger panic for finished or canceled ride"
+            );
+        }
+
+        Panic panic = new Panic();
+        panic.setRide(ride);
+        panic.setCreatedAt(LocalDateTime.now());
+
+        panicRepository.save(panic);
+    }
+
+    public void stopRide(Long rideId, RideStopRequestDTO request) {
+
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Ride not found"
+                ));
+
+        if (ride.getStatus() != RideStatus.STARTED) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Ride is not in progress"
+            );
+        }
+
+        LocationDTO stop = request.getStopLocation();
+
+        if (ride.getRoute().getDestination().getLatitude() == stop.getLatitude() &&
+                ride.getRoute().getDestination().getLongitude() == stop.getLongitude()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Stop location cannot be the same as destination"
+            );
+        }
+
+        // - price evaluation
+        // - destination change
+        // - stopping time
+        // - status = FINISHED
+
+        Location destination = ride.getRoute().getDestination();
+
+        destination.setLatitude(stop.getLatitude());
+        destination.setLongitude(stop.getLongitude());
+        destination.setAddress(stop.getAddress());
+
+        ride.setStatus(RideStatus.FINISHED);
+        ride.setEndTime(LocalDateTime.now());
+
+        rideRepository.save(ride);
     }
 
 }

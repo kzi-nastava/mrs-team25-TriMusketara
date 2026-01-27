@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Inter:wght@600&display=swap');
 
 .history-page {
-    background-color: #333533; /* Base background from Figma */
+    background-color: #333533; /* Base background */
     min-height: calc(100vh - 70px);
     display: flex;
     justify-content: center;
@@ -12,7 +12,7 @@
 .content-wrapper {
     width: 90%;
     /* max-width: 1280px; */
-    color: #E7E7E7; /* Text color from Figma */
+    color: #E7E7E7; /* Text color */
 }
 
 /* Title */
@@ -23,23 +23,84 @@
     color: #E7E7E7;
 }
 
-/* Header Filters */
+
 .header-section {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: center; /* Aligns title and filters vertically centered */
     margin-bottom: 30px;
+    gap: 20px;
 }
 
-.filters { display: flex; gap: 20px; }
+.filters {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between groups of elements */
+}
 
-.figma-input, .figma-select {
-    background: #F9FBFF;
-    border-radius: 10px;
+/* Container holding From and To date */
+.date-filter-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Label + Input (horizontal) */
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #E7E7E7;
+}
+
+/* Search and Clear buttons */
+.button-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-search, .btn-clear {
+    background: rgba(245, 203, 92, 0.75); /* Same gold as Details button */
     border: none;
-    padding: 8px 15px;
-    color: #7E7E7E;
+    border-radius: 10px;
+    padding: 10px 20px;
+    color: #333533; /* Darker text for better contrast on gold */
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.btn-search:hover, .btn-clear:hover {
+    opacity: 0.8;
+}
+
+/* Styling input fields to be consistent */
+.figma-input {
+    background: #F9FBFF;
+    border-radius: 10px; /* Slightly rounded like in the table */
+    border: none;
+    padding: 6px 10px;
+    color: #333533;
     font-size: 12px;
+    height: 30px; /* Fixed height for alignment with buttons */
+}
+
+/* Sort container */
+.sort-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.figma-select {
+    height: 30px;
+    padding: 0 10px;
+    border-radius: 10px;
 }
 
 /* Table */
@@ -50,11 +111,11 @@
 
 .figma-table th {
     text-align: left;
-    color: #B5B7C0; /* Header color from Figma */
+    color: #B5B7C0; /* Header color */
     font-weight: 500;
     font-size: 14px;
     padding: 15px 10px;
-    border-bottom: 1px solid #EEEEEE; /* Line from Figma */
+    border-bottom: 1px solid #EEEEEE; 
 }
 
 .figma-table td {
@@ -66,7 +127,7 @@
     text-overflow: ellipsis;
 }
 
-/* Badges (Colors directly from Figma) */
+/* Badges */
 .badge {
     padding: 4px 12px;
     border-radius: 4px;
@@ -78,29 +139,29 @@
 }
 
 .badge-completed, .badge-panic-no {
-    background: rgba(92, 245, 106, 0.75); /* Green from Figma */
+    background: rgba(92, 245, 106, 0.75); /* Green */
     color: #E7E7E7;
 }
 
 .badge-completed {
-    background: rgba(92, 245, 106, 0.75); /* Green from Figma */
+    background: rgba(92, 245, 106, 0.75); /* Green */
     color: #E7E7E7;
     min-width: 200px;
 }
 
 .badge-cancelled, .badge-panic-yes {
-    background: #F55C5C; /* Red from Figma */
+    background: #F55C5C; /* Red */
     color: #E7E7E7;
 }
 
 .badge-cancelled {
-    background: #F55C5C; /* Red from Figma */
+    background: #F55C5C; /* Red */
     color: #E7E7E7;
     min-width: 200px;
 }
 
 .btn-details {
-    background: rgba(245, 203, 92, 0.75); /* Yellow/Gold from Figma */
+    background: rgba(245, 203, 92, 0.75); /* Yellow/Gold */
     border: none;
     border-radius: 4px;
     padding: 4px 15px;
@@ -132,7 +193,7 @@
 }
 
 .page-num.active {
-    background: #F5CB5C; /* Yellow active color from Figma */
+    background: #F5CB5C; /* Yellow active color */
     border: 1px solid #5932EA;
     color: white;
 }

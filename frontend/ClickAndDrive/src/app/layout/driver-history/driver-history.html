@@ -1,14 +1,28 @@
 <div class="history-page">
   <div class="content-wrapper">
     
-    <!-- Higher section: Title and Filters -->
     <div class="header-section">
       <h1 class="all-drives-title">All Drives</h1>
+      
       <div class="filters">
-        <div class="search-container">
-          <span class="search-icon">🔍</span>
-          <input type="text" placeholder="Search" class="figma-input">
+        <!-- Date Pickers -->
+        <div class="date-filter-container">
+          <div class="input-group">
+            <label>From:</label>
+            <input type="date" [(ngModel)]="fromDate" class="figma-input">
+          </div>
+          <div class="input-group">
+            <label>To:</label>
+            <input type="date" [(ngModel)]="toDate" class="figma-input">
+          </div>
         </div>
+
+        <!-- Buttons -->
+        <div class="button-group">
+          <button (click)="searchByDate()" class="btn-search">Search</button>
+          <button (click)="clearFilter()" class="btn-clear">Clear</button>
+        </div>
+
         <div class="sort-container">
           <label>Sort by : </label>
           <select class="figma-select">
@@ -33,35 +47,21 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Example of a row from Figma -->
-          <tr>
-            <td>Bulevar oslobođenja 45</td>
-            <td>Cara Dušana 12</td>
-            <td>758</td>
-            <td><span class="badge badge-panic-no">NO</span></td>
-            <td>11/28/2025</td>
+          <tr *ngFor="let ride of rides">
+            <td>{{ ride.origin?.address }}</td>
+            <td>{{ ride.destination?.address }}</td>
+            <td>{{ ride.totalPrice }}</td>
+            <td>
+              <span class="badge" [ngClass]="ride.panicPressed ? 'badge-panic-yes' : 'badge-panic-no'">
+                {{ ride.panicPressed ? 'YES' : 'NO' }}
+              </span>
+            </td>
+            <td>{{ ride.startTime | date:'MM/dd/yyyy' }}</td>
             <td><button class="btn-details">Details</button></td>
             <td><span class="badge badge-completed">Completed</span></td>
           </tr>
-          <!-- Example of a cancelled drive -->
-          <tr>
-            <td>Narodnih heroja 27</td>
-            <td>Dunavska 3</td>
-            <td>548</td>
-            <td><span class="badge badge-panic-yes">YES</span></td>
-            <td>09/02/2025</td>
-            <td><button class="btn-details">Details</button></td>
-            <td><span class="badge badge-cancelled">Cancelled by user</span></td>
-          </tr>
-          <!-- More example rows -->
-        <tr>
-            <td>Bulevar oslobođenja 45</td>
-            <td>Cara Dušana 12</td>
-            <td>758</td>
-            <td><span class="badge badge-panic-no">NO</span></td>
-            <td>5/28/2025</td>
-            <td><button class="btn-details">Details</button></td>
-            <td><span class="badge badge-completed">Completed</span></td>
+          <tr *ngIf="rides.length === 0">
+            <td colspan="7" style="text-align: center;">No drives found for selected range.</td>
           </tr>
         </tbody>
       </table>
@@ -69,15 +69,13 @@
 
     <!-- Pagination -->
     <div class="pagination-footer">
-      <p class="data-info">Showing data 1 to 8 drives</p>
+      <!-- Dynamic display of how many drives are shown -->
+      <p class="data-info">Showing data {{ rides.length }} drives</p>
+      
       <div class="pagination-controls">
         <button class="page-arrow">&lt;</button>
         <button class="page-num active">1</button>
-        <button class="page-num">2</button>
-        <button class="page-num">3</button>
-        <button class="page-num">4</button>
-        <span class="dots">...</span>
-        <button class="page-num">40</button>
+        <!-- Pagination logic would go here -->
         <button class="page-arrow">&gt;</button>
       </div>
     </div>

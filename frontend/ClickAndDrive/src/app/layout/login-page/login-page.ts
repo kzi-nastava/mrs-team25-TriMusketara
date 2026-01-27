@@ -26,7 +26,14 @@ export class LoginPage {
     this.router.navigate(['/map']);
   }
 
-  login() {
+  login(event: Event) {
+    const form = event.target as HTMLFormElement;
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
     const headers = new HttpHeaders({ 'skip': 'true' });
     
     this.http.post('http://localhost:8080/api/user/auth/login', {
@@ -39,6 +46,7 @@ export class LoginPage {
         }
 
         localStorage.setItem('token', res.token);
+        // console.log(res.userId);
         this.authService.setUserType(res.role);
         this.authService.setUsername(res.email);
 

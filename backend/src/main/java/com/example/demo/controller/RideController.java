@@ -79,10 +79,9 @@ public class RideController {
 
     @PostMapping("/estimate")
     public ResponseEntity<RideEstimateResponseDTO> estimateRide(
-            @RequestBody RideRequestUnregisteredDTO request
+            @Valid @RequestBody RideRequestUnregisteredDTO request
     ) {
-        RideEstimateResponseDTO response = new RideEstimateResponseDTO();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(rideService.estimateRide(request));
     }
 
     @PostMapping("/{id}/cancel")
@@ -90,14 +89,16 @@ public class RideController {
             @PathVariable Long id,
             @RequestBody RideCancellationRequestDTO request
     ) {
+        rideService.cancelRide(id, request);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/stop")
     public ResponseEntity<Void> stopRide(
             @PathVariable Long id,
-            @RequestBody RideStopRequestDTO request
+            @Valid @RequestBody RideStopRequestDTO request
     ) {
+        rideService.stopRide(id, request);
         return ResponseEntity.ok().build();
     }
 
@@ -126,4 +127,9 @@ public class RideController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @PostMapping("/{id}/panic")
+    public ResponseEntity<Void> panicRide(@PathVariable Long id) {
+        rideService.panic(id);
+        return ResponseEntity.ok().build();
+    }
 }
