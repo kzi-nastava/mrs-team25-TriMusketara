@@ -2,14 +2,12 @@ package com.example.demo.services;
 
 import com.example.demo.dto.LocationDTO;
 import com.example.demo.dto.request.CreateRideRequestDTO;
+import com.example.demo.dto.request.RideCancellationRequestDTO;
 import com.example.demo.dto.request.RideRequestUnregisteredDTO;
 import com.example.demo.dto.response.RideEstimateResponseDTO;
 import com.example.demo.dto.response.RideResponseDTO;
 import com.example.demo.model.*;
-import com.example.demo.repositories.DriverRepository;
-import com.example.demo.repositories.LocationRepository;
-import com.example.demo.repositories.RideRepository;
-import com.example.demo.repositories.RouteRepository;
+import com.example.demo.repositories.*;
 import com.example.demo.services.interfaces.RideService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
@@ -30,6 +28,7 @@ public class RideServiceImpl implements RideService {
     private final LocationRepository locationRepository;
     private final RouteRepository routeRepository;
     private final DriverRepository driverRepository;
+    private final UserRepository userRepository;
 
     // Ride creation
     @Override
@@ -196,5 +195,41 @@ public class RideServiceImpl implements RideService {
                     "Origin and destination cannot be the same"
             );
         }
+    }
+
+    public void cancelRide(Long rideId, RideCancellationRequestDTO request) {
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Ride not found"
+                ));
+
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "User not found"
+                ));
+
+        if (user instanceof Driver) {
+
+            if (request.getReason() == null || request.getReason().isBlank()) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Driver must provide cancellation reason"
+                );
+            }
+        }
+
+        if (user instanceof Passenger) {
+
+            LocalDateTime limit = ride.getStartTime().minusMinutes(10);
+            if (LocalDateTime.now().isAfter(limit)) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Passenger can cancel only 10 minutes before ride start"
+                );
+            }
+        }
+
+        ride.setStatus(RideStatus.CANCELED);
+        rideRepository.save(ride);
     }
 }

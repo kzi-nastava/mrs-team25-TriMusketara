@@ -89,6 +89,7 @@ public class RideController {
             @PathVariable Long id,
             @RequestBody RideCancellationRequestDTO request
     ) {
+        rideService.cancelRide(id, request);
         return ResponseEntity.ok().build();
     }
 
