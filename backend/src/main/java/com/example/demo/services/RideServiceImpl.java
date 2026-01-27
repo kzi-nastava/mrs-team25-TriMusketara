@@ -4,6 +4,7 @@ import com.example.demo.dto.LocationDTO;
 import com.example.demo.dto.request.CreateRideRequestDTO;
 import com.example.demo.dto.request.RideCancellationRequestDTO;
 import com.example.demo.dto.request.RideRequestUnregisteredDTO;
+import com.example.demo.dto.request.RideStopRequestDTO;
 import com.example.demo.dto.response.RideEstimateResponseDTO;
 import com.example.demo.dto.response.RideResponseDTO;
 import com.example.demo.model.*;
@@ -259,4 +260,47 @@ public class RideServiceImpl implements RideService {
 
         panicRepository.save(panic);
     }
+
+    public void stopRide(Long rideId, RideStopRequestDTO request) {
+
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Ride not found"
+                ));
+
+        if (ride.getStatus() != RideStatus.STARTED) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Ride is not in progress"
+            );
+        }
+
+        LocationDTO stop = request.getStopLocation();
+
+        if (ride.getRoute().getDestination().getLatitude() == stop.getLatitude() &&
+                ride.getRoute().getDestination().getLongitude() == stop.getLongitude()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Stop location cannot be the same as destination"
+            );
+        }
+
+        // - price evaluation
+        // - destination change
+        // - stopping time
+        // - status = FINISHED
+
+        Location destination = ride.getRoute().getDestination();
+
+        destination.setLatitude(stop.getLatitude());
+        destination.setLongitude(stop.getLongitude());
+        destination.setAddress(stop.getAddress());
+
+        ride.setStatus(RideStatus.FINISHED);
+        ride.setEndTime(LocalDateTime.now());
+
+        rideRepository.save(ride);
+    }
+
 }

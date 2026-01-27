@@ -14,10 +14,10 @@ import lombok.Setter;
 public class LocationDTO {
 
     @NotNull(message = "Longitude cannot be null")
-    private double longitude;
+    private Double longitude;
 
     @NotNull(message = "Latitude cannot be null")
-    private double latitude;
+    private Double latitude;
 
     @NotBlank(message = "Address cannot be blank")
     private String address;
