@@ -29,6 +29,7 @@ public class RideServiceImpl implements RideService {
     private final RouteRepository routeRepository;
     private final DriverRepository driverRepository;
     private final UserRepository userRepository;
+    private final PanicRepository panicRepository;
 
     // Ride creation
     @Override
@@ -176,6 +177,7 @@ public class RideServiceImpl implements RideService {
         driverRepository.updateDriverStatus(8 * 60 + marginMinutes);
     }
 
+    @Override
     public RideEstimateResponseDTO estimateRide(RideRequestUnregisteredDTO request) {
         validateRideRequest(request);
 
@@ -197,6 +199,7 @@ public class RideServiceImpl implements RideService {
         }
     }
 
+    @Override
     public void cancelRide(Long rideId, RideCancellationRequestDTO request) {
         Ride ride = rideRepository.findById(rideId)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -231,5 +234,29 @@ public class RideServiceImpl implements RideService {
 
         ride.setStatus(RideStatus.CANCELED);
         rideRepository.save(ride);
+    }
+
+    @Override
+    public void panic(Long rideId) {
+
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Ride not found"
+                ));
+
+        if (ride.getStatus() == RideStatus.CANCELED ||
+                ride.getStatus() == RideStatus.FINISHED) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Cannot trigger panic for finished or canceled ride"
+            );
+        }
+
+        Panic panic = new Panic();
+        panic.setRide(ride);
+        panic.setCreatedAt(LocalDateTime.now());
+
+        panicRepository.save(panic);
     }
 }

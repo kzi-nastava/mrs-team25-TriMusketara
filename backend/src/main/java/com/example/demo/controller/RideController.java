@@ -126,4 +126,9 @@ public class RideController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @PostMapping("/{id}/panic")
+    public ResponseEntity<Void> panicRide(@PathVariable Long id) {
+        rideService.panic(id);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -10,4 +10,5 @@ public interface RideService {
     RideResponseDTO createRide(CreateRideRequestDTO request);
     RideEstimateResponseDTO estimateRide(RideRequestUnregisteredDTO request);
     void cancelRide(Long rideId, RideCancellationRequestDTO request);
+    void panic(Long rideId);
 }
