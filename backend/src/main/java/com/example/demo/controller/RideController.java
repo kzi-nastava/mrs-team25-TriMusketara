@@ -8,6 +8,7 @@ import com.example.demo.model.RideStatus;
 import com.example.demo.dto.response.RideEstimateResponseDTO;
 import com.example.demo.dto.response.RideTrackingResponseDTO;
 
+import com.example.demo.services.interfaces.ReviewService;
 import com.example.demo.services.interfaces.RideService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class RideController {
 
     // Service
     private final RideService rideService;
+    private final ReviewService reviewService;
 
     @PostMapping("/create-ride")
     public ResponseEntity<RideResponseDTO> createRide(
@@ -108,14 +110,14 @@ public class RideController {
         return ResponseEntity.ok(new RideTrackingResponseDTO(id, new LocationDTO( 45.26, 19.83, "Bul. Oslobodjenja"), 5));
     }
 
-    // TAČKA 2.6.2: inconsistency report
+    // 2.6.2: inconsistency report
     @PostMapping("/{id}/inconsistency")
     public ResponseEntity<Void> reportInconsistency(@PathVariable Long id,
                                                     @RequestBody InconsistencyReportRequestDTO request) {
         return ResponseEntity.ok().build();
     }
 
-    // TAČKA 2.7: Finish ride
+    // 2.7: Finish ride
     @PutMapping("/{id}/finish")
     public ResponseEntity<Void> finishRide(@PathVariable Long id) {
         return ResponseEntity.ok().build();
@@ -123,9 +125,12 @@ public class RideController {
 
     // 2.8: Rating
     @PostMapping("/{id}/review")
-    public ResponseEntity<Void> reviewRide(@PathVariable Long id, @RequestBody ReviewRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<?> createReview(@Valid @RequestBody ReviewRequestDTO dto) {
+        // @Valid activates min, max, etc...
+        reviewService.createReview(dto);
+        return ResponseEntity.ok().build();
     }
+
 
     @PostMapping("/{id}/panic")
     public ResponseEntity<Void> panicRide(@PathVariable Long id) {

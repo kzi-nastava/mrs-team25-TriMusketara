@@ -49,6 +49,13 @@ public class Ride {
 //    )
 //    @Column(name = "email")
 //    private List<String> linkedPassengerEmails;
+    @ManyToMany
+    @JoinTable(
+            name = "ride_passengers",
+            joinColumns = @JoinColumn(name = "ride_id"),
+            inverseJoinColumns = @JoinColumn(name = "passenger_id")
+    )
+    private List<Passenger> passengers;
     
     @ManyToOne
     @JoinColumn(name = "route_id")
