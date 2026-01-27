@@ -30,7 +30,6 @@ export class DriverProfile {
   onButtonClick(button: any) {
     if (button.logout) {
       this.authService.logout();
-      this.router.navigate(['/login']);
       return;
     }
 

@@ -42,7 +42,7 @@ export class AuthService {
     logout() {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        // this.currentUser.set(null);
+        window.location.reload();
     }
 
     isLoggedIn(): boolean {
