@@ -20,9 +20,9 @@ public class DriverController {
     private final DriverService driverService;
 
     // 2.9.2: Driver history
-    @GetMapping("/{id}/rides")
+    @GetMapping("/{id}/ride-history")
     public ResponseEntity<List<DriverRideHistoryResponseDTO>> getDriverHistory(@PathVariable Long id) {
-        return ResponseEntity.ok(new ArrayList<>());
+        return ResponseEntity.ok(driverService.getDriverRideHistory(id));
     }
 
     @PostMapping("/complete-registration")
