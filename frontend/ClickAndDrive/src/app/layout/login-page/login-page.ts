@@ -29,7 +29,7 @@ export class LoginPage {
   login() {
     const headers = new HttpHeaders({ 'skip': 'true' });
     
-    this.http.post('http://localhost:8080/auth/login', {
+    this.http.post('http://localhost:8080/api/user/auth/login', {
       email: this.email,
       password: this.password
     }, {headers}).subscribe({

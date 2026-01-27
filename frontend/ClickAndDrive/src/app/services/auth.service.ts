@@ -39,6 +39,50 @@ export class AuthService {
         this.destination.set(destination);
     }
 
+    // Get users role from token
+    getRoleFromToken(): string | null {
+        const token = localStorage.getItem('token');
+        if (!token) return null;
+      
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          return payload.role || null;
+        } catch {
+          return null;
+        }
+      }
+    
+    // Get user ID from token
+    // getUserIdFromToken(): number | null {
+    //     const token = localStorage.getItem('token');
+    //     if (!token) return null;
+    
+    //     try {
+    //     const payload = JSON.parse(atob(token.split('.')[1]));
+    //     return payload.userId || null;
+    //     } catch {
+    //     return null;
+    //     }
+    // }
+
+    getUserIdFromToken(): number | null {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.log('No token found'); // Debug
+            return null;
+        }
+      
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          console.log('Parsed payload:', payload); // Debug
+          console.log('userId value:', payload.userId); // Debug
+          return payload.userId || null;
+        } catch (error) {
+          console.error('Error parsing token:', error); // Debug
+          return null;
+        }
+    }
+
     logout() {
         localStorage.removeItem('token');
         localStorage.removeItem('user');

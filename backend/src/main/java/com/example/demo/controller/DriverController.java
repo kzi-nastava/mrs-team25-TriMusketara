@@ -2,9 +2,11 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.request.CompleteRegistrationRequestDTO;
 import com.example.demo.dto.response.DriverRideHistoryResponseDTO;
+import com.example.demo.dto.response.VehicleResponseDTO;
 import com.example.demo.services.interfaces.DriverService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
@@ -30,5 +32,11 @@ public class DriverController {
 
         driverService.completeRegistration(request);
         return ResponseEntity.ok("Registration is successful");
+    }
+
+    @GetMapping("/{id}/vehicle")
+    public ResponseEntity<VehicleResponseDTO> getDriverVehicle(@PathVariable Long id) {
+        VehicleResponseDTO response = driverService.getDriverVehicle(id);
+        return ResponseEntity.ok(response);
     }
 }

@@ -11,7 +11,7 @@
     width: 50%;
     height: 90%;
     background-color: #242423;
-    border: 2px solid #F5CB5C;
+    /* border: 2px solid #F5CB5C; */
     display: flex;
     flex-direction: column;
     margin-bottom: 2.5%;
@@ -37,7 +37,7 @@
 }
 
 .form-container {
-    width: 72%;
+    width: 80%;
     height: 100%;
     /* border: 1px solid pink; */
 }
@@ -47,11 +47,12 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 30px;
+    gap: 20px;
 }
 
 .form-row {
     /* border: 1px solid orange; */
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -63,7 +64,7 @@
 .form-row label {
     width: 30%;
     text-align: right;
-    font-size: 27px;
+    font-size: 24px;
     color: white;
 }
 
@@ -73,6 +74,13 @@
     background-color: #A7A7A7;
 }
 
+.form-row select {
+    height: 70%;
+    width: 38%;
+    background-color: #A7A7A7;
+
+}
+
 .buttons-container {
     width: 100%;
     height: 10%;
@@ -80,6 +88,8 @@
     align-items: center;
     justify-content: flex-end;
     /* border: 1px solid blue; */
+    gap: 16px;
+    padding-bottom: 2%;
 }
 
 .buttons-container button {
@@ -88,10 +98,10 @@
     font-size: 15px;
     width: auto;
     height: 65%;
+    padding: 0 20px;
     border-radius: 5px;
+    margin-right: 2%;
     border: none;
-    margin-right: 8%;
-    margin-bottom: 8%;
     cursor: pointer;
     transition-duration: 0.4s;
 }
@@ -101,3 +111,74 @@
     color: white;
 }
 
+.toggle-container {
+    display: none;
+}
+
+.toggle-btn {
+    background-color: #F5CB5C;
+    color: white;
+    font-size: 15px;
+    padding: 0 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    height: 100%;
+}
+
+.toggle-btn:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-1px);
+}
+
+.error-text {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-right: 11.5%;
+    transform: translateY(-85%);
+  
+    font-size: 11px;
+    color: red;
+    white-space: nowrap;
+  
+    pointer-events: none;
+  }
+
+  .change-password-btn {
+    background-color: #F5CB5C;
+    color: white;
+    font-size: 14px;
+    padding: 4px 16px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    height: 70%;
+    width: 36%;
+}
+
+.change-password-btn:hover {
+    background-color: #333533;
+}
+
+/* Modal styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 550px;
+    position: relative;
+}
