@@ -96,8 +96,9 @@ public class RideController {
     @PostMapping("/{id}/stop")
     public ResponseEntity<Void> stopRide(
             @PathVariable Long id,
-            @RequestBody RideStopRequestDTO request
+            @Valid @RequestBody RideStopRequestDTO request
     ) {
+        rideService.stopRide(id, request);
         return ResponseEntity.ok().build();
     }
 
