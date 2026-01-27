@@ -79,10 +79,9 @@ public class RideController {
 
     @PostMapping("/estimate")
     public ResponseEntity<RideEstimateResponseDTO> estimateRide(
-            @RequestBody RideRequestUnregisteredDTO request
+            @Valid @RequestBody RideRequestUnregisteredDTO request
     ) {
-        RideEstimateResponseDTO response = new RideEstimateResponseDTO();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(rideService.estimateRide(request));
     }
 
     @PostMapping("/{id}/cancel")

@@ -2,6 +2,8 @@ package com.example.demo.services;
 
 import com.example.demo.dto.LocationDTO;
 import com.example.demo.dto.request.CreateRideRequestDTO;
+import com.example.demo.dto.request.RideRequestUnregisteredDTO;
+import com.example.demo.dto.response.RideEstimateResponseDTO;
 import com.example.demo.dto.response.RideResponseDTO;
 import com.example.demo.model.*;
 import com.example.demo.repositories.DriverRepository;
@@ -11,7 +13,9 @@ import com.example.demo.repositories.RouteRepository;
 import com.example.demo.services.interfaces.RideService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -173,4 +177,24 @@ public class RideServiceImpl implements RideService {
         driverRepository.updateDriverStatus(8 * 60 + marginMinutes);
     }
 
+    public RideEstimateResponseDTO estimateRide(RideRequestUnregisteredDTO request) {
+        validateRideRequest(request);
+
+        //Logic that will later be implemented
+        RideEstimateResponseDTO response = new RideEstimateResponseDTO();
+        return response;
+    }
+
+    private void validateRideRequest(RideRequestUnregisteredDTO request) {
+        LocationDTO origin = request.getOrigin();
+        LocationDTO destination = request.getDestination();
+
+        if (origin.getLatitude() == destination.getLatitude() &&
+                origin.getLongitude() == destination.getLongitude()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Origin and destination cannot be the same"
+            );
+        }
+    }
 }
