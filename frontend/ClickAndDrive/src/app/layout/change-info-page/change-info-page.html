@@ -3,25 +3,131 @@
         <div class="title-container">
             <p class="title">Account information</p>
         </div>
-        <div class="container">
-            <div class="form-container">
-                <form action="">
-                    @for (field of fields; track field.label) {
-                        <div class="form-row">
-                        <label [for]="field.label">{{field.text}}</label>
-                        <input
-                            [id]="field.label"
-                            [name]="field.label"
-                            [type]="field.type"
-                            [placeholder]="field.placeholder"
-                        />
-                        </div>
-                    }
-                </form>
+
+        <!-- User information form -->
+        @if (!showVehicleForm) {
+            <div class="container">
+                <div class="form-container">
+                    <form action="">
+                        @for (field of fields; track field.label) {
+                            <div class="form-row">
+                                <label [for]="field.label">{{field.text}}</label>
+                                <input
+                                    [id]="field.label"
+                                    [name]="field.label"
+                                    [(ngModel)]="userForm[field.key]"
+                                    [type]="field.type"
+                                    [class.invalid]="isFieldInvalid(field.label)"
+                                />
+                                @if (fieldErrors[field.label]) {
+                                    <span class="error-text">{{ fieldErrors[field.label] }}</span>
+                                }
+                            </div>
+
+                            @if (field.label === 'lname') {
+                                <div class="form-row">
+                                    <label>Password:</label>
+                                    <button 
+                                        type="button" 
+                                        class="change-password-btn" 
+                                        (click)="openChangePasswordModal()"
+                                    >
+                                        Change Password
+                                    </button>
+                                </div>
+                            }
+                        }
+                        <!-- Changing password
+                            <div class="form-row">
+                                <label>Password:</label>
+                                <button 
+                                    type="button" 
+                                    class="change-password-btn" 
+                                    (click)="openChangePasswordModal()"
+                                >
+                                    Change Password
+                                </button>
+                            </div> -->
+                    </form>
+                </div>
             </div>
-        </div>
-        <div class="buttons-container">
-            <button>  Change information  </button>
+            
+        }
+
+        @if (showVehicleForm && isDriver) {
+            <div class="container">
+                <div class="form-container">
+                    <form action="">
+                        @for (field of vehicleFields; track field.label) {
+                            <div class="form-row">
+                                <label [for]="field.label">{{field.text}}</label>
+        
+                                <!-- Select field -->
+                                @if (field.type === 'select') {
+                                    <select [id]="field.label" 
+                                            [name]="field.label"
+                                            [(ngModel)]="vehicleForm[field.key]" 
+                                            [class.invalid]="isFieldInvalid(field.label)"
+                                    >
+                                
+                                        <option value="" disabled selected>Select type</option>
+                                        @for (option of field.options; track option) {
+                                            <option [value]="option">{{option}}</option>
+                                        }
+                                    </select>
+                                
+                                <!-- Checkbox field -->
+                                } @else if (field.type === 'checkbox') {
+                                     <input
+                                        [id]="field.label"
+                                        [name]="field.label"
+                                        type="checkbox"
+                                        [(ngModel)]="vehicleForm[field.key]"
+                                        [class.invalid]="isFieldInvalid(field.label)"
+                                        style="width: 20px; height: 20px;" 
+                                    />
+                                    
+                                <!-- Regular input field -->
+                                } @else {
+                                    <input
+                                    [id]="field.label"
+                                    [name]="field.label"
+                                    [(ngModel)]="vehicleForm[field.key]"
+                                    [type]="field.type"
+                                    [class.invalid]="isFieldInvalid(field.label)"
+                                />
+                                }
+                                
+                                @if (fieldErrors[field.label]) {
+                                    <span class="error-text">
+                                      {{ fieldErrors[field.label] }}
+                                    </span>
+                                  }                          
+                            </div>
+                        }
+                    </form>
+                </div>
+            </div>
+
+        }
+
+
+        <div class="buttons-container" >
+            @if (isDriver) {
+                <button class="toggle-btn" (click)="toggleForm()">
+                    {{ showVehicleForm ? 'Show User Information' : 'Show Vehicle Information' }}
+                </button>
+            }
+            <button (click)="onSaveChanges()">  Change information  </button>
+
         </div>
     </div>
 </div>
+
+@if (showChangePasswordModal) {
+    <div class="modal-overlay" (click)="closeChangePasswordModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <app-change-password (close)="closeChangePasswordModal()"></app-change-password>
+        </div>
+    </div>
+}

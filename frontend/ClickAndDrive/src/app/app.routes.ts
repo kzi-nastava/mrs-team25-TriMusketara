@@ -19,7 +19,7 @@ export const routes: Routes = [
   { path: 'map', component: MainPageComponent },
 
   // USER ROUTES
-  { path: 'change-info', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'user' } },
+  { path: 'drive-in-progress', component: DriveInProgress, canActivate: [AuthGuard], data: { role: 'user' } },
   { path: 'favorite-routes', component: FavoriteRoutes, canActivate: [AuthGuard], data: { role: 'user' } },
   { path: 'rate-ride', component: RideRating, canActivate: [AuthGuard], data: { role: 'user' } },
 
@@ -33,14 +33,14 @@ export const routes: Routes = [
   { path: 'support', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
   { path: 'driver-registration', component: DriverRegistration, canActivate: [AuthGuard], data: { role: 'admin' } },
 
+  // SHARED ROUTES
+  { path: 'change-information-page', component: ChangeInfoPage, canActivate: [AuthGuard], data: { roles: ['user', 'admin', 'driver'] } },
+  { path: 'drive-in-progress', component: DriveInProgress, canActivate: [AuthGuard], data: { roles: ['user', 'driver'] } },
+  
   // PUBLIC ROUTES
   { path: 'login', component: LoginPage },
   { path: 'register', component: RegistrationPage },
-  { path: 'change-information-page', component: ChangeInfoPage },
   { path: 'complete-registration', component: CompleteDriverRegistration },
-
-  //SHARED ROUTES
-  { path: 'drive-in-progress', component: DriveInProgress, canActivate: [AuthGuard], data: { roles: ['user', 'driver'] } },
 
   // CATCH ALL
   { path: '**', redirectTo: 'map' }
