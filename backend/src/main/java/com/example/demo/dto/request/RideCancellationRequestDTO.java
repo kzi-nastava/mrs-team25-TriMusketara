@@ -6,5 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RideCancellationRequestDTO {
+    private Long userId;
     private String reason;
 }
