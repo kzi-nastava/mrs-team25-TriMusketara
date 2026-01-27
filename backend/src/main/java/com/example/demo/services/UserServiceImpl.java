@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
             UserRepository userRepository,
             JwtUtil jwtUtil, 
             VehicleRepository vehicleRepository,
-            PassengerRepository passengerRepository,
+            PassengerRepository passengerRepository
             ) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
@@ -210,7 +210,6 @@ public class UserServiceImpl implements UserService {
                 saved.getEmail(),
                 saved.getName(),
                 saved.getSurname(),
-                saved.getGender(),
                 saved.getAddress(),
                 saved.getPhone()
         );
