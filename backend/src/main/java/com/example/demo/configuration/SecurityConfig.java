@@ -51,6 +51,7 @@ public class SecurityConfig {
                                 "api/user/auth/**",
                                 "/api/drivers/complete-registration").permitAll() // login, register i test endpoint
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/panic/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
