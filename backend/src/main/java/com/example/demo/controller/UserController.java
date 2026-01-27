@@ -140,7 +140,9 @@ public class UserController {
 
     // POST: Registracija korisnika
     @PostMapping("/auth/register")
-    public ResponseEntity<UserProfileResponseDTO> registerUser(@RequestBody UserRegistrationRequestDTO request) {
+    public ResponseEntity<UserProfileResponseDTO> registerUser(
+            @Valid @RequestBody UserRegistrationRequestDTO request
+    ) {
         UserProfileResponseDTO response = userService.registerPassenger(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
