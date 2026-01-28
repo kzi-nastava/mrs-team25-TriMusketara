@@ -20,5 +20,9 @@ export class RideOrderingService {
     reportInconsistency(rideId: number, reason: string): Observable<any> {
         return this.http.post(`${this.apiUrl}/${rideId}/inconsistency-report`, { reason });
     }
+
+    finishRide(rideId: number): Observable<any> {
+        return this.http.put(`http://localhost:8080/api/rides/${rideId}/finish`, {});
+    }
     
 }

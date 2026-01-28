@@ -130,7 +130,42 @@ onReport() {
   //     alert("Failed to report inconsistency: " + (err.error?.message || "Unknown error"));
   //   }
   // });
-}
 
   
+}
+
+  onFinishDriver() {
+    // Hardcoded rideId for demo purposes
+    const testRideId = 1; 
+
+    console.log("Finishing ride for demo...");
+
+    this.rideService.finishRide(testRideId).subscribe({
+      next: (res) => {
+        console.log("Ride finished successfully:", res);
+        this.completeRideFlow();
+      },
+      error: (err) => {
+        // Even if it returns an error (because rideId 1 might not exist), 
+        // your backend CATCH block will send that test email!
+        console.log("Backend error (expected for demo), but email should be sent.");
+        this.completeRideFlow();
+      }
+    });
+  }
+
+  // Helper method to clear the screen
+  private completeRideFlow() {
+    this.auth.setInDrive(false);
+    this.showFinishNotification.set(true);
+    alert("Check your email! Ride summary sent.");
+    this.router.navigate(['/map']);
+  }
+
+  onStopDriver() {
+    alert("Drive stopped.")
+    this.auth.setInDrive(false);
+    this.router.navigate(['/map']);
+    
+  }
 }

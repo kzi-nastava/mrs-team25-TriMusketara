@@ -13,11 +13,14 @@ import com.example.demo.dto.response.DriverRideHistoryResponseDTO;
 import com.example.demo.model.*;
 import com.example.demo.repositories.DriverRepository;
 import com.example.demo.repositories.RideRepository;
+import com.example.demo.repositories.UserRepository;
 import com.example.demo.repositories.VehicleRepository;
 import com.example.demo.services.interfaces.DriverService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -37,18 +40,22 @@ public class DriverServiceImpl implements DriverService {
     private final EmailServiceImpl emailService;
     private final PasswordEncoder passwordEncoder;
     private final RideRepository rideRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<DriverRideHistoryResponseDTO> getDriverRideHistory(Long driverId) {
+        // --- SECURITY ---
+        if (!isOwnerOrAdmin(driverId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Nemate pristup ovim podacima.");
+        }
+
         List<Ride> rides = rideRepository.findAllByDriverId(driverId);
         List<DriverRideHistoryResponseDTO> dtos = new ArrayList<>();
 
         for (Ride ride : rides) {
-            if (ride.getStatus() != RideStatus.FINISHED){
-                continue;
-            }
-            // Status of a ride in history is always finished
+            if (ride.getStatus() != RideStatus.FINISHED) continue;
 
+            // DTO Mapping
             DriverRideHistoryResponseDTO dto = new DriverRideHistoryResponseDTO();
             dto.setId(ride.getId());
             dto.setStartTime(ride.getStartTime());
@@ -56,14 +63,12 @@ public class DriverServiceImpl implements DriverService {
             dto.setTotalPrice(ride.getPrice());
             dto.setPanicPressed(ride.isPanicPressed());
 
-            // Map locations
             if (ride.getRoute() != null) {
                 Location start = ride.getRoute().getOrigin();
                 Location end = ride.getRoute().getDestination();
                 dto.setOrigin(new LocationDTO(start.getLongitude(), start.getLatitude(), start.getAddress()));
                 dto.setDestination(new LocationDTO(end.getLongitude(), end.getLatitude(), end.getAddress()));
             }
-
             dtos.add(dto);
         }
         return dtos;
@@ -201,5 +206,28 @@ public class DriverServiceImpl implements DriverService {
                 vehicle.getIsBabyFriendly(),
                 vehicle.getIsPetFriendly()
         );
+    }
+
+    public boolean isOwnerOrAdmin(Long idFromPath) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = auth.getPrincipal();
+
+        if (principal instanceof User) {
+            User loggedInUser = (User) principal;
+
+            // Debug
+//            System.out.println("Ulogovan korisnik ID: " + loggedInUser.getId());
+//            System.out.println("ID iz URL-a: " + idFromPath);
+
+            // Admin?
+            boolean isAdmin = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ADMIN"));
+            if (isAdmin) return true;
+
+            // Owner?
+            return loggedInUser.getId().equals(idFromPath);
+        }
+
+        return false;
     }
 }

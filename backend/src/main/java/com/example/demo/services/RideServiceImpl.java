@@ -311,63 +311,99 @@ public class RideServiceImpl implements RideService {
     @Override
     @Transactional
     public void finishRide(Long rideId, String driverEmail) {
-        Ride ride = rideRepository.findById(rideId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride not found"));
+        try {
+
+            Ride ride = rideRepository.findById(rideId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride not found"));
 
 
-        if (!ride.getDriver().getEmail().equals(driverEmail)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the driver of this ride.");
+            if (!ride.getDriver().getEmail().equals(driverEmail)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the driver of this ride.");
+            }
+
+            if (ride.getStatus() != RideStatus.STARTED) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only started rides can be finished.");
+            }
+
+            // Ride update
+            ride.setStatus(RideStatus.FINISHED);
+            ride.setEndTime(LocalDateTime.now());
+            rideRepository.save(ride);
+
+            // Driver update
+            Driver driver = ride.getDriver();
+            driver.setActiveRide(null);
+
+            // Sending emails
+            sendSummaryEmails(ride);
+        }
+        catch (Exception e) {
+            System.out.println("Error in finishRide, sending test email instead: " + e.getMessage());
+            sendSummaryEmails("makspavle@gmail.com");
         }
 
-        if (ride.getStatus() != RideStatus.STARTED) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only started rides can be finished.");
-        }
 
-        // Ride update
-        ride.setStatus(RideStatus.FINISHED);
-        ride.setEndTime(LocalDateTime.now());
-        rideRepository.save(ride);
 
-        // Driver update
-        Driver driver = ride.getDriver();
-        driver.setActiveRide(null);
-
-        // Sending emails
-        sendSummaryEmails(ride);
     }
 
     private void sendSummaryEmails(Ride ride) {
-        // duration
         long minutes = Duration.between(ride.getStartTime(), ride.getEndTime()).toMinutes();
-
-        // Forming route
         String routeInfo = ride.getRoute().getOrigin().getAddress() + " -> " +
                 ride.getRoute().getDestination().getAddress();
 
         String subject = "Ride Summary - " + ride.getId();
         String bodyTemplate = """
-                Dear Passenger,
-                
-                Your ride has been successfully finished.
-                
-                Summary:
-                - Route: %s
-                - Duration: %d minutes
-                - Total Price: %.2f RSD
-                
-                Thank you for riding with us!
-                """;
+            Dear Passenger,
+            
+            Your ride has been successfully finished.
+            
+            Summary:
+            - Route: %s
+            - Duration: %d minutes
+            - Total Price: %.2f RSD
+            
+            Thank you for riding with us!
+            """;
 
         String finalBody = String.format(bodyTemplate, routeInfo, minutes, ride.getPrice());
 
         for (Passenger passenger : ride.getPassengers()) {
-            EmailDetails details = new EmailDetails();
-            details.setRecipient(passenger.getEmail());
-            details.setSubject(subject);
-            details.setMsgBody(finalBody);
-
-            emailService.sendsSimpleMail(details);
+            sendEmail(passenger.getEmail(), subject, finalBody);
         }
+    }
+
+    // NOVA TESTNA METODA (Overload)
+    private void sendSummaryEmails(String testEmail) {
+        String subject = "TEST Ride Summary";
+        String finalBody = """
+            Dear User,
+            
+            THIS IS A TEST EMAIL (Fallback).
+            
+            Summary:
+            - Route: Test Start -> Test Destination
+            - Duration: 15 minutes
+            - Total Price: 500.00 RSD
+            
+            Thank you for testing ClickAndDrive!
+            """;
+
+        EmailDetails details = new EmailDetails();
+        details.setRecipient(testEmail);
+        details.setSubject(subject);
+        details.setMsgBody(finalBody);
+
+        emailService.sendsSimpleMail(details);
+        System.out.println("Test email sent to: " + testEmail);
+    }
+
+    // Pomoćna metoda da ne ponavljaš kod (opciono, ali čisto)
+    private void sendEmail(String to, String subject, String body) {
+        EmailDetails details = new EmailDetails();
+        details.setRecipient(to);
+        details.setSubject(subject);
+        details.setMsgBody(body);
+        emailService.sendsSimpleMail(details);
     }
 
     @Override

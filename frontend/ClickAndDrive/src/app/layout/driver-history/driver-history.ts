@@ -40,20 +40,38 @@ export class DriverHistory implements OnInit {
   }
 
   // Function for searching/filtering
-  searchByDate() {
+ searchByDate() {
+    // Reset the list if fields are empty
     if (!this.fromDate && !this.toDate) {
       this.rides = [...this.allRides];
       return;
     }
 
+    const now = new Date().getTime();
+    const start = this.fromDate ? new Date(this.fromDate).getTime() : -Infinity;
+    const end = this.toDate ? new Date(this.toDate).getTime() : Infinity;
+
+    // VALIDATIONS
+    if (this.fromDate && start > now) {
+      alert("Date 'From' cannot be in the future!");
+      return;
+    }
+
+    if (this.fromDate && this.toDate && start > end) {
+      alert("Date 'From' must be before Date 'To'!");
+      return;
+    }
+
+    // If validations pass, filter the rides
     this.rides = this.allRides.filter(ride => {
       const rideDate = new Date(ride.startTime).getTime();
       
-      // Set boundaries (if field is not filled, go to infinity)
-      const start = this.fromDate ? new Date(this.fromDate).getTime() : -Infinity;
-      const end = this.toDate ? new Date(this.toDate).setHours(23, 59, 59, 999) : Infinity;
+      // Set end of day to 23:59:59 for 'to' date to include that day
+      const adjustedEnd = this.toDate 
+        ? new Date(this.toDate).setHours(23, 59, 59, 999) 
+        : Infinity;
 
-      return rideDate >= start && rideDate <= end;
+      return rideDate >= start && rideDate <= adjustedEnd;
     });
   }
 

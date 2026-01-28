@@ -14,4 +14,6 @@ public interface DriverService {
     boolean isTokenValid(String token);
     VehicleResponseDTO getDriverVehicle(Long id);
     List<DriverRideHistoryResponseDTO> getDriverRideHistory(Long driverId);
+
+    boolean isOwnerOrAdmin(Long id);
 }

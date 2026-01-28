@@ -125,7 +125,6 @@ public class RideController {
     @PutMapping("/{id}/finish")
     @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<Void> finishRide(@PathVariable Long id, Principal principal) {
-        // principal.getName() vraća email/username koji je ugrađen u JWT token
         String driverEmail = principal.getName();
 
         rideService.finishRide(id, driverEmail);
