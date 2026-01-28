@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { RideOrderingService } from '../../services/ride.service';
 import { RideOrderCreate } from '../../services/models/ride-order-create';
 import { Location } from '../../services/models/location';
+import { ToastrService } from 'ngx-toastr';
 
 interface FormField {
   label: string;
@@ -50,7 +51,7 @@ export class RideOrdering implements OnChanges {
   @Output()
   closeRequested = new EventEmitter<void>();  
 
-  constructor (private rideOrderService: RideOrderingService) {}
+  constructor (private rideOrderService: RideOrderingService, private toastr: ToastrService) {}
 
   // These are static fields, we have one value and one input
   topFields = [
@@ -234,6 +235,7 @@ export class RideOrdering implements OnChanges {
     const isFormValid = this.validateForm();
 
     if (isFormValid === false) {
+      this.toastr.error('Please fill in all required fields correctly', 'Validation Error');
       return;
     }
 
@@ -244,6 +246,9 @@ export class RideOrdering implements OnChanges {
     // Get values from input fields
     const origin = this.formData.origin.trim();
     const destination = this.formData.destination.trim();
+
+    // Show info message that we're processing the request
+    this.toastr.info('Processing your ride request...', 'Please wait');
 
     // Emitting event to MainPage 
     this.rideRequested.emit({
@@ -265,11 +270,14 @@ export class RideOrdering implements OnChanges {
       this.rideOrderService.createRide(ride).subscribe({
         next: () => {
           console.log("Ride created successfully");
+          this.toastr.success('Your ride has been scheduled successfully', 'Success');
           this.rideSubmitted = false; 
           this.closeRequested.emit();
         },
         error: (err) => {
           console.error('Ride creation failed:', err);
+          const errorMessage = err.error?.message || err.error || 'Failed to create ride. Please try again.';
+          this.toastr.error(errorMessage, 'Error');
           this.rideSubmitted = false; 
         }
       });
