@@ -11,6 +11,7 @@ import { DriverRegistration } from './layout/driver-registration/driver-registra
 import { FavoriteRoutes } from './layout/favorite-routes/favorite-routes';
 import { RideRating } from './layout/ride-rating/ride-rating';
 import { CompleteDriverRegistration } from './layout/complete-driver-registration/complete-driver-registration';
+import { ActivateAccount } from './layout/activate-account/activate-account';
 import { AuthGuard } from './services/auth.guard';
 
 
@@ -41,6 +42,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginPage },
   { path: 'register', component: RegistrationPage },
   { path: 'complete-registration', component: CompleteDriverRegistration },
+  { path: 'activate-account', component: ActivateAccount },
 
   // CATCH ALL
   { path: '**', redirectTo: 'map' }

@@ -14,4 +14,5 @@ public interface UserService {
     UserProfileResponseDTO changeUserInfo(Long id, UpdateUserProfileRequestDTO request);
     void changePassword(Long id, ChangePasswordRequest request);
     UserProfileResponseDTO registerPassenger(UserRegistrationRequestDTO request);
+    boolean activatePassenger(String token);
 }
