@@ -52,7 +52,7 @@ public class SecurityConfig {
                                 "/api/drivers/complete-registration").permitAll() // login, register i test endpoint
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/admin/panic/**").hasRole("ADMIN")
-                        .requestMatchers("/api/drivers/**").hasRole("DRIVER")
+                        .requestMatchers("/api/drivers/**").hasAnyRole("DRIVER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

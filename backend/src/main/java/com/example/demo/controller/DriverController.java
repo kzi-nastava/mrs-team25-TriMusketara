@@ -7,7 +7,9 @@ import com.example.demo.services.interfaces.DriverService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +25,12 @@ public class DriverController {
 
     // 2.9.2: Driver history
     @GetMapping("/{id}/ride-history")
-    public ResponseEntity<List<DriverRideHistoryResponseDTO>> getDriverHistory(@PathVariable Long id) {
+    public ResponseEntity<?> getDriverHistory(@PathVariable Long id) {
+        // get logged in Email
+        if (!driverService.isOwnerOrAdmin(id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot see others driver histories!");
+        }
+
         return ResponseEntity.ok(driverService.getDriverRideHistory(id));
     }
 

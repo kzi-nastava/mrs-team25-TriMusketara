@@ -24,8 +24,8 @@
 <div class="buttons">
     <!--  DRIVER  -->
     @if (auth.userType() === 'driver') {
-        <button class="stop">Stop drive</button>
-        <button class="finish">Finish drive</button>
+        <button class="stop" (click)="onStopDriver()">Stop drive</button>
+        <button class="finish" (click)="onFinishDriver()">Finish drive</button>
     }
 
     <!--  PASSENGER  -->
