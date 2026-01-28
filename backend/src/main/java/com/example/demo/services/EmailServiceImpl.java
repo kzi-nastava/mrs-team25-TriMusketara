@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import com.example.demo.model.EmailDetails;
+import com.example.demo.model.Passenger;
 import com.example.demo.services.interfaces.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -66,6 +67,27 @@ public class EmailServiceImpl implements EmailService {
         }
         catch(MessagingException e) {
             return "Error while sending mail";
+        }
+    }
+
+    @Override
+    public void sendActivationEmail(Passenger passenger) {
+        try {
+            String activationLink = "http://localhost:4200/activate-account?token=" + passenger.getActivationToken();
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(passenger.getEmail());
+            helper.setSubject("Activate your account");
+            helper.setText(
+                    "<p>Hello " + passenger.getName() + ",</p>" +
+                            "<p>Please click the link below to activate your account (valid for 24h):</p>" +
+                            "<a href=\"" + activationLink + "\">Activate Account</a>",
+                    true
+            );
+            javaMailSender.send(message);
+            System.out.println(activationLink);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send activation email", e);
         }
     }
 }

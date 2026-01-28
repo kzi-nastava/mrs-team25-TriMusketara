@@ -15,7 +15,6 @@ public class UserProfileResponseDTO {
     private String email;
     private String name;
     private String surname;
-    private Gender gender;
     private String address;
     private String phone;
 }

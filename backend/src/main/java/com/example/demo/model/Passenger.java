@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -20,4 +21,13 @@ public class Passenger extends User {
     )
     // ManyToMany znaci da ce se napraviti posebna tabela sa id-jem putnika i rute koja mu je omiljena
     private List<Route> favoriteRoutes;
+
+    @Column(nullable = false)
+    private boolean activated = false;
+
+    @Column(unique = true)
+    private String activationToken;
+
+    @Column
+    private LocalDateTime activationTokenExpiry;
 }

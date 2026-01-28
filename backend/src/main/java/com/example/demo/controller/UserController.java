@@ -5,18 +5,25 @@ import com.example.demo.dto.response.LoginResponseDTO;
 import com.example.demo.dto.response.UserProfileResponseDTO;
 import com.example.demo.model.Administrator;
 import com.example.demo.model.Gender;
+import com.example.demo.model.Passenger;
 import com.example.demo.model.User;
 import com.example.demo.repositories.AdministratorRepository;
+import com.example.demo.repositories.PassengerRepository;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.services.interfaces.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.example.demo.services.interfaces.UserService;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Locale;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
@@ -26,46 +33,42 @@ public class UserController {
     private final AdministratorRepository administratorRepository;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final PassengerRepository passengerRepository;
 
-    public UserController(UserService userService, AdministratorRepository administratorRepository, JwtUtil jwtUtil, UserRepository userRepository){
+    public UserController(UserService userService, AdministratorRepository administratorRepository, JwtUtil jwtUtil, UserRepository userRepository, PassengerRepository passengerRepository){
         this.userService = userService;
         this.administratorRepository = administratorRepository;
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
+        this.passengerRepository = passengerRepository;
     }
 
     // GET profile
     @GetMapping("/{id}/profile")
+    @PreAuthorize("hasAnyRole('USER','DRIVER','ADMIN')")
     public ResponseEntity<UserProfileResponseDTO> getUserProfile(@PathVariable Long id) {
 
-        UserProfileResponseDTO response = new UserProfileResponseDTO(
-                id,
-                "user@google.com",
-                "Jhon",
-                "Doe",
-                Gender.MALE,
-                "Hueco Mundo",
-                "+123456789"
-        );
+        UserProfileResponseDTO response = userService.getUserProfile(id);
         return ResponseEntity.ok(response);
     }
 
     // PUT profile change
-    @PutMapping("/{id}/profile")
+    @PutMapping("/{id}/profile-update")
+    @PreAuthorize("hasAnyRole('USER','DRIVER','ADMIN')")
     public ResponseEntity<UserProfileResponseDTO> updateUserProfile(
             @PathVariable Long id,
-            @RequestBody UpdateUserProfileRequestDTO request) {
-        UserProfileResponseDTO response = new UserProfileResponseDTO(
-                id,
-                "user@google.com",
-                request.getName(),
-                request.getSurname(),
-                Gender.MALE,
-                request.getAddress(),
-                request.getPhone()
-        );
-
+            @Valid @RequestBody UpdateUserProfileRequestDTO request) {
+        UserProfileResponseDTO response = userService.changeUserInfo(id, request);
         return ResponseEntity.ok(response);
+    }
+
+    // Endpoint for changing users password
+    @PostMapping("/change-password")
+    @PreAuthorize("hasAnyRole('USER','DRIVER','ADMIN')")
+    public ResponseEntity<Map<String, String>> changePassword(@RequestBody ChangePasswordRequest request) {
+
+        userService.changePassword(request.getId(), request);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Password changed successfully"));
     }
 
     @GetMapping("/me")
@@ -150,6 +153,7 @@ public class UserController {
     // GET: Aktivacija korisnickog naloga
     @GetMapping("/auth/activate/{token}")
     public ResponseEntity<Void> activateUser(@PathVariable String token) {
+        userService.activatePassenger(token);
         return ResponseEntity.ok().build();
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @SpringBootApplication
 public class BackendApplication {
@@ -109,9 +110,11 @@ public class BackendApplication {
 				passenger.setAddress("Passenger Street 3");
 				passenger.setPhone("555666777");
 				passenger.setGender(Gender.MALE);
+				passenger.setActivated(false);
+				passenger.setActivationToken(UUID.randomUUID().toString());
 				passengerRepository.save(passenger);
 				System.out.println("Passenger saved with ID: " + passenger.getId());
-			}
+			}*/
 
 			// ---------------- RIDES, ROUTES & LOCATIONS ----------------
 

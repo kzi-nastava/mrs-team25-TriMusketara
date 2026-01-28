@@ -4,6 +4,11 @@ import com.example.demo.dto.LocationDTO;
 import com.example.demo.dto.request.CompleteRegistrationRequestDTO;
 import com.example.demo.dto.request.DriverRegistrationRequestDTO;
 import com.example.demo.dto.response.DriverRegistrationResponseDTO;
+import com.example.demo.dto.response.VehicleResponseDTO;
+import com.example.demo.model.Driver;
+import com.example.demo.model.DriverStatus;
+import com.example.demo.model.EmailDetails;
+import com.example.demo.model.Vehicle;
 import com.example.demo.dto.response.DriverRideHistoryResponseDTO;
 import com.example.demo.model.*;
 import com.example.demo.repositories.DriverRepository;
@@ -17,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -175,5 +181,25 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public boolean isTokenValid(String token) {
         return driverRepository.findByRegistrationToken(token).isPresent();
+    }
+
+    // Long id is drivers id
+    @Override
+    public VehicleResponseDTO getDriverVehicle(Long id) {
+        // First find the driver
+        Driver driver = driverRepository.findById(id).orElseThrow(() -> new RuntimeException("No driver with id exists"));
+
+        // Fetch his vehicle
+        Vehicle vehicle = driver.getVehicle();
+
+        return new VehicleResponseDTO(
+                vehicle.getId(),
+                vehicle.getModel(),
+                vehicle.getType(),
+                vehicle.getRegistration(),
+                vehicle.getSeats(),
+                vehicle.getIsBabyFriendly(),
+                vehicle.getIsPetFriendly()
+        );
     }
 }

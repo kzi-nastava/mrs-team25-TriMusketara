@@ -1,27 +1,34 @@
 package com.example.demo.services;
 
+import com.example.demo.dto.request.ChangePasswordRequest;
 import com.example.demo.dto.request.LoginRequestDTO;
+import com.example.demo.dto.request.UpdateUserProfileRequestDTO;
+import com.example.demo.dto.response.LoginResponseDTO;
+import com.example.demo.dto.response.UserProfileResponseDTO;
+import com.example.demo.model.*;
+import com.example.demo.repositories.*;
 import com.example.demo.dto.request.UserRegistrationRequestDTO;
 import com.example.demo.dto.response.LoginResponseDTO;
 import com.example.demo.dto.response.UserProfileResponseDTO;
-import com.example.demo.model.Administrator;
-import com.example.demo.model.Driver;
-import com.example.demo.model.Passenger;
-import com.example.demo.model.Gender;
-import com.example.demo.model.User;
+import com.example.demo.model.*;
 import com.example.demo.repositories.AdministratorRepository;
 import com.example.demo.repositories.DriverRepository;
 import com.example.demo.repositories.PassengerRepository;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.security.JwtUtil;
+import com.example.demo.services.interfaces.EmailService;
 import com.example.demo.services.interfaces.UserService;
+import jakarta.transaction.Transactional;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -29,21 +36,32 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PassengerRepository passengerRepository;
     private final JwtUtil jwtUtil;
+    private final EmailService emailService;
+    private final VehicleRepository vehicleRepository;
 
     public UserServiceImpl(
             PasswordEncoder passwordEncoder,
             UserRepository userRepository,
             PassengerRepository passengerRepository,
-            JwtUtil jwtUtil) {
+            EmailService emailService,
+            JwtUtil jwtUtil, 
+            VehicleRepository vehicleRepository
+            ) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.passengerRepository = passengerRepository;
         this.jwtUtil = jwtUtil;
+        this.emailService = emailService;
+        this.vehicleRepository = vehicleRepository;
     }
 
     public LoginResponseDTO login(LoginRequestDTO request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user instanceof Passenger passenger && !passenger.isActivated()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Account not activated. Check your email.");
+        }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Wrong password");
@@ -63,6 +81,109 @@ public class UserServiceImpl implements UserService {
         return new LoginResponseDTO(user.getId(), user.getEmail(), role, token);
     }
 
+    public UserProfileResponseDTO getUserProfile(Long id) {
+        // Find user in database based on his id
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("No user with this id exists"));
+
+        // Map user data to response
+        return new UserProfileResponseDTO(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                user.getSurname(),
+                user.getAddress(),
+                user.getPhone()
+        );
+    }
+
+    @Transactional
+    @Override
+    public UserProfileResponseDTO changeUserInfo(Long id, UpdateUserProfileRequestDTO request) {
+        // Get user by id from database
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("No user with this id exists"));
+
+        // Set changed information
+        user.setName(request.getName());
+        user.setSurname(request.getSurname());
+        user.setAddress(request.getAddress());
+        user.setPhone(request.getPhone());
+
+        // Email check and validation
+        if (!user.getEmail().equals(request.getEmail())) {
+            Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
+            if (existingUser.isPresent()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+            }
+            user.setEmail(request.getEmail());
+        }
+
+        // Check users role, if driver, update his vehicle information as well
+        String role = user.getClass().getSimpleName().toLowerCase();
+        role = switch (role) {
+            case "administrator" -> "admin";
+            case "passenger" -> "user";
+            case "driver" -> "driver";
+            default -> role;
+        };
+
+        if (role.equals("driver") && request.getVehicle() != null) {
+            Driver driver = (Driver) user;
+
+            if (driver.getVehicle() == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Driver does not have a vehicle assigned");
+            }
+
+            Vehicle vehicle = driver.getVehicle();
+            // Update vehicle information
+            vehicle.setModel(request.getVehicle().getModel());
+            vehicle.setType(request.getVehicle().getType());
+            vehicle.setIsBabyFriendly(request.getVehicle().getIsBabyFriendly());
+            vehicle.setIsPetFriendly(request.getVehicle().getIsPetFriendly());
+
+            // Validate registration, and see if unique
+            if (!driver.getVehicle().getRegistration().equals(request.getVehicle().getRegistration())) {
+                boolean existsRegistration = vehicleRepository.existsByRegistration(request.getVehicle().getRegistration());
+                if (existsRegistration) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Registration table already exists");
+                }
+                vehicle.setRegistration(request.getVehicle().getRegistration());
+            }
+            // Save vehicle
+            vehicleRepository.save(vehicle);
+        }
+        // Save user
+        userRepository.save(user);
+
+        return new UserProfileResponseDTO(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                user.getSurname(),
+                user.getAddress(),
+                user.getPhone()
+        );
+    }
+
+    @Override
+    public void changePassword(Long id, ChangePasswordRequest request) {
+        // Find user
+        User user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Check if current password matches the one in database
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Current password is incorrect");
+        }
+
+        // Check if new password and confirmation are equal
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "New passwords do not match");
+        }
+
+        // Save new password
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+      
     public UserProfileResponseDTO registerPassenger(UserRegistrationRequestDTO dto) {
 
         if (!dto.getPassword().equals(dto.getConfirmPassword())) {
@@ -72,7 +193,7 @@ public class UserServiceImpl implements UserService {
             );
         }
 
-        if (userRepository.existsByEmail(dto.getEmail())) {
+        if (passengerRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Email already exists"
@@ -88,17 +209,47 @@ public class UserServiceImpl implements UserService {
         passenger.setPhone(dto.getPhoneNumber());
         passenger.setGender(Gender.MALE);
 
+        passenger.setActivated(false);
+        passenger.setActivationToken(java.util.UUID.randomUUID().toString());
+        passenger.setActivationTokenExpiry(LocalDateTime.now().plusHours(24));
+
         Passenger saved = passengerRepository.save(passenger);
+
+
+        System.out.println(saved.getEmail());
+        EmailDetails email = new EmailDetails();
+        email.setRecipient(saved.getEmail());
+        email.setSubject("Activate your account");
+        email.setMsgBody(
+                "Hello " + saved.getName() + ",\n\n" +
+                        "Welcome to ClickAndDrive! Please complete your registration by setting your password:\n\n" +
+                        "http://localhost:4200/activate-account?token=" + saved.getActivationToken() + "\n\n" +
+                        "This link will expire in 24 hours.\n\n" +
+                        "Best regards,\nClickAndDrive Team"
+        );
+
+        emailService.sendsSimpleMail(email);
 
         return new UserProfileResponseDTO(
                 saved.getId(),
                 saved.getEmail(),
                 saved.getName(),
                 saved.getSurname(),
-                saved.getGender(),
                 saved.getAddress(),
                 saved.getPhone()
         );
     }
 
+    @Transactional
+    public boolean activatePassenger(String token) {
+        Passenger passenger = passengerRepository.findByActivationToken(token)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid token"));
+
+        passenger.setActivated(true);
+        passenger.setActivationToken(null);
+        passenger.setActivationTokenExpiry(null);
+        passengerRepository.save(passenger);
+
+        return true;
+    }
 }
