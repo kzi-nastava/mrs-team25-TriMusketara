@@ -20,7 +20,6 @@ export const routes: Routes = [
   { path: 'map', component: MainPageComponent },
 
   // USER ROUTES
-  { path: 'drive-in-progress', component: DriveInProgress, canActivate: [AuthGuard], data: { role: 'user' } },
   { path: 'favorite-routes', component: FavoriteRoutes, canActivate: [AuthGuard], data: { role: 'user' } },
   { path: 'rate-ride', component: RideRating, canActivate: [AuthGuard], data: { role: 'user' } },
 

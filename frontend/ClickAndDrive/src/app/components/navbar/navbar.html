@@ -4,6 +4,7 @@
     <button class="user-circle-btn" (click)="goToHome()">
         <img src="logo.png" alt="Logo">
     </button>
+    
     <span class="brand-name">Click&Drive</span>
   </div>
 
@@ -24,6 +25,7 @@
     @if (auth.userType() === 'guest') {
       <button class="btn-yellow" (click)="onLoginClick()">Log in</button>
       <button class="btn-yellow" (click)="onRegisterClick()">Register</button>
+      <button (click)="onTestRideClick()"> TEST RIDE</button>
     }
 
     <!-- DRIVER NAVBAR -->
@@ -40,6 +42,7 @@
     @if (auth.userType() === 'user') {
       @if (!auth.inDrive()) {
         <button class="btn-white" (click)="orderRideClick()">Let's Ride!</button>
+        <button (click)="onTestRideClick()"> TEST RIDE</button>
       }
       @if (auth.inDrive()) {
         <button class="btn-red" (click)="onPanic()">PANIC</button>

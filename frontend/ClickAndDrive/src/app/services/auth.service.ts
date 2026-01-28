@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import {Map} from './map'
 
 @Injectable({
     providedIn: 'root'
@@ -19,6 +20,8 @@ export class AuthService {
     origin = signal('');
     destination = signal('');
     eta = signal(0);
+
+    currentRouteCoordinates = signal<[number, number][]>([]);
 
     private apiUrl = 'http://localhost:8080/api/user';
 
@@ -42,6 +45,7 @@ export class AuthService {
     setRideData(origin: string, destination: string) {
         this.origin.set(origin);
         this.destination.set(destination);
+        
     }
 
     // Get users role from token

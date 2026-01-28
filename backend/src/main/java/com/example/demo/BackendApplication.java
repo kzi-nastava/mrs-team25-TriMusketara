@@ -110,11 +110,11 @@ public class BackendApplication {
 				passenger.setAddress("Passenger Street 3");
 				passenger.setPhone("555666777");
 				passenger.setGender(Gender.MALE);
-				passenger.setActivated(false);
+				passenger.setActivated(true);
 				passenger.setActivationToken(UUID.randomUUID().toString());
 				passengerRepository.save(passenger);
 				System.out.println("Passenger saved with ID: " + passenger.getId());
-			}*/
+			}
 
 			// ---------------- RIDES, ROUTES & LOCATIONS ----------------
 

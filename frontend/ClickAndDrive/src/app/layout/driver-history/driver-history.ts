@@ -26,7 +26,7 @@ export class DriverHistory implements OnInit {
 
   ngOnInit() {
     const driverId = this.authService.getIdFromToken();
-    let driverIdNum = 3; 
+    let driverIdNum = 2; 
     if (driverId !== null) driverIdNum = Number(driverId);
 
     this.driverService.getDriverHistory(driverIdNum).subscribe({

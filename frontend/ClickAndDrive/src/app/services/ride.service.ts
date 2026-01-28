@@ -15,5 +15,10 @@ export class RideOrderingService {
     createRide(data: RideOrderCreate): Observable<RideOrderCreate> {
         return this.http.post<RideOrderCreate>(`${this.apiUrl}/create-ride`, data);
     }
+
+    // Report inconsistency for a ride
+    reportInconsistency(rideId: number, reason: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}/${rideId}/inconsistency-report`, { reason });
+    }
     
 }
