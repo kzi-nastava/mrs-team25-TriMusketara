@@ -48,7 +48,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
-                                "api/user/auth/**",
+                                "/api/user/auth/**",
                                 "/api/drivers/complete-registration").permitAll() // login, register i test endpoint
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/admin/panic/**").hasRole("ADMIN")

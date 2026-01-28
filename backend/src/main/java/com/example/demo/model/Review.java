@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -15,6 +17,14 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "passenger_id")
+    private Passenger passenger;
+
+    @ManyToOne
+    @JoinColumn(name = "ride_id")
+    private Ride ride;
+
     @Column(nullable = false)
     private int driverRating;
 
@@ -23,4 +33,6 @@ public class Review {
 
     @Column(length = 500)
     private String comment;
+
+    private LocalDateTime creationTime;
 }

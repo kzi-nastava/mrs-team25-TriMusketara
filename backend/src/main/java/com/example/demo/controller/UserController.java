@@ -15,11 +15,13 @@ import com.example.demo.services.interfaces.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.example.demo.services.interfaces.UserService;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 
@@ -43,36 +45,30 @@ public class UserController {
 
     // GET profile
     @GetMapping("/{id}/profile")
+    @PreAuthorize("hasAnyRole('USER','DRIVER','ADMIN')")
     public ResponseEntity<UserProfileResponseDTO> getUserProfile(@PathVariable Long id) {
 
-        UserProfileResponseDTO response = new UserProfileResponseDTO(
-                id,
-                "user@google.com",
-                "Jhon",
-                "Doe",
-                Gender.MALE,
-                "Hueco Mundo",
-                "+123456789"
-        );
+        UserProfileResponseDTO response = userService.getUserProfile(id);
         return ResponseEntity.ok(response);
     }
 
     // PUT profile change
-    @PutMapping("/{id}/profile")
+    @PutMapping("/{id}/profile-update")
+    @PreAuthorize("hasAnyRole('USER','DRIVER','ADMIN')")
     public ResponseEntity<UserProfileResponseDTO> updateUserProfile(
             @PathVariable Long id,
-            @RequestBody UpdateUserProfileRequestDTO request) {
-        UserProfileResponseDTO response = new UserProfileResponseDTO(
-                id,
-                "user@google.com",
-                request.getName(),
-                request.getSurname(),
-                Gender.MALE,
-                request.getAddress(),
-                request.getPhone()
-        );
-
+            @Valid @RequestBody UpdateUserProfileRequestDTO request) {
+        UserProfileResponseDTO response = userService.changeUserInfo(id, request);
         return ResponseEntity.ok(response);
+    }
+
+    // Endpoint for changing users password
+    @PostMapping("/change-password")
+    @PreAuthorize("hasAnyRole('USER','DRIVER','ADMIN')")
+    public ResponseEntity<Map<String, String>> changePassword(@RequestBody ChangePasswordRequest request) {
+
+        userService.changePassword(request.getId(), request);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Password changed successfully"));
     }
 
     @GetMapping("/me")
