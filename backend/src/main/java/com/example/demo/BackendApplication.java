@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Bean;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootApplication
 public class BackendApplication {
@@ -28,6 +30,21 @@ public class BackendApplication {
 			RouteRepository routeRepository,
 			PasswordEncoder passwordEncoder) {
 		return args -> {
+
+
+			//---------------DATABASE RESET FOR TESTING-------------
+//
+//			// 3. Obriši sve vožnje
+//			// (JPA će sam očistiti i ride_passengers tabelu ako je ManyToMany ispravno mapiran)
+//			rideRepository.deleteAll();
+//			passengerRepository.deleteAll();
+//
+//			// 4. Opciono: Obriši rute i lokacije ako želiš i njih da generišeš ispočetka
+//			routeRepository.deleteAll();
+//			locationRepository.deleteAll();
+//
+//			System.out.println("Database cleared for initialization.");
+
 
 			// ------------------ ADMIN ------------------
 			if (administratorRepository.count() == 0) {
@@ -82,8 +99,9 @@ public class BackendApplication {
 			}
 
 			// ------------------ PASSENGER ------------------
+			Passenger passenger =  new Passenger();
 			if (passengerRepository.count() == 0) {
-				Passenger passenger = new Passenger();
+				passenger = new Passenger();
 				passenger.setName("Jovan");
 				passenger.setSurname("Jovanovic");
 				passenger.setEmail("passenger@demo.com");
@@ -97,7 +115,7 @@ public class BackendApplication {
 
 			// ---------------- RIDES, ROUTES & LOCATIONS ----------------
 
-
+			Route route1;
 
 			if (rideRepository.count() == 0) {
 				System.out.println("Initializing test rides...");
@@ -117,7 +135,7 @@ public class BackendApplication {
 				locationRepository.save(loc2);
 
 				// ROUTES
-				Route route1 = new Route();
+				route1 = new Route();
 				route1.setOrigin(loc1);
 				route1.setDestination(loc2);
 				routeRepository.save(route1);
@@ -146,10 +164,23 @@ public class BackendApplication {
 				ride2.setStatus(RideStatus.FINISHED);
 				rideRepository.save(ride2);
 
+				Ride ride3 = new Ride();
+				ride3.setDriver(driver);
+				ride3.setRoute(route1);
+				ride3.setPrice(450.0);
+				ride3.setPanicPressed(false);
+				ride3.setStartTime(LocalDateTime.now().minusMinutes(30));
+				ride3.setStatus(RideStatus.STARTED);
+
+				ride3.setPassengers(new ArrayList<>(List.of(passenger)));
+
+				rideRepository.save(ride3);
+
 				System.out.println("Test rides initialized.");
 			} else {
 				System.out.println("Rides already exist, skipping initialization.");
 			}
+
 		};
 	}
 }

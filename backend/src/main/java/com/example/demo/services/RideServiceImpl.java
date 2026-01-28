@@ -9,13 +9,16 @@ import com.example.demo.dto.response.RideEstimateResponseDTO;
 import com.example.demo.dto.response.RideResponseDTO;
 import com.example.demo.model.*;
 import com.example.demo.repositories.*;
+import com.example.demo.services.interfaces.EmailService;
 import com.example.demo.services.interfaces.RideService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +34,9 @@ public class RideServiceImpl implements RideService {
     private final DriverRepository driverRepository;
     private final UserRepository userRepository;
     private final PanicRepository panicRepository;
+
+    //Service
+    private final EmailService emailService;
 
     // Ride creation
     @Override
@@ -301,6 +307,69 @@ public class RideServiceImpl implements RideService {
         ride.setEndTime(LocalDateTime.now());
 
         rideRepository.save(ride);
+    }
+
+    @Override
+    @Transactional // Dodaj Transactional da bi se obe stvari (Ride i Driver) sačuvale zajedno
+    public void finishRide(Long rideId, String driverEmail) {
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride not found"));
+
+        // 1. Provera vozača
+        if (!ride.getDriver().getEmail().equals(driverEmail)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the driver of this ride.");
+        }
+
+        // 2. Provera statusa
+        if (ride.getStatus() != RideStatus.STARTED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only started rides can be finished.");
+        }
+
+        // Ride update
+        ride.setStatus(RideStatus.FINISHED);
+        ride.setEndTime(LocalDateTime.now());
+        rideRepository.save(ride);
+
+        // Driver update
+        Driver driver = ride.getDriver();
+        driver.setActiveRide(null);
+
+        // Sending emails
+        sendSummaryEmails(ride);
+    }
+
+    private void sendSummaryEmails(Ride ride) {
+        // duration
+        long minutes = Duration.between(ride.getStartTime(), ride.getEndTime()).toMinutes();
+
+        // Forming route
+        String routeInfo = ride.getRoute().getOrigin().getAddress() + " -> " +
+                ride.getRoute().getDestination().getAddress();
+
+        String subject = "Ride Summary - " + ride.getId();
+        String bodyTemplate = """
+                Dear Passenger,
+                
+                Your ride has been successfully finished.
+                
+                Summary:
+                - Route: %s
+                - Duration: %d minutes
+                - Total Price: %.2f RSD
+                
+                Thank you for riding with us!
+                """;
+
+        String finalBody = String.format(bodyTemplate, routeInfo, minutes, ride.getPrice());
+
+        for (Passenger passenger : ride.getPassengers()) {
+            EmailDetails details = new EmailDetails();
+            details.setRecipient(passenger.getEmail());
+            details.setSubject(subject);
+            details.setMsgBody(finalBody);
+
+            emailService.sendsSimpleMail(details);
+        }
     }
 
 }

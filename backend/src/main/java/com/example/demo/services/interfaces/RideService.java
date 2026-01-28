@@ -13,4 +13,5 @@ public interface RideService {
     void cancelRide(Long rideId, RideCancellationRequestDTO request);
     void panic(Long rideId);
     void stopRide(Long rideId, RideStopRequestDTO request);
+    void finishRide(Long rideId, String driverEmail);
 }

@@ -14,7 +14,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/rides")
@@ -119,7 +122,12 @@ public class RideController {
 
     // 2.7: Finish ride
     @PutMapping("/{id}/finish")
-    public ResponseEntity<Void> finishRide(@PathVariable Long id) {
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<Void> finishRide(@PathVariable Long id, Principal principal) {
+        // principal.getName() vraća email/username koji je ugrađen u JWT token
+        String driverEmail = principal.getName();
+
+        rideService.finishRide(id, driverEmail);
         return ResponseEntity.ok().build();
     }
 
