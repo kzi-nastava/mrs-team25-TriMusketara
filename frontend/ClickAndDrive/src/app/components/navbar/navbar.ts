@@ -53,6 +53,7 @@ export class NavbarComponent {
 
   goToHome() {
     this.auth.setInDrive(false);
+    this.auth.setRideData('', '');
     this.router.navigate(['/map']);
   }
 
@@ -60,5 +61,10 @@ export class NavbarComponent {
   onPanic() {
     console.log("Panic triggered!");
     alert("Emergency notification sent to administrator!");
+  }
+  onTestRideClick() {
+    this.auth.setRideData('Bulevar Oslobođenja 45', 'Cara Dušana 12');
+    this.auth.setInDrive(true);
+    this.router.navigate(['drive-in-progress']);
   }
 }

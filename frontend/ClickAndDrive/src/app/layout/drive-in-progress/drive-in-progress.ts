@@ -3,6 +3,7 @@ import { MapViewComponent } from '../../components/map-view/map-view';
 import { RouterOutlet, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service'; 
 import { Map } from '../../services/map'; // Import your map service
+import { RideOrderingService } from '../../services/ride.service';
 
 @Component({
   selector: 'app-drive-in-progress',
@@ -23,27 +24,29 @@ export class DriveInProgress implements AfterViewInit {
 
   // ngAfterViewInit runs after the HTML (and the map) is ready
   async ngAfterViewInit() {
+    this.auth.setRideData('Bulevar Oslobođenja 45', 'Cara Dušana 12');
     const coordinates: [number, number][] = [
       [19.8335, 45.2671],
-      [19.3956, 45.2497],
+      [19.8253, 45.2471],
       [19.6667, 46.1000] 
     ];
   
-    setTimeout(() => {
-      if (this.mapView && this.mapView.map) {
-        this.mapView.drawRouteWithStops(coordinates);
-      }
-    }, 400);
+    // setTimeout(() => {
+    //   if (this.mapView && this.mapView.map) {
+    //     this.mapView.drawRouteWithStops(coordinates);
+    //   }
+    // }, 400);
     // // Check if we have addresses stored in the service
-    // if (this.auth.origin() && this.auth.destination()) {
-    //   await this.drawRouteOnLoad();
-    // }
+    if (this.auth.origin() && this.auth.destination()) {
+      await this.drawRouteOnLoad();
+    }
   }
 
   // Private helper to geocode and draw the line
   private async drawRouteOnLoad() {
     try {
       // 1. Convert address strings to coordinates using the Map service
+      console.log('Drawing route for:', this.auth.origin(), this.auth.destination());
       const originCoords = await this.mapService.geocodeAddress(this.auth.origin());
       const destCoords = await this.mapService.geocodeAddress(this.auth.destination());
 
@@ -53,7 +56,7 @@ export class DriveInProgress implements AfterViewInit {
         if (this.mapView && this.mapView.map) {
           this.mapView.drawRouteAndCalculateETA(originCoords, destCoords);
         }
-      }, 500); 
+      }, 200); 
 
     } catch (err) {
       console.error('Failed to draw route on load:', err);
@@ -61,9 +64,9 @@ export class DriveInProgress implements AfterViewInit {
   }
 
   // Update ETA when the child map finishes calculation
-  // onEtaReceived(minutes: number) {
-  //   this.auth.eta.set(minutes);
-  // }
+  onEtaReceived(minutes: number) {
+    this.auth.eta.set(minutes);
+  }
 
   onRouteCalculated(info: { durationMinutes: number; distanceKm: number }) {
     this.auth.eta.set(info.durationMinutes);
@@ -94,13 +97,40 @@ export class DriveInProgress implements AfterViewInit {
   }
 
   // Logic for reporting route inconsistency
-  onReport() {
-    const reason = prompt("Why is the route inconsistent?");
-    if (reason) {
-      console.log("Reported reason:", reason);
-      alert("Inconsistency reported.");
-    }
+  private rideService = inject(RideOrderingService); // Inject service
+
+onReport() {
+  const reason = prompt("Why is the route inconsistent? (Max 500 chars)");
+
+  // --- FRONTEND VALIDATION ---
+  if (reason === null) return; // User clicked Cancel
+
+  const trimmedReason = reason.trim();
+
+  if (trimmedReason.length === 0) {
+    alert("Reason cannot be empty.");
+    return;
   }
+
+  if (trimmedReason.length > 500) {
+    alert("Reason is too long. Maximum 500 characters allowed.");
+    return;
+  }
+
+  // --- SEND TO BACKEND ---
+  //const rideId = this.auth.currentRideId(); 
+  // const rideId = 37; 
+  // this.rideService.reportInconsistency(rideId, trimmedReason).subscribe({
+  //   next: (res) => {
+  //     console.log("Report saved:", res);
+  //     alert("Inconsistency successfully reported.");
+  //   },
+  //   error: (err) => {
+  //     console.error("Report failed:", err);
+  //     alert("Failed to report inconsistency: " + (err.error?.message || "Unknown error"));
+  //   }
+  // });
+}
 
   
 }

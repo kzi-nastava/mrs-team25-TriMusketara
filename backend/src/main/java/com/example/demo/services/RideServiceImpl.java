@@ -1,10 +1,8 @@
 package com.example.demo.services;
 
 import com.example.demo.dto.LocationDTO;
-import com.example.demo.dto.request.CreateRideRequestDTO;
-import com.example.demo.dto.request.RideCancellationRequestDTO;
-import com.example.demo.dto.request.RideRequestUnregisteredDTO;
-import com.example.demo.dto.request.RideStopRequestDTO;
+import com.example.demo.dto.request.*;
+import com.example.demo.dto.response.InconsistencyReportResponseDTO;
 import com.example.demo.dto.response.RideEstimateResponseDTO;
 import com.example.demo.dto.response.RideResponseDTO;
 import com.example.demo.model.*;
@@ -34,7 +32,8 @@ public class RideServiceImpl implements RideService {
     private final DriverRepository driverRepository;
     private final UserRepository userRepository;
     private final PanicRepository panicRepository;
-
+    private final PassengerRepository passengerRepository;
+    private final InconsistencyReportRepository inconsistencyReportRepository;
     //Service
     private final EmailService emailService;
 
@@ -310,17 +309,16 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    @Transactional // Dodaj Transactional da bi se obe stvari (Ride i Driver) sačuvale zajedno
+    @Transactional
     public void finishRide(Long rideId, String driverEmail) {
         Ride ride = rideRepository.findById(rideId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride not found"));
 
-        // 1. Provera vozača
+
         if (!ride.getDriver().getEmail().equals(driverEmail)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the driver of this ride.");
         }
 
-        // 2. Provera statusa
         if (ride.getStatus() != RideStatus.STARTED) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only started rides can be finished.");
         }
@@ -370,6 +368,45 @@ public class RideServiceImpl implements RideService {
 
             emailService.sendsSimpleMail(details);
         }
+    }
+
+    @Override
+    public InconsistencyReportResponseDTO reportInconsistency(
+            Long rideId, InconsistencyReportRequestDTO dto, String passengerEmail) {
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride not found"));
+
+        // started?
+        if (ride.getStatus() != RideStatus.STARTED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Inconsistency can only be reported for active rides.");
+        }
+
+        // is passenger on the ride?
+        boolean isPassenger = ride.getPassengers().stream()
+                .anyMatch(p -> p.getEmail().equals(passengerEmail));
+        if (!isPassenger) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not a passenger in this ride.");
+        }
+
+        // report creation
+        InconsistencyReport report = new InconsistencyReport();
+        report.setNote(dto.getReason());
+        report.setCreatedAt(LocalDateTime.now());
+        report.setRide(ride);
+        // set Passenger
+        Passenger passenger = passengerRepository.findByEmail(passengerEmail).get();
+        report.setPassenger(passenger);
+
+        inconsistencyReportRepository.save(report);
+
+        //mapping
+        return new InconsistencyReportResponseDTO(
+                report.getId(),
+                report.getNote(),
+                report.getCreatedAt(),
+                passenger.getEmail(),
+                ride.getId()
+        );
     }
 
 }

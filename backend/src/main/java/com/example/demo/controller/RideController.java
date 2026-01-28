@@ -2,11 +2,8 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.LocationDTO;
 import com.example.demo.dto.request.*;
-import com.example.demo.dto.response.RideResponseDTO;
-import com.example.demo.dto.response.RouteFromFavoritesResponseDTO;
+import com.example.demo.dto.response.*;
 import com.example.demo.model.RideStatus;
-import com.example.demo.dto.response.RideEstimateResponseDTO;
-import com.example.demo.dto.response.RideTrackingResponseDTO;
 
 import com.example.demo.services.interfaces.ReviewService;
 import com.example.demo.services.interfaces.RideService;
@@ -114,10 +111,14 @@ public class RideController {
     }
 
     // 2.6.2: inconsistency report
-    @PostMapping("/{id}/inconsistency")
-    public ResponseEntity<Void> reportInconsistency(@PathVariable Long id,
-                                                    @RequestBody InconsistencyReportRequestDTO request) {
-        return ResponseEntity.ok().build();
+    @PostMapping("/{id}/inconsistency-report")
+    @PreAuthorize("hasAuthority('Passenger')") // Samo putnici mogu da prijave
+    public ResponseEntity<InconsistencyReportResponseDTO> reportInconsistency(
+            @PathVariable Long id,
+            @Valid @RequestBody InconsistencyReportRequestDTO dto,
+            Principal principal) {
+
+        return ResponseEntity.ok(rideService.reportInconsistency(id, dto, principal.getName()));
     }
 
     // 2.7: Finish ride
