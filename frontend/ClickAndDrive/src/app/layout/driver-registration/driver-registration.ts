@@ -180,6 +180,7 @@ export class DriverRegistration {
     const isFormValid = this.validateForm();
 
     if (isFormValid === false) {
+      this.toastr.error('Please fill in all required fields correctly', 'Validation Error');
       return;
     }
 
@@ -194,7 +195,10 @@ export class DriverRegistration {
           this.toastr.success('Driver registered successfully', 'Success');
           console.log('Driver registered successfully:', res);
           this.resetForm();
-          alert(`Driver ${res.name} ${res.surname} registered successfully!`);
+          // Redirect to map after short delay
+          setTimeout(() => {
+            this.router.navigate(['/map']);
+          }, 1500);
         },
         error: (err) => {
           console.log(err);
