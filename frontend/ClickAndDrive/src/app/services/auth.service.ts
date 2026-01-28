@@ -1,9 +1,10 @@
-import {Injectable, signal} from '@angular/core';
+import { Injectable, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Injectable({
     providedIn: 'root'
 })
-
 export class AuthService {
     // Signal for user type
     userType = signal<'guest' | 'user' | 'driver' | 'admin'>('guest');
@@ -17,7 +18,11 @@ export class AuthService {
     // Signals to store the current ride data
     origin = signal('');
     destination = signal('');
-    eta = signal(0); 
+    eta = signal(0);
+
+    private apiUrl = 'http://localhost:8080/api/user';
+
+    constructor(private http: HttpClient, private router: Router) {}
 
     // Set which user
     setUserType(type: 'guest' | 'user' | 'driver' | 'admin') {
@@ -54,10 +59,20 @@ export class AuthService {
         if (!token) return null;
 
         try {
-          const payload = JSON.parse(atob(token.split('.')[0]));
-          return payload.id || null;
+            const payload = JSON.parse(atob(token.split('.')[0]));
+            return payload.id || null;
         } catch {
-          return null;
+            return null;
         }
-      }
+    }
+
+    // ===================== REGISTRATION + ACTIVATION =====================
+
+    registerPassenger(registerData: any) {
+        return this.http.post(`${this.apiUrl}/auth/register`, registerData);
+    }
+
+    activateAccount(token: string) {
+        return this.http.get(`${this.apiUrl}/auth/activate/${token}`);
+    }
 }

@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @SpringBootApplication
 public class BackendApplication {
@@ -82,7 +83,7 @@ public class BackendApplication {
 			}
 
 			// ------------------ PASSENGER ------------------
-			if (passengerRepository.count() == 0) {
+			/*if (passengerRepository.count() == 0) {
 				Passenger passenger = new Passenger();
 				passenger.setName("Jovan");
 				passenger.setSurname("Jovanovic");
@@ -91,9 +92,11 @@ public class BackendApplication {
 				passenger.setAddress("Passenger Street 3");
 				passenger.setPhone("555666777");
 				passenger.setGender(Gender.MALE);
+				passenger.setActivated(false);
+				passenger.setActivationToken(UUID.randomUUID().toString());
 				passengerRepository.save(passenger);
 				System.out.println("Passenger saved with ID: " + passenger.getId());
-			}
+			}*/
 
 			// ---------------- RIDES, ROUTES & LOCATIONS ----------------
 

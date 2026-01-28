@@ -8,4 +8,5 @@ import com.example.demo.dto.response.UserProfileResponseDTO;
 public interface UserService {
     LoginResponseDTO login(LoginRequestDTO request);
     UserProfileResponseDTO registerPassenger(UserRegistrationRequestDTO request);
+    boolean activatePassenger(String token);
 }
