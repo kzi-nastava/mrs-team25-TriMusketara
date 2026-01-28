@@ -15,7 +15,7 @@ public class RouteFromFavoritesResponseDTO {
 
     private LocationDTO destination;
 
-    private int distance;
+    private double distance;
 
     private int duration;
 
