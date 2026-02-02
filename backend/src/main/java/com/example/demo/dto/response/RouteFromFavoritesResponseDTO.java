@@ -11,13 +11,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RouteFromFavoritesResponseDTO {
+    private Long id;
     private LocationDTO origin;
-
     private LocationDTO destination;
-
-    private int distance;
-
+    private double distance;
     private int duration;
-
     private int timesUsed;
 }

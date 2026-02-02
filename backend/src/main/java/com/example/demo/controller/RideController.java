@@ -52,6 +52,7 @@ public class RideController {
 
         RouteFromFavoritesResponseDTO response =
                 new RouteFromFavoritesResponseDTO(
+                        1L,
                         origin,
                         destination,
                         100,

@@ -113,7 +113,6 @@ public class RideServiceImpl implements RideService {
             driver.getScheduledRides().add(ride);
         }
 
-
         rideRepository.save(ride);
 
         // Map na response

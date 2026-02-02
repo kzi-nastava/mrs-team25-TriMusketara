@@ -1,4 +1,4 @@
-import { Component, inject, OnChanges , Output, EventEmitter, Input, SimpleChange } from '@angular/core';
+import { Component, inject, OnChanges , Output, EventEmitter, Input, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service'; 
@@ -6,6 +6,7 @@ import { RideOrderingService } from '../../services/ride.service';
 import { RideOrderCreate } from '../../services/models/ride-order-create';
 import { Location } from '../../services/models/location';
 import { ToastrService } from 'ngx-toastr';
+import { SharedRideDataService } from '../../services/shared-ride-data.service';
 
 interface FormField {
   label: string;
@@ -26,6 +27,11 @@ export class RideOrdering implements OnChanges {
   //services
   // private authService = inject(AuthService);
   // private router = inject(Router);
+
+  @Input() prefilledOrigin?: string;
+  @Input() prefilledDestination?: string;
+
+  @Output() rideCreatedSuccessfully = new EventEmitter<void>();
 
   // Needed to get longitude and latitude coords from mainpage where we geolocate
   @Input() resolvedLocations?: {
@@ -51,7 +57,7 @@ export class RideOrdering implements OnChanges {
   @Output()
   closeRequested = new EventEmitter<void>();  
 
-  constructor (private rideOrderService: RideOrderingService, private toastr: ToastrService) {}
+  constructor (private rideOrderService: RideOrderingService, private toastr: ToastrService, private sharedRideDataService: SharedRideDataService, private router: Router) {}
 
   // These are static fields, we have one value and one input
   topFields = [
@@ -98,6 +104,15 @@ export class RideOrdering implements OnChanges {
       else {
         this.formData[field.label] = '';
       }
+    }
+
+    // Check if there is data stored in service
+    const storedData = this.sharedRideDataService.getStoredData();
+    if (storedData) {
+      this.formData['origin'] = storedData.origin;
+      this.formData['destination'] = storedData.destination;
+      
+      this.sharedRideDataService.clearPrefilledData();
     }
   }
 
@@ -258,8 +273,19 @@ export class RideOrdering implements OnChanges {
     });
   }
 
-  ngOnChanges(changes: { [propName: string]: SimpleChange<any>; }): void {
-    if (this.resolvedLocations && this.routeInfo && !this.rideSubmitted) {
+  ngOnChanges(changes: SimpleChanges): void {
+
+    if (changes['prefilledOrigin'] && changes['prefilledOrigin'].currentValue) {
+      this.formData['origin'] = changes['prefilledOrigin'].currentValue;
+      console.log(' RideOrdering: Set origin to:', this.formData['origin']);
+    }
+    
+    if (changes['prefilledDestination'] && changes['prefilledDestination'].currentValue) {
+      this.formData['destination'] = changes['prefilledDestination'].currentValue;
+      console.log(' RideOrdering: Set destination to:', this.formData['destination']);
+    }
+
+    if (this.resolvedLocations && !this.rideSubmitted) {
       console.log("Both locations and route info available, building ride");
 
       this.rideSubmitted = true;
@@ -267,12 +293,32 @@ export class RideOrdering implements OnChanges {
       const ride = this.buildRide();
 
       console.log('Final ride object:', ride);
+
       this.rideOrderService.createRide(ride).subscribe({
-        next: () => {
+        next: (response) => {
           console.log("Ride created successfully");
-          this.toastr.success('Your ride has been scheduled successfully', 'Success');
-          this.rideSubmitted = false; 
-          this.closeRequested.emit();
+
+          // Check created rides status...
+          if (response.status === 'CREATED' || response.status === 'SCHEDULED') {
+            this.toastr.success('Your ride has been scheduled successfully', 'Success');
+            this.rideSubmitted = false; 
+            this.rideCreatedSuccessfully.emit();
+            this.closeRequested.emit();
+
+          } else if (response.status === 'FAILED') {
+            this.toastr.error('No driver available at the moment. Please try again later.', 'Error');
+            this.rideSubmitted = false; 
+            this.closeRequested.emit();
+            // Send to main page
+            setTimeout(() => {
+              this.router.navigate(['/']);
+            }, 2000);
+
+          } else {
+            this.toastr.info(`Ride status: ${response.status}`, 'Info');
+            this.rideSubmitted = false; 
+            this.closeRequested.emit();
+          }
         },
         error: (err) => {
           console.error('Ride creation failed:', err);
