@@ -2,7 +2,7 @@
   <div class="ride-data" [class.visible]="showRideData()">
     <p><span class="w-clr">Driver</span> arrival: <span class="driver-arrival-data">6 minutes</span></p>
     <p>Estimated <span class="w-clr">time</span>: <span class="estimated-time-data">{{ routeInfo ? routeInfo.durationMinutes + ' minutes' : '--' }}</span></p>
-    <button class="btn-cancel">Cancel ride</button>
+    <button class="btn-cancel" (click)="cancelGuestRide()">Cancel ride</button>
   </div>
 
 </app-map-view>

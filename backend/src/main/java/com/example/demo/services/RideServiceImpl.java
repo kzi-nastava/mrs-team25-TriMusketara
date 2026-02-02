@@ -2,6 +2,7 @@ package com.example.demo.services;
 
 import com.example.demo.dto.LocationDTO;
 import com.example.demo.dto.request.*;
+import com.example.demo.dto.response.GuestRideResponseDTO;
 import com.example.demo.dto.response.InconsistencyReportResponseDTO;
 import com.example.demo.dto.response.RideEstimateResponseDTO;
 import com.example.demo.dto.response.RideResponseDTO;
@@ -27,6 +28,7 @@ public class RideServiceImpl implements RideService {
 
     //Repository
     private final RideRepository rideRepository;
+    private final GuestRideRepository guestRideRepository;
     private final LocationRepository locationRepository;
     private final RouteRepository routeRepository;
     private final DriverRepository driverRepository;
@@ -180,28 +182,6 @@ public class RideServiceImpl implements RideService {
     public void updateDriverStatuses() {
         int marginMinutes = 15;
         driverRepository.updateDriverStatus(8 * 60 + marginMinutes);
-    }
-
-    @Override
-    public RideEstimateResponseDTO estimateRide(RideRequestUnregisteredDTO request) {
-        validateRideRequest(request);
-
-        //Logic that will later be implemented
-        RideEstimateResponseDTO response = new RideEstimateResponseDTO();
-        return response;
-    }
-
-    private void validateRideRequest(RideRequestUnregisteredDTO request) {
-        LocationDTO origin = request.getOrigin();
-        LocationDTO destination = request.getDestination();
-
-        if (origin.getLatitude() == destination.getLatitude() &&
-                origin.getLongitude() == destination.getLongitude()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Origin and destination cannot be the same"
-            );
-        }
     }
 
     @Override

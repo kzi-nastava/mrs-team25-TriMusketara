@@ -7,6 +7,8 @@ import { AuthService } from '../services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { Location } from '../services/models/location';
 import { SharedRideDataService } from '../services/shared-ride-data.service';
+import { HttpClient } from '@angular/common/http';
+import { GuestRideResponseDTO } from '../services/models/guest-ride-response-dto';
 
 
 @Component({
@@ -17,7 +19,7 @@ import { SharedRideDataService } from '../services/shared-ride-data.service';
   styleUrls: ['./main-page.css']
 })
 export class MainPageComponent {
-  constructor(public ridePopup: RidePopup, public auth: AuthService, private sharedRideDataService: SharedRideDataService, private cdr: ChangeDetectorRef) {}
+  constructor(public ridePopup: RidePopup, public auth: AuthService, private http: HttpClient, private sharedRideDataService: SharedRideDataService, private cdr: ChangeDetectorRef) {}
 
   @ViewChild('mapView') mapView!: MapViewComponent;
 
@@ -42,6 +44,7 @@ export class MainPageComponent {
   };  
 
   showRideData = signal(false);
+  guestRide?: GuestRideResponseDTO;
 
   async onShowRoute() {
     if (!this.originAddress || !this.destinationAddress) return;
@@ -58,9 +61,50 @@ export class MainPageComponent {
 
       this.showRideData.set(true);
       this.ridePopup.close();
+
+      // CREATE GuestRide automatically
+      const payload = {
+        origin: { latitude: originCoords[1], longitude: originCoords[0], address: this.originAddress },
+        destination: { latitude: destCoords[1], longitude: destCoords[0], address: this.destinationAddress }
+      };
+
+      this.guestRide = await this.http.post<GuestRideResponseDTO>(
+        'http://localhost:8080/api/guest-rides/create',
+        payload
+      ).toPromise();
+
+      console.log('GuestRide created:', this.guestRide);
+
+      if (this.guestRide && this.guestRide.status === 'FAILED') {
+        alert('No available drivers at the moment');
+      }
+
     } catch (err) {
-      console.error('Geocoding error:', err);
-      alert('Address not found: ' + err);
+      console.error('Geocoding or ride creation error:', err);
+      alert('Address not found or ride could not be created.');
+    }
+  }
+
+  async cancelGuestRide() {
+    if (!this.guestRide) return;
+
+    try {
+      await this.http.post(
+        `http://localhost:8080/api/guest-rides/${this.guestRide.id}/cancel`,
+        {}
+      ).toPromise();
+
+      alert('Ride canceled.');
+      this.guestRide = undefined;
+      this.showRideData.set(false);
+
+      if (this.mapView) {
+        window.location.reload();
+      }
+
+    } catch (err) {
+      console.error('Cancel ride error:', err);
+      alert('Failed to cancel ride.');
     }
   }
 
