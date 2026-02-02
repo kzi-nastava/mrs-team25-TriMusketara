@@ -79,13 +79,6 @@ public class RideController {
             return "RideController radi!";
     }
 
-    @PostMapping("/estimate")
-    public ResponseEntity<RideEstimateResponseDTO> estimateRide(
-            @Valid @RequestBody RideRequestUnregisteredDTO request
-    ) {
-        return ResponseEntity.ok(rideService.estimateRide(request));
-    }
-
     @PostMapping("/{id}/cancel")
     public ResponseEntity<Void> cancelRide(
             @PathVariable Long id,

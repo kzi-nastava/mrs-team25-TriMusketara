@@ -49,7 +49,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
                                 "/api/user/auth/**",
-                                "/api/drivers/complete-registration").permitAll() // login, register i test endpoint
+                                "/api/drivers/complete-registration",
+                                "/api/guest-rides/**").permitAll() // login, register...
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/admin/panic/**").hasRole("ADMIN")
                         .requestMatchers("/api/drivers/**").hasAnyRole("DRIVER", "ADMIN")
