@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CompleteRegistration } from '../../services/models/complete-driver-registration';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -14,7 +15,7 @@ import { CompleteRegistration } from '../../services/models/complete-driver-regi
 })
 export class CompleteDriverRegistration {
 
-  constructor (private route: ActivatedRoute, private router: Router, private driverService: DriverService) {}
+  constructor (private route: ActivatedRoute, private router: Router, private driverService: DriverService, private toastr: ToastrService) {}
 
   token: string = '';
   password: string = '';
@@ -99,11 +100,12 @@ export class CompleteDriverRegistration {
 
     this.driverService.completeRegistration(request).subscribe({
       next: () => {
-        alert('Registration completed successfully');
+        this.toastr.success('Registration completed successfully', 'Success');
         this.router.navigate(['/login']);
       },
       error: (err) => {
         console.error('Registration error:', err);
+        this.toastr.error(err, 'Error');
         this.isLoading = false;
       },
       complete: () => {

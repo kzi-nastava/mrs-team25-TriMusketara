@@ -1,4 +1,4 @@
-import { Component, signal, ViewChild } from '@angular/core';
+import { Component, signal, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { MapViewComponent } from '../components/map-view/map-view';
 import { RouterOutlet } from '@angular/router';
 import { RidePopup } from '../shared/ride-popup';
@@ -6,6 +6,7 @@ import { RideOrdering } from '../layout/ride-ordering/ride-ordering';
 import { AuthService } from '../services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { Location } from '../services/models/location';
+import { SharedRideDataService } from '../services/shared-ride-data.service';
 
 
 @Component({
@@ -16,12 +17,18 @@ import { Location } from '../services/models/location';
   styleUrls: ['./main-page.css']
 })
 export class MainPageComponent {
-  constructor(public ridePopup: RidePopup, public auth: AuthService) {}
+  constructor(public ridePopup: RidePopup, public auth: AuthService, private sharedRideDataService: SharedRideDataService, private cdr: ChangeDetectorRef) {}
 
   @ViewChild('mapView') mapView!: MapViewComponent;
 
   originAddress = '';
   destinationAddress = '';
+
+  prefilledOrigin?: string;
+  prefilledDestination?: string;
+
+  // Pending coordinates , we first have to see the status for when we order a ride
+  pendingRouteCoordinates?: [number, number][];
   
   routeInfo?: {
     durationMinutes: number;
@@ -57,6 +64,16 @@ export class MainPageComponent {
     }
   }
 
+  ngOnInit() {
+    this.sharedRideDataService.prefilledData$.subscribe(data => {
+      if (data) {
+        this.prefilledOrigin = data.origin;
+        this.prefilledDestination = data.destination;
+        this.ridePopup.open();
+      }
+    });
+  }
+
   onOverlayClick() {
     this.ridePopup.close();
   }
@@ -85,7 +102,6 @@ export class MainPageComponent {
   // }
 
   onRouteCalculated(info: {durationMinutes: number; distanceKm: number}) {
-    console.log(' Route calculated:', info);
     this.routeInfo = info;
   }
 
@@ -112,18 +128,12 @@ export class MainPageComponent {
     destination: string,
     stops: string[];
     }) {
-      console.log('Ride requested:', data);
-
       // Making an ordered list
       const allAddresses: string[] = [data.origin, ...data.stops, data.destination];
-
-      console.log('All addresses in order:', allAddresses);
 
       try {
         // Geocode addresses
         const coordinates = await this.geocodeAddressesSequentialy(allAddresses);
-
-        console.log(' All coordinates:', coordinates); // ← DEBUG
 
         // Create Location objects to send to Ride object
         const locations: Location[] = allAddresses.map((address, i) => ({
@@ -135,23 +145,44 @@ export class MainPageComponent {
         const destination = locations[locations.length - 1];
         const stops = locations.slice(1, -1);
 
-        this.resolvedLocations = {
-          origin,
-          destination,
-          stops
-        };
+        this.pendingRouteCoordinates = coordinates;
 
-        console.log(coordinates);
+        setTimeout(() => {
+            this.resolvedLocations = {
+              origin, 
+              destination, 
+              stops
+            };            
+            this.cdr.detectChanges();
+          }, 0);
 
-        if (this.mapView) {
-          this.mapView.drawRouteWithStops(coordinates);
-        }
+        // this.resolvedLocations = {
+        //   origin,
+        //   destination,
+        //   stops
+        // };
 
-        this.showRideData.set(true);
+        // if (this.mapView) {
+        //   this.mapView.drawRouteWithStops(coordinates);
+        // }
+
+        // this.showRideData.set(true);
 
       } catch (err) {
         alert('One of the addresses could not be found');
       }
+  }
+
+  onRideCreatedSuccessfully() {
+    if (this.mapView && this.pendingRouteCoordinates) {
+      this.mapView.drawRouteWithStops(this.pendingRouteCoordinates);
+      this.showRideData.set(true);
+
+      // Clear pending coordinates
+      this.pendingRouteCoordinates = undefined;
+    } else {
+      console.error("Map view not found or coordinates missing");
+    }
   }
 }
 

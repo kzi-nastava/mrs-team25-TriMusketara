@@ -112,8 +112,9 @@ public class BackendApplication {
 				passenger.setGender(Gender.MALE);
 				passenger.setActivated(true);
 				passenger.setActivationToken(UUID.randomUUID().toString());
-				passengerRepository.save(passenger);
+				//passengerRepository.save(passenger);
 				System.out.println("Passenger saved with ID: " + passenger.getId());
+
 			}
 
 			// ---------------- RIDES, ROUTES & LOCATIONS ----------------
@@ -141,12 +142,25 @@ public class BackendApplication {
 				route1 = new Route();
 				route1.setOrigin(loc1);
 				route1.setDestination(loc2);
+				route1.setDistance(12);
+				route1.setDuration(15);
+				route1.setTimesUsed(3);
 				routeRepository.save(route1);
+
 
 				Route route2 = new Route();
 				route2.setOrigin(loc2);
 				route2.setDestination(loc1);
+				route2.setDistance(12);
+				route2.setDuration(15);
+				route2.setTimesUsed(5);
 				routeRepository.save(route2);
+
+				List<Route> routes = new ArrayList<>();
+				routes.add(route1);
+				routes.add(route2);
+				passenger.setFavoriteRoutes(routes);
+				passengerRepository.save(passenger);
 
 				// RIDES
 				Ride ride1 = new Ride();

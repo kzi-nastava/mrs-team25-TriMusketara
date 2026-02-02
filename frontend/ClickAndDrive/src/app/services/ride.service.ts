@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { RideOrderCreate } from "./models/ride-order-create";
+import { RideOrderResponse } from "./models/ride-order-response";
 
 // Service for ordering a new ride - registered user
 @Injectable({providedIn: 'root'})
@@ -12,8 +13,8 @@ export class RideOrderingService {
     private apiUrl = 'http://localhost:8080/api/rides';
 
     // Create ride function
-    createRide(data: RideOrderCreate): Observable<RideOrderCreate> {
-        return this.http.post<RideOrderCreate>(`${this.apiUrl}/create-ride`, data);
+    createRide(data: RideOrderCreate): Observable<RideOrderResponse> {
+        return this.http.post<RideOrderResponse>(`${this.apiUrl}/create-ride`, data);
     }
 
     // Report inconsistency for a ride
