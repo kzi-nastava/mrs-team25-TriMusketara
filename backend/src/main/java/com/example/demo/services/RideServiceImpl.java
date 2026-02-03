@@ -2,16 +2,17 @@ package com.example.demo.services;
 
 import com.example.demo.dto.LocationDTO;
 import com.example.demo.dto.request.*;
-import com.example.demo.dto.response.GuestRideResponseDTO;
-import com.example.demo.dto.response.InconsistencyReportResponseDTO;
-import com.example.demo.dto.response.RideEstimateResponseDTO;
-import com.example.demo.dto.response.RideResponseDTO;
+import com.example.demo.dto.response.*;
 import com.example.demo.model.*;
 import com.example.demo.repositories.*;
 import com.example.demo.services.interfaces.EmailService;
 import com.example.demo.services.interfaces.RideService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -186,40 +188,41 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public void cancelRide(Long rideId, RideCancellationRequestDTO request) {
-        Ride ride = rideRepository.findById(rideId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Ride not found"
-                ));
+    @Transactional
+    public void cancelAnyRide(Long rideId, RideCancellationRequestDTO request) {
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "User not found"
-                ));
+        Ride ride = rideRepository.findById(rideId).orElse(null);
+        if (ride != null) {
 
-        if (user instanceof Driver) {
+            User user = userRepository.findById(request.getUserId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
             if (request.getReason() == null || request.getReason().isBlank()) {
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
-                        "Driver must provide cancellation reason"
+                        "Cancellation reason is required"
                 );
             }
+
+            ride.setStatus(RideStatus.CANCELED);
+            ride.setCancellationReason(request.getReason());
+            ride.setCancelledBy(user);
+
+            rideRepository.save(ride);
+            return;
         }
 
-        if (user instanceof Passenger) {
+        GuestRide guestRide = guestRideRepository.findById(rideId).orElse(null);
+        if (guestRide != null) {
 
-            LocalDateTime limit = ride.getStartTime().minusMinutes(10);
-            if (LocalDateTime.now().isAfter(limit)) {
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "Passenger can cancel only 10 minutes before ride start"
-                );
-            }
+            guestRide.setStatus(RideStatus.CANCELED);
+            guestRide.setCancellationReason(request.getReason());
+
+            guestRideRepository.save(guestRide);
+            return;
         }
 
-        ride.setStatus(RideStatus.CANCELED);
-        rideRepository.save(ride);
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride not found");
     }
 
     @Override
@@ -423,6 +426,51 @@ public class RideServiceImpl implements RideService {
                 passenger.getEmail(),
                 ride.getId()
         );
+    }
+
+    @Override
+    public Page<ScheduledRideResponseDTO> getDriverScheduledRides(Long driverId, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size); // 0-based page
+
+        // 1️⃣ Učitaj sve SCHEDULED regular rides
+        List<Ride> rides = rideRepository.findAllByDriverId(driverId).stream()
+                .filter(r -> r.getStatus() == RideStatus.SCHEDULED)
+                .toList();
+
+        // 2️⃣ Učitaj sve SCHEDULED guest rides
+        List<GuestRide> guestRides = guestRideRepository.findAllByDriverId(driverId).stream()
+                .filter(gr -> gr.getStatus() == RideStatus.SCHEDULED)
+                .toList();
+
+        // 3️⃣ Mapiranje u DTO i dodavanje flag-a isGuest
+        List<ScheduledRideResponseDTO> allRides = new ArrayList<>();
+        for (Ride r : rides) {
+            allRides.add(new ScheduledRideResponseDTO(
+                    r.getId(),
+                    r.getRoute().getOrigin().getAddress(),
+                    r.getRoute().getDestination().getAddress(),
+                    r.getScheduledTime(),
+                    false // false = regular ride
+            ));
+        }
+
+        for (GuestRide gr : guestRides) {
+            allRides.add(new ScheduledRideResponseDTO(
+                    gr.getId(),
+                    gr.getRoute().getOrigin().getAddress(),
+                    gr.getRoute().getDestination().getAddress(),
+                    gr.getScheduledTime(),
+                    true // true = guest ride
+            ));
+        }
+
+        allRides.sort(Comparator.comparing(ScheduledRideResponseDTO::getScheduledTime));
+
+        int start = Math.min((page - 1) * size, allRides.size());
+        int end = Math.min(start + size, allRides.size());
+        List<ScheduledRideResponseDTO> pagedList = allRides.subList(start, end);
+
+        return new PageImpl<>(pagedList, pageable, allRides.size());
     }
 
 }

@@ -34,4 +34,11 @@ public class GuestRide {
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
+
+    @Column(name = "cancellation_reason")
+    private String cancellationReason;
+
+    @ManyToOne
+    @JoinColumn(name = "cancelled_by_id")
+    private User cancelledBy;
 }

@@ -1,15 +1,16 @@
 package com.example.demo.services.interfaces;
 
 import com.example.demo.dto.request.*;
-import com.example.demo.dto.response.GuestRideResponseDTO;
-import com.example.demo.dto.response.InconsistencyReportResponseDTO;
-import com.example.demo.dto.response.RideEstimateResponseDTO;
-import com.example.demo.dto.response.RideResponseDTO;
+import com.example.demo.dto.response.*;
+import com.example.demo.model.Ride;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 public interface RideService {
     RideResponseDTO createRide(CreateRideRequestDTO request);
-    void cancelRide(Long rideId, RideCancellationRequestDTO request);
+//    void cancelRide(Long rideId, RideCancellationRequestDTO request);
     void panic(Long rideId);
     void stopRide(Long rideId, RideStopRequestDTO request);
     void finishRide(Long rideId, String driverEmail);
@@ -17,5 +18,7 @@ public interface RideService {
     InconsistencyReportResponseDTO reportInconsistency(Long id,
                                                        @Valid InconsistencyReportRequestDTO dto,
                                                        String name);
+    Page<ScheduledRideResponseDTO> getDriverScheduledRides(Long driverId, int page, int size);
+    void cancelAnyRide(Long rideId, RideCancellationRequestDTO request);
 
 }

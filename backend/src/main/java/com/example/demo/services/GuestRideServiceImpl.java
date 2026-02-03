@@ -98,4 +98,15 @@ public class GuestRideServiceImpl implements GuestRideService {
     private int estimateTime(double distanceKm) {
         return (int) Math.ceil(distanceKm / 40 * 60);
     }
+
+    @Override
+    public List<GuestRide> getScheduledGuestRides(Long driverId, int page, int size) {
+        int offset = (page - 1) * size;
+        return guestRideRepository.findAllByDriverId(driverId)
+                .stream()
+                .filter(r -> r.getStatus() != RideStatus.CANCELED)
+                .skip(offset)
+                .limit(size)
+                .toList();
+    }
 }

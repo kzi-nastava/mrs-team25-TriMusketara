@@ -3,18 +3,26 @@ package com.example.demo.controller;
 import com.example.demo.dto.LocationDTO;
 import com.example.demo.dto.request.*;
 import com.example.demo.dto.response.*;
+import com.example.demo.model.GuestRide;
+import com.example.demo.model.Ride;
 import com.example.demo.model.RideStatus;
 
+import com.example.demo.model.User;
+import com.example.demo.repositories.UserRepository;
+import com.example.demo.services.interfaces.GuestRideService;
 import com.example.demo.services.interfaces.ReviewService;
 import com.example.demo.services.interfaces.RideService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/rides")
@@ -25,6 +33,8 @@ public class RideController {
     // Service
     private final RideService rideService;
     private final ReviewService reviewService;
+    private final GuestRideService guestRideService;
+    private final UserRepository userRepository;
 
     @PostMapping("/create-ride")
     public ResponseEntity<RideResponseDTO> createRide(
@@ -79,12 +89,12 @@ public class RideController {
             return "RideController radi!";
     }
 
-    @PostMapping("/{id}/cancel")
+    @PostMapping("/cancel/{id}")
     public ResponseEntity<Void> cancelRide(
             @PathVariable Long id,
             @RequestBody RideCancellationRequestDTO request
     ) {
-        rideService.cancelRide(id, request);
+        rideService.cancelAnyRide(id, request);
         return ResponseEntity.ok().build();
     }
 
@@ -101,6 +111,16 @@ public class RideController {
     @GetMapping("/{id}/tracking")
     public ResponseEntity<RideTrackingResponseDTO> getRideTracking(@PathVariable Long id) {
         return ResponseEntity.ok(new RideTrackingResponseDTO(id, new LocationDTO( 45.26, 19.83, "Bul. Oslobodjenja"), 5));
+    }
+
+    @GetMapping("/driver/{driverId}")
+    public ResponseEntity<Page<ScheduledRideResponseDTO>> getDriverScheduledRides(
+            @PathVariable Long driverId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "6") int size
+    ) {
+        Page<ScheduledRideResponseDTO> rides = rideService.getDriverScheduledRides(driverId, page, size);
+        return ResponseEntity.ok(rides);
     }
 
     // 2.6.2: inconsistency report

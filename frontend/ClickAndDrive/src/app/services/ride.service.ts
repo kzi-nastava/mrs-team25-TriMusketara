@@ -3,6 +3,14 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { RideOrderCreate } from "./models/ride-order-create";
 
+export interface DriverRideDTO {
+  id: number;
+  originAddress: string;
+  destinationAddress: string;
+  scheduledTime: string;
+  status: string;
+}
+
 // Service for ordering a new ride - registered user
 @Injectable({providedIn: 'root'})
 export class RideOrderingService {
@@ -25,4 +33,13 @@ export class RideOrderingService {
         return this.http.put(`http://localhost:8080/api/rides/${rideId}/finish`, {});
     }
     
+    getScheduledRides(page: number, size: number): Observable<any> {
+        return this.http.get(
+          `${this.apiUrl}/driver/2?page=${page}&size=${size}`
+        );
+    }
+
+    cancelRide(rideId: number, userId: number, reason: string): Observable<void> {
+        return this.http.post<void>(`${this.apiUrl}/cancel/${rideId}`, {userId,reason});
+    }
 }
