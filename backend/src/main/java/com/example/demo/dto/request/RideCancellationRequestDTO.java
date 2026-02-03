@@ -8,4 +8,5 @@ import lombok.Setter;
 public class RideCancellationRequestDTO {
     private Long userId;
     private String reason;
+    private boolean guest;
 }

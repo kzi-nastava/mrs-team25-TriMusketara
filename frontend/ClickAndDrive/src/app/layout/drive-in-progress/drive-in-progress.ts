@@ -1,13 +1,13 @@
 import { Component, inject, signal, ViewChild, AfterViewInit } from '@angular/core';
 import { MapViewComponent } from '../../components/map-view/map-view';
 import { RouterOutlet, Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service'; 
-import { Map } from '../../services/map'; // Import your map service
+import { AuthService } from '../../services/auth.service';
+import { Map } from '../../services/map';
 import { RideOrderingService } from '../../services/ride.service';
 
 @Component({
   selector: 'app-drive-in-progress',
-  standalone: true, 
+  standalone: true,
   imports: [RouterOutlet, MapViewComponent],
   templateUrl: './drive-in-progress.html',
   styleUrl: './drive-in-progress.css',
@@ -28,9 +28,9 @@ export class DriveInProgress implements AfterViewInit {
     const coordinates: [number, number][] = [
       [19.8335, 45.2671],
       [19.8253, 45.2471],
-      [19.6667, 46.1000] 
+      [19.6667, 46.1000]
     ];
-  
+
     // setTimeout(() => {
     //   if (this.mapView && this.mapView.map) {
     //     this.mapView.drawRouteWithStops(coordinates);
@@ -56,7 +56,7 @@ export class DriveInProgress implements AfterViewInit {
         if (this.mapView && this.mapView.map) {
           this.mapView.drawRouteAndCalculateETA(originCoords, destCoords);
         }
-      }, 200); 
+      }, 200);
 
     } catch (err) {
       console.error('Failed to draw route on load:', err);
@@ -74,11 +74,11 @@ export class DriveInProgress implements AfterViewInit {
   }
 
 
-  // Method to handle when the passenger simulates/detects ride end 
+  // Method to handle when the passenger simulates/detects ride end
   onFinishPassenger() {
     // 1. Update global state to stop the drive tracking
     this.auth.setInDrive(false);
-    
+
     // 2. Show the post-ride notification overlay
     this.showFinishNotification.set(true);
   }
@@ -90,10 +90,10 @@ export class DriveInProgress implements AfterViewInit {
     this.router.navigate(['/rate-ride']);
   }
 
-  // Method to return to home/order screen 
+  // Method to return to home/order screen
   resetToOrder() {
     this.showFinishNotification.set(false);
-    this.router.navigate(['/map']); 
+    this.router.navigate(['/map']);
   }
 
   // Logic for reporting route inconsistency
@@ -116,10 +116,47 @@ onReport() {
     alert("Reason is too long. Maximum 500 characters allowed.");
     return;
   }
+}
+  // ---------------- Driver actions ----------------
+
+  onStopDriver() {
+    const rideDataStr = localStorage.getItem('activeRideData');
+    if (!rideDataStr) {
+      alert('No active ride');
+      return;
+    }
+
+    const ride = JSON.parse(rideDataStr);
+
+    const stopLocation = {
+      latitude: 45.2671,
+      longitude: 19.8335,
+      address: 'Stopped at current location'
+    };
+
+    this.rideService.stopRide(ride.id, ride.guest, stopLocation)
+      .subscribe({
+        next: () => {
+          localStorage.removeItem('activeRideData');
+          this.auth.setInDrive(false);
+          this.router.navigate(['/map']);
+          alert('Stopped at current location.');
+        },
+        error: err => {
+          console.error(err);
+          alert('Failed to stop ride');
+        }
+      });
+  }
+
+
+  // onFinishDriver() {
+  //   if (!this.activeRide) return;
+
 
   // --- SEND TO BACKEND ---
-  //const rideId = this.auth.currentRideId(); 
-  // const rideId = 37; 
+  //const rideId = this.auth.currentRideId();
+  // const rideId = 37;
   // this.rideService.reportInconsistency(rideId, trimmedReason).subscribe({
   //   next: (res) => {
   //     console.log("Report saved:", res);
@@ -131,12 +168,10 @@ onReport() {
   //   }
   // });
 
-  
-}
 
   onFinishDriver() {
     // Hardcoded rideId for demo purposes
-    const testRideId = 1; 
+    const testRideId = 1;
 
     console.log("Finishing ride for demo...");
 
@@ -146,8 +181,6 @@ onReport() {
         this.completeRideFlow();
       },
       error: (err) => {
-        // Even if it returns an error (because rideId 1 might not exist), 
-        // your backend CATCH block will send that test email!
         console.log("Backend error (expected for demo), but email should be sent.");
         this.completeRideFlow();
       }
@@ -162,10 +195,10 @@ onReport() {
     this.router.navigate(['/map']);
   }
 
-  onStopDriver() {
-    alert("Drive stopped.")
-    this.auth.setInDrive(false);
-    this.router.navigate(['/map']);
-    
-  }
+  // onStopDriver() {
+  //   alert("Drive stopped.")
+  //   this.auth.setInDrive(false);
+  //   this.router.navigate(['/map']);
+  //
+  // }
 }

@@ -9,7 +9,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RideStopRequestDTO {
+
     @NotNull(message = "Stop location is required")
     @Valid
     private LocationDTO stopLocation;
+
+    @NotNull
+    private Boolean guest;
 }
