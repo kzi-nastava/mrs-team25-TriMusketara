@@ -17,6 +17,9 @@ import java.util.List;
 @Setter
 public class CreateRideRequestDTO {
 
+    @NotNull
+    private Long passengerId; // which passenger created the ride
+
     @NotNull(message = "Origin cannot be null")
     @Valid
     private LocationDTO origin;

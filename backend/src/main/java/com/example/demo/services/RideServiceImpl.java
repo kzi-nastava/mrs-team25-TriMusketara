@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,8 +47,8 @@ public class RideServiceImpl implements RideService {
     public RideResponseDTO createRide(CreateRideRequestDTO request) {
 
         // Validation
-        if ((request.getOrigin().getLongitude() == request.getDestination().getLongitude()) &&
-                (request.getOrigin().getLatitude() == request.getDestination().getLatitude()) &&
+        if ((request.getOrigin().getLongitude().equals(request.getDestination().getLongitude())) &&
+                (request.getOrigin().getLatitude().equals(request.getDestination().getLatitude())) &&
                 (request.getOrigin().getAddress().equals(request.getDestination().getAddress()))) {
             try {
                 throw new BadRequestException("Both origin and destination cannot be the same");
@@ -65,6 +66,10 @@ public class RideServiceImpl implements RideService {
                 throw new RuntimeException(e);
             }
         }
+
+        // Find the passenger who created the ride
+        Passenger creator = passengerRepository.findById(request.getPassengerId())
+                .orElseThrow(() -> new RuntimeException("Passenger not found with id: " + request.getPassengerId()));
 
         // Create origin Location
         Location origin = new Location();
@@ -100,29 +105,43 @@ public class RideServiceImpl implements RideService {
         ride.setStatus(RideStatus.CREATED);
         ride.setScheduledTime(request.getScheduledTime());
         ride.setStops(createStops(request.getStops()));
-        //ride.setLinkedPassengerEmails(request.getPassengerEmails());
         ride.setRoute(route);
         ride.setBabyFriendly(request.isBabyFriendly());
         ride.setPetFriendly(request.isPetFriendly());
 
+        // Linked passengers
+        List<Passenger> registeredPassengers = resolvePassengers(request.getPassengerEmails());
+        ride.setPassengers(registeredPassengers); // Set linked passengers
+
+        // Save the passenger who created the ride
+        ride.setRideCreator(creator);
+
         // Assign driver to ride
-        if (driver == null) {
+        if (driver == null) { // There is no available driver at the moment
             ride.setStatus(RideStatus.FAILED); // later send notification
+            rideRepository.save(ride);
+            // Map ride to response with status FAILED
+            return new RideResponseDTO(
+                    ride.getId(),
+                    ride.getStatus(),
+                    ride.getPrice()
+            );
         }
-        else {
+        else { // An available driver was found
             ride.setStatus(RideStatus.SCHEDULED);
             ride.setDriver(driver);
             driver.getScheduledRides().add(ride);
+            rideRepository.save(ride);
+
+            // Send notifications and emails to linked passengers for this ride
+            processNotifications(request.getPassengerEmails(), ride);
+
+            return new RideResponseDTO(
+                    ride.getId(),
+                    ride.getStatus(),
+                    ride.getPrice()
+            );
         }
-
-        rideRepository.save(ride);
-
-        // Map na response
-        return new RideResponseDTO(
-                ride.getId(),
-                ride.getStatus(),
-                ride.getPrice()
-        );
     }
 
     // Create additional stops
@@ -139,6 +158,52 @@ public class RideServiceImpl implements RideService {
             list.add(location);
         }
         return list;
+    }
+
+    // Link other passengers
+    // Find passengers in database if they are registered
+    private List<Passenger> resolvePassengers(List<String> emails) {
+        List<Passenger> passengers = new ArrayList<>();
+        if (emails == null) return passengers;
+
+        for (String email : emails) {
+            passengerRepository.findByEmail(email).ifPresent(p -> {
+                passengers.add(p);
+            });
+        }
+        return passengers;
+    }
+
+    // Helper for sending notifications and emails to linked passengers
+    private void processNotifications(List<String> emails, Ride ride) {
+        if (emails == null) return;
+
+        for (String email : emails) {
+            Optional<Passenger> passenger = passengerRepository.findByEmail(email);
+
+            if (passenger.isPresent()) {
+                // This passenger is registered
+                Passenger p = passenger.get();
+
+                // SEND NOTIFICATION
+                // ...
+            }
+            else {
+                // This passenger is not registered
+                // Send only mail
+                EmailDetails emailToSend = new EmailDetails();
+                emailToSend.setRecipient(email);
+                emailToSend.setSubject("Ride in progress");
+                emailToSend.setMsgBody(
+                        "Hello " +  "\n\n" +
+                                "Your are receiving this email because you've been linked to this drive:\n\n" +
+                                "http://localhost:4200/map" + "\n\n" + // adjust the url to correct page later
+                                "Have a safe ride.\n\n" +
+                                "Best regards"
+                );
+                emailService.sendsSimpleMail(emailToSend);
+            }
+        }
     }
 
     // Find suitable driver
