@@ -43,4 +43,8 @@ export class RideOrderingService {
     cancelRide(rideId: number, userId: number, reason: string): Observable<void> {
         return this.http.post<void>(`${this.apiUrl}/cancel/${rideId}`, {userId,reason});
     }
+
+    startRide(rideId: number, isGuest: boolean): Observable<void> {
+        return this.http.post<void>(`${this.apiUrl}/${rideId}/start`, { isGuest });
+    }
 }

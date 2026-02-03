@@ -2,7 +2,7 @@ import { Component, inject, signal, ViewChild, AfterViewInit } from '@angular/co
 import { MapViewComponent } from '../../components/map-view/map-view';
 import { RouterOutlet, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service'; 
-import { Map } from '../../services/map'; // Import your map service
+import { Map } from '../../services/map';
 import { RideOrderingService } from '../../services/ride.service';
 
 @Component({
@@ -15,55 +15,48 @@ import { RideOrderingService } from '../../services/ride.service';
 export class DriveInProgress implements AfterViewInit {
   auth = inject(AuthService);
   router = inject(Router);
-  private mapService = inject(Map); // Inject Map service
+  private mapService = inject(Map);
+  private rideService = inject(RideOrderingService);
 
-  // Access the child map component
   @ViewChild(MapViewComponent) mapView!: MapViewComponent;
 
   showFinishNotification = signal(false);
+  activeRide: any = null; // Vožnja koja je trenutno aktivna
 
-  // ngAfterViewInit runs after the HTML (and the map) is ready
   async ngAfterViewInit() {
-    this.auth.setRideData('Bulevar Oslobođenja 45', 'Cara Dušana 12');
-    const coordinates: [number, number][] = [
-      [19.8335, 45.2671],
-      [19.8253, 45.2471],
-      [19.6667, 46.1000] 
-    ];
-  
-    // setTimeout(() => {
-    //   if (this.mapView && this.mapView.map) {
-    //     this.mapView.drawRouteWithStops(coordinates);
-    //   }
-    // }, 400);
-    // // Check if we have addresses stored in the service
+    const rideData = localStorage.getItem('activeRideData');
+    if (!rideData) {
+      alert('No active ride found. Returning to scheduled rides.');
+      this.router.navigate(['/scheduled-rides']);
+      return;
+    }
+
+    this.activeRide = JSON.parse(rideData);
+
+    this.auth.setRideData(this.activeRide.origin, this.activeRide.destination);
+    this.auth.setInDrive(true);
+
     if (this.auth.origin() && this.auth.destination()) {
       await this.drawRouteOnLoad();
     }
   }
 
-  // Private helper to geocode and draw the line
   private async drawRouteOnLoad() {
     try {
-      // 1. Convert address strings to coordinates using the Map service
       console.log('Drawing route for:', this.auth.origin(), this.auth.destination());
       const originCoords = await this.mapService.geocodeAddress(this.auth.origin());
       const destCoords = await this.mapService.geocodeAddress(this.auth.destination());
 
-      // 2. We must wait a tiny bit to ensure Mapbox has fully loaded its internal layers
-      // Mapbox can be picky if you try to add a layer the exact millisecond it's created
       setTimeout(() => {
         if (this.mapView && this.mapView.map) {
           this.mapView.drawRouteAndCalculateETA(originCoords, destCoords);
         }
-      }, 200); 
-
+      }, 200);
     } catch (err) {
       console.error('Failed to draw route on load:', err);
     }
   }
 
-  // Update ETA when the child map finishes calculation
   onEtaReceived(minutes: number) {
     this.auth.eta.set(minutes);
   }
@@ -73,99 +66,68 @@ export class DriveInProgress implements AfterViewInit {
     console.log('Route info:', info);
   }
 
-
-  // Method to handle when the passenger simulates/detects ride end 
+  // ---------------- Passenger actions ----------------
   onFinishPassenger() {
-    // 1. Update global state to stop the drive tracking
     this.auth.setInDrive(false);
-    
-    // 2. Show the post-ride notification overlay
     this.showFinishNotification.set(true);
   }
 
-  // Method called from the notification to start rating the ride
   openRating() {
     this.showFinishNotification.set(false);
-    console.log("Opening rating screen...");
     this.router.navigate(['/rate-ride']);
   }
 
-  // Method to return to home/order screen 
   resetToOrder() {
     this.showFinishNotification.set(false);
     this.router.navigate(['/map']); 
   }
 
-  // Logic for reporting route inconsistency
-  private rideService = inject(RideOrderingService); // Inject service
+  // ---------------- Driver actions ----------------
+  onStopDriver() {
+    if (!this.activeRide) return;
 
-onReport() {
-  const reason = prompt("Why is the route inconsistent? (Max 500 chars)");
+    alert("Drive stopped at current location.");
 
-  // --- FRONTEND VALIDATION ---
-  if (reason === null) return; // User clicked Cancel
+    this.auth.setInDrive(false);
 
-  const trimmedReason = reason.trim();
+    // Moze se ovde dodati backend poziv za update trenutne lokacije i preračunavanje cene
+    // this.rideService.stopRide(this.activeRide.id, currentLocation, reason).subscribe(...)
 
-  if (trimmedReason.length === 0) {
-    alert("Reason cannot be empty.");
-    return;
+    this.router.navigate(['/map']);
   }
-
-  if (trimmedReason.length > 500) {
-    alert("Reason is too long. Maximum 500 characters allowed.");
-    return;
-  }
-
-  // --- SEND TO BACKEND ---
-  //const rideId = this.auth.currentRideId(); 
-  // const rideId = 37; 
-  // this.rideService.reportInconsistency(rideId, trimmedReason).subscribe({
-  //   next: (res) => {
-  //     console.log("Report saved:", res);
-  //     alert("Inconsistency successfully reported.");
-  //   },
-  //   error: (err) => {
-  //     console.error("Report failed:", err);
-  //     alert("Failed to report inconsistency: " + (err.error?.message || "Unknown error"));
-  //   }
-  // });
-
-  
-}
 
   onFinishDriver() {
-    // Hardcoded rideId for demo purposes
-    const testRideId = 1; 
+    if (!this.activeRide) return;
 
-    console.log("Finishing ride for demo...");
-
-    this.rideService.finishRide(testRideId).subscribe({
-      next: (res) => {
-        console.log("Ride finished successfully:", res);
-        this.completeRideFlow();
-      },
-      error: (err) => {
-        // Even if it returns an error (because rideId 1 might not exist), 
-        // your backend CATCH block will send that test email!
-        console.log("Backend error (expected for demo), but email should be sent.");
+    this.rideService.finishRide(this.activeRide.id).subscribe({
+      next: () => this.completeRideFlow(),
+      error: () => {
         this.completeRideFlow();
       }
     });
   }
 
-  // Helper method to clear the screen
   private completeRideFlow() {
     this.auth.setInDrive(false);
     this.showFinishNotification.set(true);
-    alert("Check your email! Ride summary sent.");
+    alert("Ride finished! Summary sent via email.");
     this.router.navigate(['/map']);
   }
 
-  onStopDriver() {
-    alert("Drive stopped.")
-    this.auth.setInDrive(false);
-    this.router.navigate(['/map']);
-    
+  // ---------------- Reporting route issues ----------------
+  onReport() {
+    const reason = prompt("Why is the route inconsistent? (Max 500 chars)");
+    if (!reason) return;
+
+    const trimmed = reason.trim();
+    if (trimmed.length === 0) { alert("Reason cannot be empty."); return; }
+    if (trimmed.length > 500) { alert("Reason too long."); return; }
+
+    if (!this.activeRide) { alert("No active ride."); return; }
+
+    this.rideService.reportInconsistency(this.activeRide.id, trimmed).subscribe({
+      next: () => alert("Inconsistency reported successfully."),
+      error: err => alert("Failed to report inconsistency: " + (err.error?.message || "Unknown"))
+    });
   }
 }
