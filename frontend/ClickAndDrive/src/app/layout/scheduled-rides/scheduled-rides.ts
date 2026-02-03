@@ -79,8 +79,12 @@ export class ScheduledRides implements OnInit {
 
   const userId = this.auth.getUserId();
 
-  this.rideService.cancelRide(ride.id, userId, this.cancelReason)
-    .subscribe({
+  this.rideService.cancelRide(
+      ride.id,
+      userId,
+      this.cancelReason,
+      ride.guest
+    ).subscribe({
       next: () => {
         this.rides = this.rides.filter(r => r.id !== ride.id);
         this.ridePopup.close();

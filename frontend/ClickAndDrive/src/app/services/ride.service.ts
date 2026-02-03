@@ -12,6 +12,12 @@ export interface DriverRideDTO {
   status: string;
 }
 
+export interface LocationDTO {
+  latitude: number;
+  longitude: number;
+  address: string;
+}
+
 // Service for ordering a new ride - registered user
 @Injectable({providedIn: 'root'})
 export class RideOrderingService {
@@ -40,8 +46,12 @@ export class RideOrderingService {
         );
     }
 
-    cancelRide(rideId: number, userId: number, reason: string): Observable<void> {
-        return this.http.post<void>(`${this.apiUrl}/cancel/${rideId}`, {userId,reason});
+    cancelRide(rideId: number, userId: number, reason: string, guest: boolean): Observable<void> {
+        return this.http.post<void>(`${this.apiUrl}/cancel/${rideId}`,{userId, reason, guest});
+    }
+
+    stopRide(rideId: number, guest: boolean, stopLocation: LocationDTO): Observable<void> {
+        return this.http.post<void>(`${this.apiUrl}/${rideId}/stop`,{ guest, stopLocation });
     }
 
     startRide(rideId: number, isGuest: boolean): Observable<void> {

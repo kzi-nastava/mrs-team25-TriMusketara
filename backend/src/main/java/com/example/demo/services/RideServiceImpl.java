@@ -255,38 +255,29 @@ public class RideServiceImpl implements RideService {
     @Transactional
     public void cancelAnyRide(Long rideId, RideCancellationRequestDTO request) {
 
-        Ride ride = rideRepository.findById(rideId).orElse(null);
-        if (ride != null) {
-
-            User user = userRepository.findById(request.getUserId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
-            if (request.getReason() == null || request.getReason().isBlank()) {
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "Cancellation reason is required"
-                );
-            }
-
-            ride.setStatus(RideStatus.CANCELED);
-            ride.setCancellationReason(request.getReason());
-            ride.setCancelledBy(user);
-
-            rideRepository.save(ride);
-            return;
-        }
-
-        GuestRide guestRide = guestRideRepository.findById(rideId).orElse(null);
-        if (guestRide != null) {
+        if (request.isGuest()) {
+            GuestRide guestRide = guestRideRepository.findById(rideId)
+                    .orElseThrow(() ->
+                            new ResponseStatusException(HttpStatus.NOT_FOUND, "Guest ride not found"));
 
             guestRide.setStatus(RideStatus.CANCELED);
             guestRide.setCancellationReason(request.getReason());
-
             guestRideRepository.save(guestRide);
             return;
         }
 
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride not found");
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride not found"));
+
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        ride.setStatus(RideStatus.CANCELED);
+        ride.setCancellationReason(request.getReason());
+        ride.setCancelledBy(user);
+        rideRepository.save(ride);
     }
 
     @Override
@@ -328,46 +319,63 @@ public class RideServiceImpl implements RideService {
         }
     }
 
+    @Transactional
     public void stopRide(Long rideId, RideStopRequestDTO request) {
 
+        if (request.getGuest()) {
+            stopGuestRide(rideId, request);
+        } else {
+            stopRegularRide(rideId, request);
+        }
+    }
+
+    private void stopRegularRide(Long rideId, RideStopRequestDTO dto) {
+
         Ride ride = rideRepository.findById(rideId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Ride not found"
-                ));
+                .orElseThrow(() -> new RuntimeException("Ride not found"));
 
         if (ride.getStatus() != RideStatus.STARTED) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Ride is not in progress"
-            );
+            throw new IllegalStateException("Ride is not started");
         }
 
-        LocationDTO stop = request.getStopLocation();
+        Location savedLocation = saveStopLocation(dto);
 
-        if (ride.getRoute().getDestination().getLatitude() == stop.getLatitude() &&
-                ride.getRoute().getDestination().getLongitude() == stop.getLongitude()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Stop location cannot be the same as destination"
-            );
-        }
-
-        // - price evaluation
-        // - destination change
-        // - stopping time
-        // - status = FINISHED
-
-        Location destination = ride.getRoute().getDestination();
-
-        destination.setLatitude(stop.getLatitude());
-        destination.setLongitude(stop.getLongitude());
-        destination.setAddress(stop.getAddress());
+        Route route = ride.getRoute();
+        route.setDestination(savedLocation);
 
         ride.setStatus(RideStatus.FINISHED);
         ride.setEndTime(LocalDateTime.now());
 
         rideRepository.save(ride);
+    }
+
+    private void stopGuestRide(Long rideId, RideStopRequestDTO dto) {
+
+        GuestRide guestRide = guestRideRepository.findById(rideId)
+                .orElseThrow(() -> new RuntimeException("Guest ride not found"));
+
+        if (guestRide.getStatus() != RideStatus.STARTED) {
+            throw new IllegalStateException("Guest ride is not started");
+        }
+
+        Location savedLocation = saveStopLocation(dto);
+
+        Route route = guestRide.getRoute();
+        route.setDestination(savedLocation);
+
+        guestRide.setStatus(RideStatus.FINISHED);
+        guestRide.setEndTime(LocalDateTime.now());
+
+        guestRideRepository.save(guestRide);
+    }
+
+
+    private Location saveStopLocation(RideStopRequestDTO dto) {
+        Location loc = new Location();
+        loc.setLatitude(dto.getStopLocation().getLatitude());
+        loc.setLongitude(dto.getStopLocation().getLongitude());
+        loc.setAddress(dto.getStopLocation().getAddress());
+        return locationRepository.save(loc);
     }
 
     @Override
@@ -511,17 +519,14 @@ public class RideServiceImpl implements RideService {
     public Page<ScheduledRideResponseDTO> getDriverScheduledRides(Long driverId, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size); // 0-based page
 
-        // 1️⃣ Učitaj sve SCHEDULED regular rides
         List<Ride> rides = rideRepository.findAllByDriverId(driverId).stream()
                 .filter(r -> r.getStatus() == RideStatus.SCHEDULED)
                 .toList();
 
-        // 2️⃣ Učitaj sve SCHEDULED guest rides
         List<GuestRide> guestRides = guestRideRepository.findAllByDriverId(driverId).stream()
                 .filter(gr -> gr.getStatus() == RideStatus.SCHEDULED)
                 .toList();
 
-        // 3️⃣ Mapiranje u DTO i dodavanje flag-a isGuest
         List<ScheduledRideResponseDTO> allRides = new ArrayList<>();
         for (Ride r : rides) {
             allRides.add(new ScheduledRideResponseDTO(

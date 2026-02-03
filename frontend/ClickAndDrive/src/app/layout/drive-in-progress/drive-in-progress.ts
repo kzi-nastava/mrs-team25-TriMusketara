@@ -1,13 +1,13 @@
 import { Component, inject, signal, ViewChild, AfterViewInit } from '@angular/core';
 import { MapViewComponent } from '../../components/map-view/map-view';
 import { RouterOutlet, Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service'; 
+import { AuthService } from '../../services/auth.service';
 import { Map } from '../../services/map';
 import { RideOrderingService } from '../../services/ride.service';
 
 @Component({
   selector: 'app-drive-in-progress',
-  standalone: true, 
+  standalone: true,
   imports: [RouterOutlet, MapViewComponent],
   templateUrl: './drive-in-progress.html',
   styleUrl: './drive-in-progress.css',
@@ -69,6 +69,8 @@ export class DriveInProgress implements AfterViewInit {
   // ---------------- Passenger actions ----------------
   onFinishPassenger() {
     this.auth.setInDrive(false);
+
+    // 2. Show the post-ride notification overlay
     this.showFinishNotification.set(true);
   }
 
@@ -77,9 +79,10 @@ export class DriveInProgress implements AfterViewInit {
     this.router.navigate(['/rate-ride']);
   }
 
+  // Method to return to home/order screen
   resetToOrder() {
     this.showFinishNotification.set(false);
-    this.router.navigate(['/map']); 
+    this.router.navigate(['/map']);
   }
 
   // ---------------- Driver actions ----------------
@@ -95,6 +98,43 @@ export class DriveInProgress implements AfterViewInit {
 
     this.router.navigate(['/map']);
   }
+}
+  // ---------------- Driver actions ----------------
+
+  onStopDriver() {
+    const rideDataStr = localStorage.getItem('activeRideData');
+    if (!rideDataStr) {
+      alert('No active ride');
+      return;
+    }
+
+    const ride = JSON.parse(rideDataStr);
+
+    const stopLocation = {
+      latitude: 45.2671,
+      longitude: 19.8335,
+      address: 'Stopped at current location'
+    };
+
+    this.rideService.stopRide(ride.id, ride.guest, stopLocation)
+      .subscribe({
+        next: () => {
+          localStorage.removeItem('activeRideData');
+          this.auth.setInDrive(false);
+          this.router.navigate(['/map']);
+          alert('Stopped at current location.');
+        },
+        error: err => {
+          console.error(err);
+          alert('Failed to stop ride');
+        }
+      });
+  }
+
+
+  // onFinishDriver() {
+  //   if (!this.activeRide) return;
+
 
   onFinishDriver() {
     if (!this.activeRide) return;
