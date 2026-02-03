@@ -50,10 +50,12 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/user/auth/**",
                                 "/api/drivers/complete-registration",
-                                "/api/guest-rides/**").permitAll() // login, register...
+                                "/api/guest-rides/**",
+                                "/api/rides/**").permitAll() // login, register...
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/admin/panic/**").hasRole("ADMIN")
                         .requestMatchers("/api/drivers/**").hasAnyRole("DRIVER", "ADMIN")
+                        //.requestMatchers("").hasRole("DRIVER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

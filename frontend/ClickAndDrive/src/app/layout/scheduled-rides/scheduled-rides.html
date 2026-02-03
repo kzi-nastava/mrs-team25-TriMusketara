@@ -27,93 +27,33 @@
             <th>Destination</th>
             <th>Time</th>
             <th></th>
-            <th></th>
-            <th></th>
-            <th>Choose</th>
-            <th></th>
+            <th>Begin</th>
+            <th>Cancel</th>
           </tr>
         </thead>
-
         <tbody>
-          <!-- Example of a row from Figma -->
-          <tr>
-            <td >Bulevar oslobođenja 45</td>
-            <td>Cara Dušana 12</td>
-            <td>15:34</td>
+          <tr *ngFor="let ride of rides">
+            <td>{{ ride.origin }}</td>
+            <td>{{ ride.destination }}</td>
+            <td>{{ ride.scheduledTime | date:'shortTime' }}</td>
             <td></td>
-            <td></td>
-            <td></td>
-            <td><button class="btn-begin" (click)="onStartClick()">Begin ride</button></td>
-            <td><button class="btn-cancel" (click)="openPopup()">Cancel ride</button></td>
-          </tr>
-          <!-- Example of a cancelled drive -->
-          <tr>
-            <td>Narodnih heroja 27</td>
-            <td>Dunavska 3</td>
-            <td>15:35</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td><button class="btn-begin" (click)="onStartClick()">Begin ride</button></td>
-            <td><button class="btn-cancel" (click)="openPopup()">Cancel ride</button></td>
-          </tr>
-          <!-- More example rows -->
-        <tr>
-            <td>Ive Lole Ribara 89</td>
-            <td>Kej Skojevaca 10</td>
-            <td>15:43</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td><button class="btn-begin" (click)="onStartClick()">Begin ride</button></td>
-            <td><button class="btn-cancel" (click)="openPopup()">Cancel ride</button></td>
-          </tr>
-        <tr>
-            <td>Bulevar Mihajla Pupina 22</td>
-            <td>Cankareva 5</td>
-            <td>15:47</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td><button class="btn-begin" (click)="onStartClick()">Begin ride</button></td>
-            <td><button class="btn-cancel" (click)="openPopup()">Cancel ride</button></td>
-          </tr>
-        <tr>
-            <td>Čika Stevina 33</td>
-            <td>Hadži Đerina 56</td>
-            <td>16:00</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td><button class="btn-begin" (click)="onStartClick()">Begin ride</button></td>
-            <td><button class="btn-cancel" (click)="openPopup()">Cancel ride</button></td>
-          </tr>
-        <tr>
-            <td>Futoška 78</td>
-            <td>Bulevar cara Lazara 96</td>
-            <td>16:32</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td><button class="btn-begin" (click)="onStartClick()">Begin ride</button></td>
-            <td><button class="btn-cancel" (click)="openPopup()">Cancel ride</button></td>
+            <td>
+              <button class="btn-begin" (click)="onStartClick()">Begin ride</button>
+            </td>
+            <td>
+              <button class="btn-cancel" (click)="openPopup(ride.id); selectedRide = ride;">Cancel ride</button>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Pagination -->
     <div class="pagination-footer">
       <p class="data-info">Showing data 1 to 6 rides</p>
       <div class="pagination-controls">
-        <button class="page-arrow">&lt;</button>
-        <button class="page-num active">1</button>
-        <button class="page-num">2</button>
-        <button class="page-num">3</button>
-        <button class="page-num">4</button>
-        <span class="dots">...</span>
-        <button class="page-num">40</button>
-        <button class="page-arrow">&gt;</button>
+        <button (click)="prevPage()">&lt;</button>
+        <span>{{ page }}</span>
+        <button (click)="nextPage()">&gt;</button>
       </div>
     </div>
 
@@ -130,9 +70,15 @@
 
     <div class="form-group">
       <label for="reason">Reason: </label>
-      <textarea name="reason" id=""></textarea>
+      <textarea [(ngModel)]="cancelReason" name="reason"></textarea>
     </div>
     
-    <button type="button" class="btn-cancel-popup" (click)="ridePopup.close()">Cancel ride</button>
+    <button
+      type="button"
+      class="btn-cancel-popup"
+      [disabled]="!selectedRide"
+      (click)="cancelRide(selectedRide!)">
+      Confirm
+    </button>
   </form>
 }

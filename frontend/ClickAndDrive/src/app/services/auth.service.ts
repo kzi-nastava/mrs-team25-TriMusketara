@@ -92,6 +92,15 @@ export class AuthService {
         }
     }
 
+    getUserId(): number{
+        const token = localStorage.getItem('token');
+        if(token){
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.userId;
+        }
+        return 0;
+    }
+
     logout() {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
