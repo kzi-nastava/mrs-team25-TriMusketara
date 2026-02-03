@@ -5,7 +5,9 @@ import com.example.demo.dto.request.LoginRequestDTO;
 import com.example.demo.dto.request.UpdateUserProfileRequestDTO;
 import com.example.demo.dto.request.UserRegistrationRequestDTO;
 import com.example.demo.dto.response.LoginResponseDTO;
+import com.example.demo.dto.response.ProfileImageResponseDTO;
 import com.example.demo.dto.response.UserProfileResponseDTO;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
     LoginResponseDTO login(LoginRequestDTO request);
@@ -15,4 +17,6 @@ public interface UserService {
     void changePassword(Long id, ChangePasswordRequest request);
     UserProfileResponseDTO registerPassenger(UserRegistrationRequestDTO request);
     boolean activatePassenger(String token);
+    ProfileImageResponseDTO uploadProfileImage(Long id, MultipartFile file);
+    void deleteProfileImage(Long id);
 }

@@ -7,7 +7,7 @@ import { UserProfileInformation } from "./models/user-profile-information";
 import { Observable } from "rxjs";
 import { VehicleInformation } from "./models/driver-vehicle-information";
 import { ChangePasswordRequest } from "./models/change-password";
-
+import { ProfileImageResponse } from "./models/profile-image-response";
 
 @Injectable({providedIn: 'root'})
 export class UserService {
@@ -30,6 +30,16 @@ export class UserService {
     // Save changed information (if driver + vehicle)
     changeUserInfo(userId: number, updatedProfile: UserProfileInformation): Observable<UserProfileInformation> {
         return this.http.put<UserProfileInformation>(`${this.apiUrlUser}/${userId}/profile-update`, updatedProfile);
+    }
+
+    // Upload a profile photo
+    uploadProfileImage(userId: number, formData: FormData): Observable<ProfileImageResponse> {
+        return this.http.post<ProfileImageResponse>(`${this.apiUrlUser}/${userId}/profile-image`, formData);
+    }
+
+    // Delete users profile photo
+    deleteProfileImage(userId: number): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrlUser}/${userId}/delete-profile-image`);
     }
 
     // Change user password
