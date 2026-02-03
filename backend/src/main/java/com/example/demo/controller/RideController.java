@@ -8,6 +8,7 @@ import com.example.demo.model.Ride;
 import com.example.demo.model.RideStatus;
 
 import com.example.demo.model.User;
+import com.example.demo.repositories.RideRepository;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.services.interfaces.GuestRideService;
 import com.example.demo.services.interfaces.ReviewService;
@@ -19,9 +20,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -35,6 +39,7 @@ public class RideController {
     private final ReviewService reviewService;
     private final GuestRideService guestRideService;
     private final UserRepository userRepository;
+    private final RideRepository rideRepository;
 
     @PostMapping("/create-ride")
     public ResponseEntity<RideResponseDTO> createRide(
@@ -74,15 +79,15 @@ public class RideController {
     }
 
     // Starting the ride
-    @PutMapping("/{rideId}/start")
-    public ResponseEntity<RideResponseDTO> startRide(@PathVariable Long rideId) {
-        RideResponseDTO response = new RideResponseDTO(
-                rideId,
-                RideStatus.STARTED,
-                0
-        );
+    @PostMapping("/{id}/start")
+    public ResponseEntity<Void> startRide(
+            @PathVariable Long id,
+            @RequestBody Map<String, Boolean> body) {
 
-        return ResponseEntity.ok(response);
+        boolean isGuest = body.getOrDefault("isGuest", false);
+        rideService.startRide(id, isGuest);
+
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/ping")

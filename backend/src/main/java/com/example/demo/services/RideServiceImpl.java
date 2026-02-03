@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -246,6 +247,21 @@ public class RideServiceImpl implements RideService {
         panic.setCreatedAt(LocalDateTime.now());
 
         panicRepository.save(panic);
+    }
+
+    @Transactional
+    public void startRide(Long rideId, boolean isGuest) {
+        if (isGuest) {
+            GuestRide guestRide = guestRideRepository.findById(rideId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "GuestRide not found"));
+            guestRide.setStatus(RideStatus.STARTED);
+            guestRideRepository.save(guestRide);
+        } else {
+            Ride ride = rideRepository.findById(rideId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride not found"));
+            ride.setStatus(RideStatus.STARTED);
+            rideRepository.save(ride);
+        }
     }
 
     public void stopRide(Long rideId, RideStopRequestDTO request) {
