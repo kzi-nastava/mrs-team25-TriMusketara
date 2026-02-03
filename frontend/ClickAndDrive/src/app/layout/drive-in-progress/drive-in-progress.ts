@@ -86,20 +86,6 @@ export class DriveInProgress implements AfterViewInit {
   }
 
   // ---------------- Driver actions ----------------
-  onStopDriver() {
-    if (!this.activeRide) return;
-
-    alert("Drive stopped at current location.");
-
-    this.auth.setInDrive(false);
-
-    // Moze se ovde dodati backend poziv za update trenutne lokacije i preračunavanje cene
-    // this.rideService.stopRide(this.activeRide.id, currentLocation, reason).subscribe(...)
-
-    this.router.navigate(['/map']);
-  }
-}
-  // ---------------- Driver actions ----------------
 
   onStopDriver() {
     const rideDataStr = localStorage.getItem('activeRideData');
@@ -129,8 +115,8 @@ export class DriveInProgress implements AfterViewInit {
           alert('Failed to stop ride');
         }
       });
-  }
-
+    
+    }
 
   // onFinishDriver() {
   //   if (!this.activeRide) return;
