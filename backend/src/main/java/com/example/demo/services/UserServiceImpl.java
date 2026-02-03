@@ -3,8 +3,7 @@ package com.example.demo.services;
 import com.example.demo.dto.request.ChangePasswordRequest;
 import com.example.demo.dto.request.LoginRequestDTO;
 import com.example.demo.dto.request.UpdateUserProfileRequestDTO;
-import com.example.demo.dto.response.LoginResponseDTO;
-import com.example.demo.dto.response.UserProfileResponseDTO;
+import com.example.demo.dto.response.*;
 import com.example.demo.model.*;
 import com.example.demo.repositories.*;
 import com.example.demo.dto.request.UserRegistrationRequestDTO;
@@ -18,14 +17,21 @@ import com.example.demo.repositories.UserRepository;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.services.interfaces.EmailService;
 import com.example.demo.services.interfaces.UserService;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,6 +44,17 @@ public class UserServiceImpl implements UserService {
     private final JwtUtil jwtUtil;
     private final EmailService emailService;
     private final VehicleRepository vehicleRepository;
+
+    private final Path fileStorageLocation = Paths.get("uploads/profile-images");
+
+    @PostConstruct
+    public void init() {
+        try {
+            Files.createDirectories(fileStorageLocation);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not create upload directory", e);
+        }
+    }
 
     public UserServiceImpl(
             PasswordEncoder passwordEncoder,
@@ -92,7 +109,8 @@ public class UserServiceImpl implements UserService {
                 user.getName(),
                 user.getSurname(),
                 user.getAddress(),
-                user.getPhone()
+                user.getPhone(),
+                user.getProfileImageUrl()
         );
     }
 
@@ -160,7 +178,8 @@ public class UserServiceImpl implements UserService {
                 user.getName(),
                 user.getSurname(),
                 user.getAddress(),
-                user.getPhone()
+                user.getPhone(),
+                user.getProfileImageUrl()
         );
     }
 
@@ -236,8 +255,82 @@ public class UserServiceImpl implements UserService {
                 saved.getName(),
                 saved.getSurname(),
                 saved.getAddress(),
-                saved.getPhone()
+                saved.getPhone(),
+                saved.getProfileImageUrl()
         );
+    }
+
+    // Upload profile image
+    @Override
+    public ProfileImageResponseDTO uploadProfileImage(Long id, MultipartFile file) {
+        // Validations
+        if (file.isEmpty()) {
+            throw new RuntimeException("File is empty");
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new RuntimeException("Only image files are allowed");
+        }
+
+        if (file.getSize() > 5 * 1024 * 1024) {
+            throw new RuntimeException("File size exceeds maximum limit (5MB)");
+        }
+
+        try {
+            User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+
+            // Delete old one if exists
+            if (user.getProfileImageUrl() != null) {
+                String oldFilename = user.getProfileImageUrl().substring(user.getProfileImageUrl().lastIndexOf("/") + 1);
+                Path oldFile = fileStorageLocation.resolve(oldFilename);
+                Files.deleteIfExists(oldFile);
+            }
+
+            // Generate new name
+            String originalFilename = file.getOriginalFilename();
+            String extension = originalFilename != null ? originalFilename.substring(originalFilename.lastIndexOf(".")) : ".jpg";
+            String filename = id + "_" + System.currentTimeMillis() + extension;
+
+            // Save file
+            Path targetLocation = fileStorageLocation.resolve(filename);
+            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+
+            // Update URL
+            String imageUrl = "/api/user/profile-images/" + filename;
+            user.setProfileImageUrl(imageUrl);
+            userRepository.save(user);
+
+            return new ProfileImageResponseDTO(
+                    imageUrl,
+                    "Profile image updated successfully"
+            );
+        } catch (IOException e) {
+            throw new RuntimeException("Faild to store file", e);
+        }
+    }
+
+    // Delete user profile image
+    @Override
+    public void deleteProfileImage(Long id) {
+        // Find user
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getProfileImageUrl() != null) {
+            try {
+                String filename = user.getProfileImageUrl().substring(user.getProfileImageUrl().lastIndexOf("/")+1);
+
+                // Delete file
+                Path file = fileStorageLocation.resolve(filename);
+                Files.deleteIfExists(file);
+
+                // Delete URL from database
+                user.setProfileImageUrl(null);
+                userRepository.save(user);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to delete file", e);
+            }
+        }
     }
 
     @Transactional
@@ -252,4 +345,6 @@ public class UserServiceImpl implements UserService {
 
         return true;
     }
+
+
 }

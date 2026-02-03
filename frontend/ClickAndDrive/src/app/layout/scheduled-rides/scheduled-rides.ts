@@ -98,7 +98,7 @@ export class ScheduledRides implements OnInit {
     });
   }
 
-  onStartClick() {
+  /*onStartClick() {
     
     const coords: [number, number][] = [
       [19.8350, 45.2517], 
@@ -111,6 +111,21 @@ export class ScheduledRides implements OnInit {
 
     
     this.router.navigate(['drive-in-progress']);
+  }*/
+
+  beginRide(ride: ScheduledRide) {
+    this.rideService.startRide(ride.id, ride.guest).subscribe({
+      next: () => {
+        // Sačuvaj active ride podatke za drive-in-progress
+        localStorage.setItem('activeRideData', JSON.stringify(ride));
+        this.auth.setInDrive(true);
+        this.router.navigate(['/drive-in-progress']);
+      },
+      error: err => {
+        console.error('Failed to start ride:', err);
+        alert('Cannot start this ride.');
+      }
+    });
   }
   
   openPopup(rideId: number) {

@@ -57,7 +57,13 @@ export class RideOrdering implements OnChanges {
   @Output()
   closeRequested = new EventEmitter<void>();  
 
-  constructor (private rideOrderService: RideOrderingService, private toastr: ToastrService, private sharedRideDataService: SharedRideDataService, private router: Router) {}
+  constructor (
+    private rideOrderService: RideOrderingService, 
+    private toastr: ToastrService, 
+    private sharedRideDataService: SharedRideDataService, 
+    private router: Router,
+    private authService: AuthService
+    ) {}
 
   // These are static fields, we have one value and one input
   topFields = [
@@ -89,10 +95,23 @@ export class RideOrdering implements OnChanges {
   showStopsModal = false;
   showPassengerModal = false;
 
+  userId!: number; // Passenger id
+
   // ngOnInit is a method that is called when a component is loaded
   // Here we will initialize our form data with empty values which will later contain real values the user inputs
   ngOnInit() {
     const allFieldsCombined = [...this.topFields, ...this.bottomFields];
+
+    // Save current users id
+    const idFromToken = this.authService.getUserIdFromToken();
+
+    if (!idFromToken) {
+      this.authService.logout();
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.userId = idFromToken;
 
     for (let i = 0; i < allFieldsCombined.length; i++) {
       const field = allFieldsCombined[i];
@@ -345,6 +364,7 @@ export class RideOrdering implements OnChanges {
     }
 
     return {
+      passengerId: this.userId,
       origin: this.resolvedLocations.origin,
       destination: this.resolvedLocations.destination,
       stops: this.resolvedLocations.stops,

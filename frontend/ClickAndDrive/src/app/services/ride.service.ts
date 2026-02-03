@@ -53,4 +53,8 @@ export class RideOrderingService {
     stopRide(rideId: number, guest: boolean, stopLocation: LocationDTO): Observable<void> {
         return this.http.post<void>(`${this.apiUrl}/${rideId}/stop`,{ guest, stopLocation });
     }
+
+    startRide(rideId: number, isGuest: boolean): Observable<void> {
+        return this.http.post<void>(`${this.apiUrl}/${rideId}/start`, { isGuest });
+    }
 }

@@ -13,4 +13,5 @@ export interface UserProfileInformation {
     phone: string
     // Only for drivers
     vehicle?: VehicleInformation
+    profileImageUrl?: string;
 }

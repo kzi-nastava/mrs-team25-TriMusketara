@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.request.*;
 import com.example.demo.dto.response.LoginResponseDTO;
+import com.example.demo.dto.response.ProfileImageResponseDTO;
 import com.example.demo.dto.response.UserProfileResponseDTO;
 import com.example.demo.model.Administrator;
 import com.example.demo.model.Gender;
@@ -13,13 +14,19 @@ import com.example.demo.repositories.UserRepository;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.services.interfaces.UserService;
 import jakarta.validation.Valid;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.example.demo.services.interfaces.UserService;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Locale;
@@ -69,6 +76,38 @@ public class UserController {
 
         userService.changePassword(request.getId(), request);
         return ResponseEntity.ok(Collections.singletonMap("message", "Password changed successfully"));
+    }
+
+    // Allow user to upload a photo
+    @PostMapping("/{id}/profile-image")
+    @PreAuthorize("hasAnyRole('USER', 'DRIVER', 'ADMIN')")
+    public ResponseEntity<ProfileImageResponseDTO> uploadProfileImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        ProfileImageResponseDTO response = userService.uploadProfileImage(id, file);
+        return ResponseEntity.ok(response);
+    }
+
+    // Delete profile image
+    @DeleteMapping("/{id}/delete-profile-image")
+    @PreAuthorize("hasAnyRole('USER', 'DRIVER', 'ADMIN')")
+    public ResponseEntity<Void> deleteProfileImage(@PathVariable Long id) {
+        userService.deleteProfileImage(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Get profile image
+    @GetMapping("/profile-images/{filename}")
+    public ResponseEntity<Resource> getProfileImage(@PathVariable String filename) {
+        try {
+            Path filePath = Paths.get("uploads/profile-images").resolve(filename).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists()) {
+                return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(resource);
+            }
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/me")
