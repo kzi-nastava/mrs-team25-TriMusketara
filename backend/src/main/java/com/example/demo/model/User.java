@@ -41,4 +41,7 @@ public abstract class User {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id", referencedColumnName = "id")
     private Chat chat;
+
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
 }

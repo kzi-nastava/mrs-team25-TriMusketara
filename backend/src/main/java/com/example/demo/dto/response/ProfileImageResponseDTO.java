@@ -1,6 +1,5 @@
 package com.example.demo.dto.response;
 
-import com.example.demo.model.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,12 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserProfileResponseDTO {
-    private Long id;
-    private String email;
-    private String name;
-    private String surname;
-    private String address;
-    private String phone;
+public class ProfileImageResponseDTO {
     private String profileImageUrl;
+    private String message;
 }

@@ -9,8 +9,21 @@
     <div class="profile-sidebar">
         <div class="profile-picture-frame">
             <div class="profile-picture">
-                <img src="noProfilePic.svg" alt="No Picture">
+                <img [src]="profileImageUrl" alt="Profile image" (error)="onImageError($event)">
+            
+                <!-- Overlay on hover  -->
+                <div class="upload-overlay">
+                    <div *ngIf="!isUploading || !isDeleting" class="overlay-buttons">
+                        <button class="overlay-btn change-btn" (click)="triggerFileInput()">Change image</button>
+
+                        <button *ngIf="hasCustomImage()" class="overlay-btn delete-btn" (click)="deleteProfileImage()">Remove image</button>
+                    </div>
+                </div>
             </div>
+
+             <!-- Input for file choosing -->
+             <input type="file" id="fileInput" accept="image/*" (change)="onFileSelected($event)" style="display: none;">
+
             <p id="profile-name">{{userName}}</p>
         </div>
         <div class="buttons-frame">
