@@ -1,0 +1,33 @@
+<div class="page-wrapper">
+    <div class="inner-container">
+        <div class="container">
+            <div class="title">
+                <p>Panic notifications</p>
+            </div>
+            <div class="card-container">
+                <!-- set of favoriteRoutes -->
+                @for (panic of panics; track panic.id) {
+                    <div class="card">
+                            <!-- The card part where we have the Origin: Destination: -->
+                            <div class="info">
+                                <div class="location-pin"></div>
+                                <div class="route-info">
+                                    <p><b>Triggered by:</b> {{ panic.triggeredByName }} ({{ panic.triggeredByEmail }})</p>
+                                    <p><b>Ride ID:</b> {{ panic.rideId }} {{ panic.isGuest ? '(Guest)' : '' }}</p>
+                                    <p><b>Route:</b> {{ panic.originAddress }} → {{ panic.destinationAddress }}</p>
+                                </div>
+                            </div>
+                            <!-- The card part where the button and heart are -->
+                            <div class="interactable">
+                                <button (click)="resolvePanic(panic.id)">Resolve</button>
+                            </div>
+                    </div>
+                }
+            </div>
+            <div class="button-container">
+                <button>Previous</button>
+                <button>Next</button>
+            </div>
+        </div>
+    </div>
+</div>

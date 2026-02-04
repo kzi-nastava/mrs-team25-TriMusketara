@@ -2,15 +2,13 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Panic {
@@ -19,8 +17,20 @@ public class Panic {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne
+    @JoinColumn(name = "ride_id")
     private Ride ride;
 
+    @ManyToOne
+    @JoinColumn(name = "guest_ride_id")
+    private GuestRide guestRide;
+
+    @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    private boolean resolved = false;
+
+    @ManyToOne
+    @JoinColumn(name = "triggered_by_id")
+    private User triggeredBy;
 }

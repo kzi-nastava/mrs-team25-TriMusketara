@@ -13,12 +13,12 @@ import mapboxgl from 'mapbox-gl';
 export class MapViewComponent implements AfterViewInit {
 
   @Input() size: 'large' | 'small' = 'large';
-  //@Output() etaCalculated = new EventEmitter<number>();
-  @Output() routeCalculated = new EventEmitter<{durationMinutes: number, distanceKm: number}>(); // Send to front both duration and distance for given route
+  @Output() routeCalculated = new EventEmitter<{durationMinutes: number, distanceKm: number}>();
 
   @ViewChild('mapContainer', { static: true }) mapContainer!: ElementRef<HTMLDivElement>;
 
   public map!: mapboxgl.Map;
+  private panicMarker?: mapboxgl.Marker; // Marker za auto u panici
 
   constructor(private http: HttpClient) {}
 
@@ -59,6 +59,48 @@ export class MapViewComponent implements AfterViewInit {
   });
   }
 
+  // Metoda za označavanje auta crvenom bojom kada se pritisne PANIC
+  markCarAsPanic() {
+    // Trenutno fiksna lokacija - kasnije će biti dinamička iz backend-a
+    const panicLocation: [number, number] = [19.84234796637571, 45.25430134740514];
+
+    // Ukloni stari marker ako postoji
+    if (this.panicMarker) {
+      this.panicMarker.remove();
+    }
+
+    // Kreiraj crveni marker
+    const el = document.createElement('div');
+    el.className = 'panic-car-marker';
+    el.style.width = '50px';
+    el.style.height = '50px';
+    el.style.borderRadius = '50%';
+    el.style.backgroundColor = '#FF0000';
+    el.style.border = '3px solid #FFFFFF';
+    el.style.boxShadow = '0 0 20px rgba(255, 0, 0, 0.8)';
+    el.style.animation = 'pulse 1.5s infinite';
+    
+    // Dodaj ikonu auta unutar kruga
+    el.innerHTML = `
+      <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
+          <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
+        </svg>
+      </div>
+    `;
+
+    this.panicMarker = new mapboxgl.Marker(el)
+      .setLngLat(panicLocation)
+      .addTo(this.map);
+
+    // Center map on panic location
+    this.map.flyTo({
+      center: panicLocation,
+      zoom: 15,
+      duration: 1500
+    });
+  }
+
   drawRouteAndCalculateETA(origin: [number, number], destination: [number, number]) {
     const url = `https://api.mapbox.com/directions/v5/mapbox/driving/` +
       `${origin[0]},${origin[1]};${destination[0]},${destination[1]}` +
@@ -68,16 +110,13 @@ export class MapViewComponent implements AfterViewInit {
       if (!res.routes || !res.routes.length) return;
 
       const route = res.routes[0].geometry;
-      const durationSeconds = res.routes[0].duration; // s
-      const distanceMeters = res.routes[0].distance;  // m
-      //const etaMinutes = Math.round(durationSeconds / 60);
+      const durationSeconds = res.routes[0].duration;
+      const distanceMeters = res.routes[0].distance;
       const durationMinutes = Math.round(durationSeconds / 60);
       const distanceKm = Math.round((distanceMeters/1000) * 100) / 100; 
 
-      // Sending both to backend
-      console.log(' Emitting from map:', { durationMinutes, distanceKm }); 
+      console.log('Emitting from map:', { durationMinutes, distanceKm }); 
       this.routeCalculated.emit({durationMinutes, distanceKm});
-      //this.etaCalculated.emit(etaMinutes);
 
       if (this.map.getSource('route')) {
         this.map.removeLayer('route');
@@ -105,7 +144,6 @@ export class MapViewComponent implements AfterViewInit {
     }, (err) => console.error('Directions API error:', err));
   }
 
-  // Draws a route 
   drawRouteWithStops(coordinates: [number, number][]) {
     if (coordinates.length < 2) return;
 
@@ -124,22 +162,17 @@ export class MapViewComponent implements AfterViewInit {
       const route = res.routes[0].geometry;
       const durationSeconds = res.routes[0].duration;
       const distanceMeters = res.routes[0].distance;
-      //const etaMinutes = Math.round(durationSeconds / 60);
       const durationMinutes = Math.round(durationSeconds / 60);
       const distanceKm = Math.round((distanceMeters / 1000) * 100) / 100;
 
-      // Emit
       console.log('Emitting from map:', { durationMinutes, distanceKm }); 
       this.routeCalculated.emit({durationMinutes, distanceKm});
-      //this.etaCalculated.emit(etaMinutes);
 
-      // Clear old route if exists
       if (this.map.getSource('route')) {
         this.map.removeLayer('route');
         this.map.removeSource('route');
       }
 
-      // Add new route
       this.map.addSource('route', {
         type: 'geojson', 
         data: {
@@ -163,8 +196,6 @@ export class MapViewComponent implements AfterViewInit {
         }
       });
 
-
-      // Add markers for additional stops (not to origin and destination)
       const stops = coordinates.slice(1, -1);
       stops.forEach(coords => {
         const stopsMarker = document.createElement('div');
@@ -177,7 +208,6 @@ export class MapViewComponent implements AfterViewInit {
         new mapboxgl.Marker(stopsMarker).setLngLat(coords).addTo(this.map);
       });
 
-      // Add marker to destination coords
       const destinationCoords = coordinates[coordinates.length - 1];
       const destMarker = document.createElement('div');
       destMarker.className = 'destination-marker';
@@ -189,7 +219,6 @@ export class MapViewComponent implements AfterViewInit {
       `;
       new mapboxgl.Marker(destMarker, {anchor: 'bottom'}).setLngLat(destinationCoords).addTo(this.map);
 
-
       const bounds = new mapboxgl.LngLatBounds();
       route.coordinates.forEach((c: [number, number]) => bounds.extend(c));
 
@@ -200,4 +229,3 @@ export class MapViewComponent implements AfterViewInit {
     });
   }
 }
-
