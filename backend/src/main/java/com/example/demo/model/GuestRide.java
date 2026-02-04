@@ -41,4 +41,6 @@ public class GuestRide {
     @ManyToOne
     @JoinColumn(name = "cancelled_by_id")
     private User cancelledBy;
+
+    private boolean panicPressed;
 }

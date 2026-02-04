@@ -13,6 +13,7 @@ import { RideRating } from './layout/ride-rating/ride-rating';
 import { CompleteDriverRegistration } from './layout/complete-driver-registration/complete-driver-registration';
 import { ActivateAccount } from './layout/activate-account/activate-account';
 import { AuthGuard } from './services/auth.guard';
+import { PanicNotifications } from './layout/panic-notifications/panic-notifications';
 
 
 export const routes: Routes = [
@@ -32,6 +33,7 @@ export const routes: Routes = [
   { path: 'notes', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
   { path: 'support', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
   { path: 'driver-registration', component: DriverRegistration, canActivate: [AuthGuard], data: { role: 'admin' } },
+  { path: 'panic-notifications',component: PanicNotifications, canActivate: [AuthGuard], data: { role: 'admin' } },
 
   // SHARED ROUTES
   { path: 'change-information-page', component: ChangeInfoPage, canActivate: [AuthGuard], data: { roles: ['user', 'admin', 'driver'] } },
@@ -42,7 +44,6 @@ export const routes: Routes = [
   { path: 'register', component: RegistrationPage },
   { path: 'complete-registration', component: CompleteDriverRegistration },
   { path: 'activate-account', component: ActivateAccount },
-
   // CATCH ALL
   { path: '**', redirectTo: 'map' }
 ];
