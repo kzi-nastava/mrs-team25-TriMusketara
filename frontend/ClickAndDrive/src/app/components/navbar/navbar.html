@@ -31,7 +31,9 @@
     <!-- DRIVER NAVBAR -->
     @if (auth.userType() === 'driver') {
       @if (auth.inDrive()) {
-        <button class="btn-red" (click)="onPanic()">PANIC</button>
+        <button class="btn-red" (click)="onPanic()" [disabled]="panicPressed()" [class.panic-disabled]="panicPressed()">
+          {{ panicPressed() ? 'PANIC SENT' : 'PANIC' }}
+        </button>
       }
       <button class="user-circle-btn" (click)="onProfileClick()">
         <img src="user-icon.png" alt="Profile">
@@ -45,7 +47,9 @@
         <button (click)="onTestRideClick()"> TEST RIDE</button>
       }
       @if (auth.inDrive()) {
-        <button class="btn-red" (click)="onPanic()">PANIC</button>
+        <button class="btn-red" (click)="onPanic()" [disabled]="panicPressed()" [class.panic-disabled]="panicPressed()">
+          {{ panicPressed() ? 'PANIC SENT' : 'PANIC' }}
+        </button>
       }
       <button class="user-circle-btn" (click)="onProfileClick()">
         <img src="user-icon.png" alt="Profile">
@@ -54,7 +58,9 @@
 
     <!-- ADMIN NAVBAR -->
     @if (auth.userType() === 'admin') {
-      <button class="btn-red-wide">PANIC MESSAGES</button> 
+      <button class="btn-red-wide" (click)="goToPanicNotifications()">
+        PANIC MESSAGES
+      </button>  
       <button class="user-circle-btn" (click)="onProfileClick()">
         <img src="user-icon.png" alt="Profile">
       </button>

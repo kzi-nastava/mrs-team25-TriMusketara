@@ -81,9 +81,4 @@ public class AdminController {
                 request.getStandardBasePrice(), request.getLuxuryBasePrice(),
                 request.getVanBasePrice(), request.getPricePerKm()));
     }
-
-    @GetMapping
-    public ResponseEntity<List<PanicResponseDTO>> getAllPanics() {
-        return ResponseEntity.ok(panicService.getAll());
-    }
 }
