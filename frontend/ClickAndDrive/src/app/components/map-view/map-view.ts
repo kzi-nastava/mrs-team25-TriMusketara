@@ -1,7 +1,13 @@
-import { Component, AfterViewInit, Input, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, AfterViewInit, Input, ElementRef, ViewChild, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import mapboxgl from 'mapbox-gl';
+import { VehicleService } from '../../services/vehicle.service';
+import { ActiveVehicleResponse } from '../../services/models/active-vehicle-response';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { switchMap } from 'rxjs/internal/operators/switchMap';
+import { startWith } from 'rxjs/internal/operators/startWith';
+import { interval } from 'rxjs/internal/observable/interval';
 
 @Component({
   selector: 'app-map-view',
@@ -10,7 +16,7 @@ import mapboxgl from 'mapbox-gl';
   templateUrl: './map-view.html',
   styleUrls: ['./map-view.css'],
 })
-export class MapViewComponent implements AfterViewInit {
+export class MapViewComponent implements AfterViewInit, OnDestroy {
 
   @Input() size: 'large' | 'small' = 'large';
   @Output() routeCalculated = new EventEmitter<{durationMinutes: number, distanceKm: number}>();
@@ -18,9 +24,14 @@ export class MapViewComponent implements AfterViewInit {
   @ViewChild('mapContainer', { static: true }) mapContainer!: ElementRef<HTMLDivElement>;
 
   public map!: mapboxgl.Map;
+  private activeMarkers: mapboxgl.Marker[] = [];
+  private vehicleSub?: Subscription;
   private panicMarker?: mapboxgl.Marker; // Marker za auto u panici
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient, 
+    private vehicleService: VehicleService
+  ) {}
 
   ngAfterViewInit() {
     mapboxgl.accessToken = 'pk.eyJ1IjoicmliaWNuaWtvbGEiLCJhIjoiY21qbTJvNHFlMmV6OTNncXhpOGNiaTVnayJ9.Bhzo0Euk2D923K3smmoVaQ';
@@ -33,30 +44,72 @@ export class MapViewComponent implements AfterViewInit {
     });
 
     this.map.on('load', () => {
-      this.addTaxiMarkers();
+      this.startVehiclePolling();
     });
   }
 
-  private addTaxiMarkers() {
+   // Function that fetches new data every 5 seconds
+  private startVehiclePolling() {
+    this.vehicleSub = interval(5000) // 5 seconds
+      .pipe(
+        startWith(0), // Right away on start
+        switchMap(() => this.vehicleService.getActiveVehicles())
+      )
+      .subscribe({
+        next: (vehicles) => this.addTaxiMarkers(vehicles),
+        error: (err) => console.error('Polling error:', err)
+      });
+  }
 
-  const taxiLocations: [number, number][] = [
-    [19.830221442332125, 45.26411740426349],
-    [19.882080282032774, 45.242658480042856],
-    [19.82537097950451, 45.239920691629045],
-  ];
+  
+  ngOnDestroy() {
+    this.vehicleSub?.unsubscribe();
+  }
 
-  taxiLocations.forEach((coords) => {
-    const el = document.createElement('img');
-    el.className = 'taxi-marker';
-    
-    el.style.width = '45px';
-    el.style.height = '45px';
-    el.src = '/taxi-icon.png';
+   private loadActiveVehicles() {
+    this.vehicleService.getActiveVehicles().subscribe({
+      next: (vehicles: ActiveVehicleResponse[]) => {
+        this.addTaxiMarkers(vehicles);
+      },
+      error: (err) => console.error('Greška pri učitavanju vozila:', err)
+    });
+  }
 
-    new mapboxgl.Marker(el)
-      .setLngLat(coords)
-      .addTo(this.map);
-  });
+  private addTaxiMarkers(vehicles: ActiveVehicleResponse[]) {
+    // Refresh markers
+    this.activeMarkers.forEach(m => m.remove());
+    this.activeMarkers = [];
+
+    //console.log('Dodavanje markera za vozila:', vehicles.length);
+
+    vehicles.forEach((v) => {
+      const el = document.createElement('img');
+      el.className = 'taxi-marker';
+      el.style.width = '45px';
+      el.style.height = '45px';
+
+      //console.log(`Vozilo ${v.id} na lokaciji: [${v.currentLocation.longitude}, ${v.currentLocation.latitude}]`);
+      
+      // Later on: differentiate busy/free vehicles with different icons
+      el.src = v.busy ? '/taxi-icon.png' : '/taxi-icon.png';
+      if (!v.busy) el.src = '/taxi-icon.png';
+      const marker = new mapboxgl.Marker(el)
+      // IMPORTANT: Mapbox uses different coordinate order, we've mistaken long and lat so now it's reversed, lat is first
+      if(v.busy){
+        
+        marker.setLngLat([v.currentLocation.latitude, v.currentLocation.longitude])
+        marker.setPopup(new mapboxgl.Popup().setHTML(`<b>ZAUZETO Vozilo #${v.id}</b><br>${v.currentLocation.address}`))
+        marker.addTo(this.map);
+      }
+      else{
+        marker.setLngLat([v.currentLocation.latitude, v.currentLocation.longitude])
+        marker.setPopup(new mapboxgl.Popup().setHTML(`<b>Vozilo #${v.id}</b><br>${v.currentLocation.address}`))
+        marker.addTo(this.map);
+      }
+      
+
+      this.activeMarkers.push(marker);
+    });
   }
 
   // Metoda za označavanje auta crvenom bojom kada se pritisne PANIC

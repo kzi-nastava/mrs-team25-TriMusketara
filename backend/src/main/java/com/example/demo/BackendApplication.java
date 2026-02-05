@@ -33,23 +33,8 @@ public class BackendApplication {
 		return args -> {
 
 
-			//---------------DATABASE RESET FOR TESTING-------------
-//
-//			// 3. Obriši sve vožnje
-//			// (JPA će sam očistiti i ride_passengers tabelu ako je ManyToMany ispravno mapiran)
-//			rideRepository.deleteAll();
-//			passengerRepository.deleteAll();
-//
-//			// 4. Opciono: Obriši rute i lokacije ako želiš i njih da generišeš ispočetka
-//			routeRepository.deleteAll();
-//			locationRepository.deleteAll();
-//
-//			System.out.println("Database cleared for initialization.");
-
-
 			// ------------------ ADMIN ------------------
 			if (administratorRepository.count() == 0) {
-				Chat chat = new Chat();
 				Administrator admin = new Administrator();
 				admin.setName("Admin");
 				admin.setSurname("Adminovic");
@@ -58,49 +43,66 @@ public class BackendApplication {
 				admin.setAddress("Admin Street 1");
 				admin.setPhone("123456789");
 				admin.setGender(Gender.MALE);
-				admin.setChat(chat);
 				administratorRepository.save(admin);
-				System.out.println("Admin saved with ID: " + admin.getId());
+				System.out.println("Admin 'admin@demo.com' created");
 			}
 
-			// ------------------ VEHICLE ------------------
-			Vehicle vehicle;
-			if (vehicleRepository.count() == 0) {
-				vehicle = new Vehicle();
-				vehicle.setModel("Toyota Prius");
-				vehicle.setRegistration("NS123AB");
-				vehicle.setSeats(4);
-				vehicle.setType(VehicleType.STANDARD);
-				vehicle.setBusy(false);
-				vehicle.setIsBabyFriendly(true);
-				vehicle.setIsPetFriendly(false);
-				vehicle = vehicleRepository.save(vehicle);
-				System.out.println("Vehicle saved with ID: " + vehicle.getId());
-			} else {
-				vehicle = vehicleRepository.findAll().get(0);
-			}
-
-			// ------------------ DRIVER ------------------
-			Driver driver;
+			// ------------------ VEHICLES & DRIVERS & LOCATIONS ------------------
 			if (driverRepository.count() == 0) {
-				driver = new Driver();
-				driver.setName("Marko");
-				driver.setSurname("Markovic");
-				driver.setEmail("driver@demo.com");
-				driver.setPassword(passwordEncoder.encode("driver123"));
-				driver.setAddress("Driver Street 2");
-				driver.setPhone("987654321");
-				driver.setGender(Gender.MALE);
-				driver.setVehicle(vehicle);
-				driver.setStatus(DriverStatus.ACTIVE);
-				driverRepository.save(driver);
-				System.out.println("Driver saved with ID: " + driver.getId());
-			} else {
-				driver = driverRepository.findAll().get(0);
+				double[][] coords = {
+						{45.26411740426349, 19.830221442332125},
+						{45.242658480042856, 19.882080282032774},
+						{45.239920691629045, 19.82537097950451}
+				};
+				String[] addresses = {
+						"Bulevar Kralja Petra I",
+						"Futoški put",
+						"Bulevar Evrope"
+				};
+
+				String[] names = {"Marko", "Ivan", "Petar"};
+				String[] surnames = {"Markovic", "Ivanovic", "Petrovic"};
+				String[] emails = {"driver@demo.com", "driver2@demo.com", "driver3@demo.com"};
+				String[] models = {"Toyota Prius", "Skoda Octavia", "Volkswagen Golf"};
+				String[] regs = {"NS-001-AA", "NS-002-BB", "NS-003-CC"};
+
+				for (int i = 0; i < 3; i++) {
+					// LOCATIONS CREATION - WITHOUT SAVING!
+					Location loc = new Location();
+					loc.setLatitude(coords[i][0]);
+					loc.setLongitude(coords[i][1]);
+					loc.setAddress(addresses[i]);
+
+					// 2. VEHICLE CREATION
+					Vehicle v = new Vehicle();
+					v.setModel(models[i]);
+					v.setRegistration(regs[i]);
+					v.setSeats(4);
+					v.setType(VehicleType.STANDARD);
+					v.setBusy(false);
+					v.setIsBabyFriendly(i % 2 == 0);
+					v.setIsPetFriendly(true);
+					v.setLocation(loc);
+					v = vehicleRepository.save(v);
+
+					// 3. DRIVERS CREATION
+					Driver d = new Driver();
+					d.setName(names[i]);
+					d.setSurname(surnames[i]);
+					d.setEmail(emails[i]);
+					d.setPassword(passwordEncoder.encode("driver123"));
+					d.setAddress("Street " + (i + 1));
+					d.setPhone("060123456" + i);
+					d.setGender(Gender.MALE);
+					d.setStatus(DriverStatus.ACTIVE);
+					d.setVehicle(v);
+					driverRepository.save(d);
+				}
+				System.out.println("3 Drivers, Vehicles and Locations initialized.");
 			}
 
 			// ------------------ PASSENGER ------------------
-			Passenger passenger =  new Passenger();
+			Passenger passenger;
 			if (passengerRepository.count() == 0) {
 				passenger = new Passenger();
 				passenger.setName("Jovan");
@@ -112,90 +114,78 @@ public class BackendApplication {
 				passenger.setGender(Gender.MALE);
 				passenger.setActivated(true);
 				passenger.setActivationToken(UUID.randomUUID().toString());
-				//passengerRepository.save(passenger);
-				System.out.println("Passenger saved with ID: " + passenger.getId());
-
+				passenger = passengerRepository.save(passenger);
+				System.out.println("Passenger 'passenger@demo.com' created.");
+			} else {
+				passenger = passengerRepository.findAll().get(0);
 			}
 
-			// ---------------- RIDES, ROUTES & LOCATIONS ----------------
-
-			Route route1;
-
+			// ---------------- RIDES & ROUTES ----------------
 			if (rideRepository.count() == 0) {
-				System.out.println("Initializing test rides...");
+				System.out.println("Initializing 3 finished rides for driver history...");
 
-				// ORIGIN
-				Location loc1 = new Location();
-				loc1.setAddress("Bulevar oslobođenja 45");
-				loc1.setLatitude(45.2485);
-				loc1.setLongitude(19.8331);
-				locationRepository.save(loc1);
+				Driver firstDriver = driverRepository.findAll().get(0);
+				Passenger passenger1 = passengerRepository.findAll().get(0);
 
-				// DESTINATION
-				Location loc2 = new Location();
-				loc2.setAddress("Cara Dušana 12");
-				loc2.setLatitude(45.2413);
-				loc2.setLongitude(19.8256);
-				locationRepository.save(loc2);
+				//Test adresses
+				String[][] addresses = {
+						{"Bulevar oslobođenja 45", "Cara Dušana 12"},   // Ride 1
+						{"Futoška 10", "Zmaj Jovina 5"},               // Ride 2 (Panic)
+						{"Narodnog fronta 22", "Dunavska 1"}           // Ride 3
+				};
 
-				// ROUTES
-				route1 = new Route();
-				route1.setOrigin(loc1);
-				route1.setDestination(loc2);
-				route1.setDistance(12);
-				route1.setDuration(15);
-				route1.setTimesUsed(3);
-				routeRepository.save(route1);
+				double[][] coords = {
+						{45.2485, 19.8331, 45.2413, 19.8256}, // Origin(lat, lon), Dest(lat, lon)
+						{45.2512, 19.8365, 45.2570, 19.8440},
+						{45.2390, 19.8310, 45.2460, 19.8510}
+				};
 
+				double[] prices = {750.0, 420.0, 1150.0};
 
-				Route route2 = new Route();
-				route2.setOrigin(loc2);
-				route2.setDestination(loc1);
-				route2.setDistance(12);
-				route2.setDuration(15);
-				route2.setTimesUsed(5);
-				routeRepository.save(route2);
+				for (int i = 0; i < 3; i++) {
+					// origin - WITH SAVING
+					Location locOrigin = new Location();
+					locOrigin.setAddress(addresses[i][0]);
+					locOrigin.setLatitude(coords[i][0]);
+					locOrigin.setLongitude(coords[i][1]);
+					locOrigin = locationRepository.save(locOrigin);
 
-				List<Route> routes = new ArrayList<>();
-				routes.add(route1);
-				routes.add(route2);
-				passenger.setFavoriteRoutes(routes);
-				passengerRepository.save(passenger);
+					// destination - WITH SAVING
+					Location locDest = new Location();
+					locDest.setAddress(addresses[i][1]);
+					locDest.setLatitude(coords[i][2]);
+					locDest.setLongitude(coords[i][3]);
+					locDest = locationRepository.save(locDest);
 
-				// RIDES
-				Ride ride1 = new Ride();
-				ride1.setDriver(driver);
-				ride1.setRoute(route1);
-				ride1.setPrice(758.0);
-				ride1.setPanicPressed(false);
-				ride1.setStartTime(LocalDateTime.now().minusDays(1));
-				ride1.setStatus(RideStatus.FINISHED);
-				rideRepository.save(ride1);
+					// route
+					Route route = new Route();
+					route.setOrigin(locOrigin);
+					route.setDestination(locDest);
+					route.setDistance(5 + i); // For difference
+					route.setDuration(10 + i);
+					route = routeRepository.save(route); // If Cascade is turned on...
 
-				Ride ride2 = new Ride();
-				ride2.setDriver(driver);
-				ride2.setRoute(route2);
-				ride2.setPrice(920.0);
-				ride2.setPanicPressed(true);
-				ride2.setStartTime(LocalDateTime.now().minusDays(2));
-				ride2.setStatus(RideStatus.FINISHED);
-				rideRepository.save(ride2);
+					// Ride
+					Ride ride = new Ride();
+					ride.setDriver(firstDriver);
+					ride.setRoute(route);
+					ride.setPrice(prices[i]);
 
-				Ride ride3 = new Ride();
-				ride3.setDriver(driver);
-				ride3.setRoute(route1);
-				ride3.setPrice(450.0);
-				ride3.setPanicPressed(false);
-				ride3.setStartTime(LocalDateTime.now().minusMinutes(30));
-				ride3.setStatus(RideStatus.STARTED);
+					// Panic only on second one
+					ride.setPanicPressed(i == 1);
 
-				ride3.setPassengers(new ArrayList<>(List.of(passenger)));
+					// Time
+					ride.setStartTime(LocalDateTime.now().minusDays(i + 1));
+					ride.setEndTime(LocalDateTime.now().minusDays(i + 1).plusMinutes(20));
+					ride.setStatus(RideStatus.FINISHED);
 
-				rideRepository.save(ride3);
+					// Passenger
+					ride.setPassengers(new ArrayList<>(List.of(passenger1)));
 
-				System.out.println("Test rides initialized.");
-			} else {
-				System.out.println("Rides already exist, skipping initialization.");
+					rideRepository.save(ride);
+				}
+
+				System.out.println("3 finished rides initialized.");
 			}
 
 		};

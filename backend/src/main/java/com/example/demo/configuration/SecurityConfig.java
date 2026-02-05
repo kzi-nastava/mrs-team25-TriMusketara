@@ -52,6 +52,7 @@ public class SecurityConfig {
                                 "/api/drivers/complete-registration",
                                 "/api/guest-rides/**",
                                 "/api/rides/**",
+                                "/api/vehicles/active",                     //map view
                                 "/api/user/profile-images/**").permitAll() // login, register...
                         // PANIC endpoints - must be BEFORE anyRequest().authenticated()
                         .requestMatchers("/api/panic/**").permitAll()

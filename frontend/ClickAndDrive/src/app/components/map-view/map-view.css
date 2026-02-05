@@ -28,6 +28,8 @@
 .taxi-marker {
   font-size: 100px;
   text-align: center;
+  /* cursor: pointer;
+  z-index: 1000; */
   line-height: 1;
 }
 

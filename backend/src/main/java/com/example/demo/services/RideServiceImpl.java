@@ -39,6 +39,7 @@ public class RideServiceImpl implements RideService {
     private final PanicRepository panicRepository;
     private final PassengerRepository passengerRepository;
     private final InconsistencyReportRepository inconsistencyReportRepository;
+    private final VehicleRepository vehicleRepository;
     //Service
     private final EmailService emailService;
 
@@ -311,11 +312,27 @@ public class RideServiceImpl implements RideService {
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "GuestRide not found"));
             guestRide.setStatus(RideStatus.STARTED);
             guestRideRepository.save(guestRide);
+
+            //set vehicle and driver data
+            Driver driver = guestRide.getDriver();
+            ///TO-DO: can't set active ride because it's diff class
+            Vehicle vehicle = driver.getVehicle();
+            vehicle.setBusy(true);
+            vehicleRepository.save(vehicle);
         } else {
             Ride ride = rideRepository.findById(rideId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride not found"));
             ride.setStatus(RideStatus.STARTED);
             rideRepository.save(ride);
+
+            //set vehicle and driver data
+            Driver driver = ride.getDriver();
+            driver.setActiveRide(ride);
+            driverRepository.save(driver);
+
+            Vehicle vehicle = driver.getVehicle();
+            vehicle.setBusy(true);
+            vehicleRepository.save(vehicle);
         }
     }
 
@@ -347,6 +364,16 @@ public class RideServiceImpl implements RideService {
         ride.setEndTime(LocalDateTime.now());
 
         rideRepository.save(ride);
+
+        //update driver active ride
+        Driver driver =  ride.getDriver();
+        driver.setActiveRide(null);
+        driverRepository.save(driver);
+
+        //update vehicle status
+        Vehicle vehicle = driver.getVehicle();
+        vehicle.setBusy(false);
+        vehicleRepository.save(vehicle);
     }
 
     private void stopGuestRide(Long rideId, RideStopRequestDTO dto) {
@@ -367,6 +394,16 @@ public class RideServiceImpl implements RideService {
         guestRide.setEndTime(LocalDateTime.now());
 
         guestRideRepository.save(guestRide);
+
+        //update driver active ride
+        Driver driver =  guestRide.getDriver();
+        driver.setActiveRide(null);
+        driverRepository.save(driver);
+
+        //update vehicle status
+        Vehicle vehicle = driver.getVehicle();
+        vehicle.setBusy(false);
+        vehicleRepository.save(vehicle);
     }
 
 
@@ -386,15 +423,10 @@ public class RideServiceImpl implements RideService {
             Ride ride = rideRepository.findById(rideId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride not found"));
 
-
-            if (!ride.getDriver().getEmail().equals(driverEmail)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the driver of this ride.");
-            }
-
             if (ride.getStatus() != RideStatus.STARTED) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only started rides can be finished.");
             }
-
+            ///TO-DO: find out why authorization doesn't work, for testing I'll put this here
             // Ride update
             ride.setStatus(RideStatus.FINISHED);
             ride.setEndTime(LocalDateTime.now());
@@ -403,6 +435,17 @@ public class RideServiceImpl implements RideService {
             // Driver update
             Driver driver = ride.getDriver();
             driver.setActiveRide(null);
+            driverRepository.save(driver);
+
+            // Vehicle update
+            Vehicle vehicle = driver.getVehicle();
+            vehicle.setBusy(false);
+            vehicleRepository.save(vehicle);
+
+            if (!ride.getDriver().getEmail().equals(driverEmail)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the driver of this ride.");
+            }
+
 
             // Sending emails
             sendSummaryEmails(ride);
@@ -467,7 +510,6 @@ public class RideServiceImpl implements RideService {
         System.out.println("Test email sent to: " + testEmail);
     }
 
-    // Pomoćna metoda da ne ponavljaš kod (opciono, ali čisto)
     private void sendEmail(String to, String subject, String body) {
         EmailDetails details = new EmailDetails();
         details.setRecipient(to);

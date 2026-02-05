@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Vehicle {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,11 +25,11 @@ public class Vehicle {
     private String registration;
 
     private int seats;
-
     private Boolean isBabyFriendly;
     private Boolean isPetFriendly;
-
     private Boolean busy = false;
 
-    //private double price; maybe not needed here
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "location_id", referencedColumnName = "id")
+    private Location location;
 }
