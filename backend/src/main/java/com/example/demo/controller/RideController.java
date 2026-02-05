@@ -3,11 +3,8 @@ package com.example.demo.controller;
 import com.example.demo.dto.LocationDTO;
 import com.example.demo.dto.request.*;
 import com.example.demo.dto.response.*;
-import com.example.demo.model.GuestRide;
-import com.example.demo.model.Ride;
-import com.example.demo.model.RideStatus;
+import com.example.demo.model.*;
 
-import com.example.demo.model.User;
 import com.example.demo.repositories.RideRepository;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.services.interfaces.GuestRideService;
@@ -19,6 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -131,20 +131,25 @@ public class RideController {
 
     // 2.6.2: inconsistency report
     @PostMapping("/{id}/inconsistency-report")
-    @PreAuthorize("hasAuthority('Passenger')") // Samo putnici mogu da prijave
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<InconsistencyReportResponseDTO> reportInconsistency(
             @PathVariable Long id,
             @Valid @RequestBody InconsistencyReportRequestDTO dto,
-            Principal principal) {
+            Authentication authentication) {
+        Passenger passenger = (Passenger) authentication.getPrincipal();
+        String passengerEmail = passenger.getEmail();
+        System.out.println("passenger email: " + passengerEmail);
 
-        return ResponseEntity.ok(rideService.reportInconsistency(id, dto, principal.getName()));
+        return ResponseEntity.ok(rideService.reportInconsistency(id, dto, passengerEmail));
     }
 
     // 2.7: Finish ride
     @PutMapping("/{id}/finish")
     @PreAuthorize("hasRole('DRIVER')")
-    public ResponseEntity<Void> finishRide(@PathVariable Long id, Principal principal) {
-        String driverEmail = principal.getName();
+    public ResponseEntity<Void> finishRide(@PathVariable Long id,
+                                           Authentication authentication) {
+        Driver driver = (Driver) authentication.getPrincipal();
+        String driverEmail = driver.getEmail();
 
         rideService.finishRide(id, driverEmail);
         return ResponseEntity.ok().build();

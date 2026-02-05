@@ -93,12 +93,20 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
       // Later on: differentiate busy/free vehicles with different icons
       el.src = v.busy ? '/taxi-icon.png' : '/taxi-icon.png';
       if (!v.busy) el.src = '/taxi-icon.png';
-
-      // IMPORTANT: Mapbox uses different coordinate order, we've mistaken long and lat so now it's reversed, lat is first
       const marker = new mapboxgl.Marker(el)
-        .setLngLat([v.currentLocation.latitude, v.currentLocation.longitude])
-        .setPopup(new mapboxgl.Popup().setHTML(`<b>Vozilo #${v.id}</b><br>${v.currentLocation.address}`))
-        .addTo(this.map);
+      // IMPORTANT: Mapbox uses different coordinate order, we've mistaken long and lat so now it's reversed, lat is first
+      if(v.busy){
+        
+        marker.setLngLat([v.currentLocation.latitude, v.currentLocation.longitude])
+        marker.setPopup(new mapboxgl.Popup().setHTML(`<b>ZAUZETO Vozilo #${v.id}</b><br>${v.currentLocation.address}`))
+        marker.addTo(this.map);
+      }
+      else{
+        marker.setLngLat([v.currentLocation.latitude, v.currentLocation.longitude])
+        marker.setPopup(new mapboxgl.Popup().setHTML(`<b>Vozilo #${v.id}</b><br>${v.currentLocation.address}`))
+        marker.addTo(this.map);
+      }
+      
 
       this.activeMarkers.push(marker);
     });
