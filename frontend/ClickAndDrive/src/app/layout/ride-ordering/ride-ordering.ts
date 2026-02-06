@@ -45,6 +45,7 @@ export class RideOrdering implements OnChanges {
     distanceKm: number;
   }
 
+  private formInitialized = false;
   private rideSubmitted = false;
 
   @Output()
@@ -133,6 +134,8 @@ export class RideOrdering implements OnChanges {
       
       this.sharedRideDataService.clearPrefilledData();
     }
+
+    this.formInitialized = true;
   }
 
   get allFields() {
@@ -294,6 +297,10 @@ export class RideOrdering implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
 
+    if (!this.formInitialized) {
+      return;
+    }
+
     if (changes['prefilledOrigin'] && changes['prefilledOrigin'].currentValue) {
       this.formData['origin'] = changes['prefilledOrigin'].currentValue;
       console.log(' RideOrdering: Set origin to:', this.formData['origin']);
@@ -357,6 +364,9 @@ export class RideOrdering implements OnChanges {
 
   // Build ride object to send
   buildRide(): RideOrderCreate {
+    console.log('--- FRONTEND DEBUG ---');
+    console.log('Baby Checkbox value:', this.formData['baby-friendly']);
+    console.log('Pet Checkbox value:', this.formData['pet-friendly']);
 
     if (!this.resolvedLocations) {
       console.log('Resolved locations:', this.resolvedLocations);
@@ -402,5 +412,33 @@ export class RideOrdering implements OnChanges {
   
   isFieldInvalid(label: string): boolean {
     return this.invalidFields.includes(label);
+  }
+
+  resetForm() {
+    console.log('Resetting form...');
+
+    // Reset form data
+    const allFieldsCombined = [... this.topFields, ...this.bottomFields];
+    for (let field of allFieldsCombined) {
+      if (field.type === 'checkbox') {
+        this.formData[field.label] = false;
+      } else {
+        this.formData[field.label] = '';
+      }
+    }
+    // Reset dynamic arrays
+    this.additionalStops = [''];
+    this.linkedPassengers = [''];
+
+    // Reset validation
+    this.invalidFields = [];
+    this.fieldErrors = {};
+
+    this.rideSubmitted = false;
+    this.formInitialized = false;
+  }
+
+  ngOnDestory() {
+    this.resetForm();
   }
 }
