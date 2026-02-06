@@ -59,7 +59,15 @@
                             }
                         </select>
                     <!-- Otherwise, use regular input field -->
-                    } @else {
+                    } @else if (field.type === 'checkbox') {
+                      <input
+                          [id]="field.label"
+                          [name]="field.label"
+                          type="checkbox" 
+                          [(ngModel)]="formData[field.label]"
+                          [class.invalid]="isFieldInvalid(field.label)"
+                      />
+                    }  @else {
                         <input
                         [id]="field.label"
                         [name]="field.label"

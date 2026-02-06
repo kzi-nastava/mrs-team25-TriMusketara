@@ -46,7 +46,6 @@ public class RideServiceImpl implements RideService {
     // Ride creation
     @Override
     public RideResponseDTO createRide(CreateRideRequestDTO request) {
-
         // Validation
         if ((request.getOrigin().getLongitude().equals(request.getDestination().getLongitude())) &&
                 (request.getOrigin().getLatitude().equals(request.getDestination().getLatitude())) &&
@@ -94,12 +93,9 @@ public class RideServiceImpl implements RideService {
         route.setDuration(request.getDurationMinutes());
         routeRepository.save(route);
 
-        // Update drivers status based on work hours
-        updateDriverStatuses();
-
         // Find suitable driver for ride
-        List<Driver> drivers = driverRepository.filterAvailableDrivers(DriverStatus.ACTIVE ,request.isBabyFriendly(), request.isPetFriendly());
-        Driver driver = findDriver(drivers);
+        List<Driver> drivers = driverRepository.filterAvailableDrivers(DriverStatus.ACTIVE ,request.isBabyFriendly(), request.isPetFriendly(), request.getVehicleType());
+        Driver driver = findDriver(drivers, request.getScheduledTime(), request.getDurationMinutes());
 
         // Create ride
         Ride ride = new Ride();
@@ -208,48 +204,92 @@ public class RideServiceImpl implements RideService {
     }
 
     // Find suitable driver
-    private Driver findDriver(List<Driver> drivers) {
-        LocalDateTime now = LocalDateTime.now();
-        int marginMinutes = 10;
+    private Driver findDriver(List<Driver> drivers, LocalDateTime scheduledTime, int durationMinutes) {
+        LocalDateTime requestStart = scheduledTime;
+        LocalDateTime requestEnd = scheduledTime.plusMinutes(durationMinutes);
 
-        List<Driver> freeDrivers = new ArrayList<>();
-        List<Driver> nearlyFreeDrivers = new ArrayList<>();
+        List<Driver> perfectCandidates = new ArrayList<>();
+        List<Driver> busyButFinishingCandidates = new ArrayList<>();
 
         for (Driver d : drivers) {
-            // Completely free
-            if (d.getScheduledRides().isEmpty()) {
-                freeDrivers.add(d);
-                continue;
+            // Check work minutes
+            int workMinutes = calculateDriverWorkMinutes(d);
+
+            if (workMinutes > 480) {
+                continue; // Skip driver consideration
             }
+            boolean isBusy = false;
 
-            // Has drives scheduled
-            Ride nextRide = d.getScheduledRides().get(0);
-            if (nextRide.getStatus() == RideStatus.STARTED) {
-                LocalDateTime finishTime = nextRide.getScheduledTime().plusMinutes(nextRide.getRoute().getDuration());
+            // Check currently active ride
+            Ride active = d.getActiveRide();
+            if (active != null) {
+                // When is currently active ride ending
+                LocalDateTime activeEnd = active.getScheduledTime().plusMinutes(active.getRoute().getDuration());
 
-                if (finishTime.isBefore(now.plusMinutes(marginMinutes))) {
-                    nearlyFreeDrivers.add(d);
+                // Overlap
+                if (isOverlapping(requestStart, requestEnd, active.getScheduledTime(), activeEnd)) {
+                    isBusy = true;
+
+                    // If driver is finishing within 10 minutes
+                    if (isRideRequestedForNow(requestStart)) {
+                        LocalDateTime now = LocalDateTime.now();
+                        if (activeEnd.isAfter(now) && activeEnd.isBefore(now.plusMinutes(10))) {
+                            // Busy but is finishing soon
+                            busyButFinishingCandidates.add(d);
+                        }
+                    }
                 }
             }
+            // Scheduled rides
+            if (!isBusy) {
+                for (Ride scheduled : d.getScheduledRides()) {
+                    LocalDateTime scheduledEnd = scheduled.getScheduledTime().plusMinutes(scheduled.getRoute().getDuration());
+
+                    if (isOverlapping(requestStart, requestEnd, scheduled.getScheduledTime(), scheduledEnd)) {
+                        isBusy = true;
+                        break; // Busy, no need for further checking
+                    }
+                }
+            }
+            // Completely available
+            if (!isBusy) {
+                perfectCandidates.add(d);
+            }
         }
 
-        // Priority have free drivers
-        if (!freeDrivers.isEmpty()) {
-            return freeDrivers.get(0); // later will be updated based on position
+        if (!perfectCandidates.isEmpty()) {
+            // Add location check later...
+            return perfectCandidates.get(0);
         }
 
-        // Then nearly free drivers
-        if (!nearlyFreeDrivers.isEmpty()) {
-            return nearlyFreeDrivers.get(0);
+        if (!busyButFinishingCandidates.isEmpty()) {
+            // Add location check later...
+            return busyButFinishingCandidates.get(0);
         }
-
         // No available drivers
         return null;
     }
 
-    public void updateDriverStatuses() {
-        int marginMinutes = 15;
-        driverRepository.updateDriverStatus(8 * 60 + marginMinutes);
+    // Time interval overlap
+    private boolean isOverlapping(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) {
+        return start1.isBefore(end2) && start2.isBefore(end1);
+    }
+
+    private boolean isRideRequestedForNow(LocalDateTime scheduledTime) {
+        return scheduledTime.isBefore(LocalDateTime.now().plusMinutes(5));
+    }
+
+    private int calculateDriverWorkMinutes(Driver driver) {
+        LocalDateTime last24Hours = LocalDateTime.now().minusHours(24);
+        int totalMinutes = 0;
+
+        for (Ride ride : driver.getFinishedRides()) {
+            if (ride.getEndTime() != null && ride.getEndTime().isAfter(last24Hours)) {
+                totalMinutes += ride.getRoute().getDuration();
+            }
+        }
+        //...
+        return totalMinutes;
     }
 
     @Override
