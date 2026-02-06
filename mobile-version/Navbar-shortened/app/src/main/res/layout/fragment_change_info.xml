@@ -32,198 +32,232 @@
                 android:layout_height="wrap_content"
                 android:padding="16dp">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Account Information"
-                    android:textSize="22sp"
-                    android:textColor="@color/whiteish"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="16dp"/>
-
-                <!-- Form row -->
+                <!-- Account information section  -->
                 <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp">
-
-                    <!-- Label -->
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="16sp"
-                        android:text="First Name"
-                        android:textColor="@color/whiteish"/>
-
-                    <!-- Input -->
-                    <EditText
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:minHeight="48dp"
-                        android:layout_weight="2"
-                        android:textSize="16sp"
-                        android:hint="Jhon"
-                        android:textColor="@color/profile_bg"
-                        android:textColorHint="@color/whiteish"
-                        android:backgroundTint="@color/whiteish"/>
-
-                </LinearLayout>
-
-                <!-- Form row -->
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp">
-
-                    <!-- Label -->
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="16sp"
-                        android:text="Last Name"
-                        android:textColor="@color/whiteish"/>
-
-                    <!-- Input -->
-                    <EditText
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:minHeight="48dp"
-                        android:layout_weight="2"
-                        android:textSize="16sp"
-                        android:hint="Doe"
-                        android:textColor="@color/whiteish"
-                        android:textColorHint="@color/whiteish"
-                        android:backgroundTint="@color/whiteish"/>
-                </LinearLayout>
-
-                <!-- Form row -->
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp">
-
-                    <!-- Label -->
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="16sp"
-                        android:text="Email"
-                        android:textColor="@color/whiteish"/>
-
-                    <!-- Input -->
-                    <EditText
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:minHeight="48dp"
-                        android:layout_weight="2"
-                        android:textSize="16sp"
-                        android:hint="jhondoe@gmai.com"
-                        android:textColor="@color/black"
-                        android:textColorHint="@color/whiteish"
-                        android:backgroundTint="@color/whiteish"/>
-                </LinearLayout>
-
-                <!-- Form row -->
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp">
-
-                    <!-- Label -->
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="16sp"
-                        android:text="Password"
-                        android:textColor="@color/whiteish"/>
-
-                    <!-- Input -->
-                    <EditText
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:minHeight="48dp"
-                        android:layout_weight="2"
-                        android:textSize="16sp"
-                        android:hint="*********"
-                        android:textColor="@color/black"
-                        android:textColorHint="@color/whiteish"
-                        android:backgroundTint="@color/whiteish"/>
-                </LinearLayout>
-
-                <!-- Form row -->
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp">
-
-                    <!-- Label -->
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="16sp"
-                        android:text="Address"
-                        android:textColor="@color/whiteish"/>
-
-                    <!-- Input -->
-                    <EditText
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:minHeight="48dp"
-                        android:layout_weight="2"
-                        android:textSize="16sp"
-                        android:hint="Hueco Mundo"
-                        android:textColor="@color/black"
-                        android:textColorHint="@color/whiteish"
-                        android:backgroundTint="@color/whiteish"/>
-                </LinearLayout>
-
-
-                <!-- Form row -->
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp">
-
-                    <!-- Label -->
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="16sp"
-                        android:text="Mobile"
-                        android:textColor="@color/whiteish"/>
-
-                    <!-- Input -->
-                    <EditText
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:minHeight="48dp"
-                        android:layout_weight="2"
-                        android:textSize="16sp"
-                        android:hint="+123456789"
-                        android:textColor="@color/black"
-                        android:textColorHint="@color/whiteish"
-                        android:backgroundTint="@color/whiteish"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/driver_part"
+                    android:id="@+id/account_info_section"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:visibility="gone"
-                    android:layout_marginTop="16dp">
+                    android:visibility="visible">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Account Information"
+                        android:textSize="22sp"
+                        android:textColor="@color/whiteish"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="16dp"/>
+
+                    <!-- Form row -->
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp">
+
+                        <!-- Label -->
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:text="First Name"
+                            android:textColor="@color/whiteish"/>
+
+                        <!-- Input -->
+                        <EditText
+                            android:id="@+id/et_first_name"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:minHeight="48dp"
+                            android:layout_weight="2"
+                            android:textSize="16sp"
+                            android:hint="Jhon"
+                            android:textColor="@color/user_input"
+                            android:textColorHint="@color/hint_color"
+                            android:backgroundTint="@color/whiteish"/>
+
+                    </LinearLayout>
+
+                    <!-- Form row -->
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp">
+
+                        <!-- Label -->
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:text="Last Name"
+                            android:textColor="@color/whiteish"/>
+
+                        <!-- Input -->
+                        <EditText
+                            android:id="@+id/et_last_name"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:minHeight="48dp"
+                            android:layout_weight="2"
+                            android:textSize="16sp"
+                            android:hint="Doe"
+                            android:textColor="@color/user_input"
+                            android:textColorHint="@color/hint_color"
+                            android:backgroundTint="@color/whiteish"/>
+                    </LinearLayout>
+
+                    <!-- Form row -->
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp">
+
+                        <!-- Label -->
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:text="Email"
+                            android:textColor="@color/whiteish"/>
+
+                        <!-- Input -->
+                        <EditText
+                            android:id="@+id/et_email"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:minHeight="48dp"
+                            android:layout_weight="2"
+                            android:textSize="16sp"
+                            android:hint="jhondoe@gmai.com"
+                            android:textColor="@color/user_input"
+                            android:textColorHint="@color/hint_color"
+                            android:backgroundTint="@color/whiteish"/>
+                    </LinearLayout>
+
+                    <!-- Form row -->
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp">
+
+                        <!-- Label -->
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:text="Password"
+                            android:textColor="@color/whiteish"
+                            android:layout_gravity="center_vertical"/>
+
+                        <!-- Button -->
+                        <Button
+                            android:id="@+id/btn_change_password"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:text="Change Password"
+                            android:textColor="@color/profile_bg"
+                            android:backgroundTint="@color/nav_bg"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                    </LinearLayout>
+
+                    <!-- Form row -->
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp">
+
+                        <!-- Label -->
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:text="Address"
+                            android:textColor="@color/whiteish"/>
+
+                        <!-- Input -->
+                        <EditText
+                            android:id="@+id/et_address"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:minHeight="48dp"
+                            android:layout_weight="2"
+                            android:textSize="16sp"
+                            android:hint="Hueco Mundo"
+                            android:textColor="@color/user_input"
+                            android:textColorHint="@color/hint_color"
+                            android:backgroundTint="@color/whiteish"/>
+                    </LinearLayout>
+
+
+                    <!-- Form row -->
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp">
+
+                        <!-- Label -->
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:text="Mobile"
+                            android:textColor="@color/whiteish"/>
+
+                        <!-- Input -->
+                        <EditText
+                            android:id="@+id/et_mobile"
+                            android:inputType="phone"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:minHeight="48dp"
+                            android:layout_weight="2"
+                            android:textSize="16sp"
+                            android:hint="+123456789"
+                            android:textColor="@color/user_input"
+                            android:textColorHint="@color/hint_color"
+                            android:backgroundTint="@color/whiteish"/>
+                    </LinearLayout>
+
+                    <!-- Next button  -->
+                    <LinearLayout
+                        android:id="@+id/navigation_buttons"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp"
+                        android:visibility="gone">
+
+                        <Button
+                            android:id="@+id/btn_next_to_vehicle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Next"
+                            android:textColor="@color/profile_bg"
+                            android:backgroundTint="@color/nav_bg"
+                            android:textSize="16sp"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Vehicle information section -->
+                <LinearLayout
+                    android:id="@+id/vehicle_info_section"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <TextView
                         android:layout_width="match_parent"
@@ -233,7 +267,6 @@
                         android:textColor="@color/whiteish"
                         android:textStyle="bold"
                         android:layout_marginBottom="16dp"/>
-
 
                     <!-- Form row -->
                     <LinearLayout
@@ -253,18 +286,21 @@
 
                         <!-- Input -->
                         <EditText
+                            android:id="@+id/et_model"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:minHeight="48dp"
                             android:layout_weight="2"
                             android:textSize="16sp"
                             android:hint="model"
-                            android:textColor="@color/black"
-                            android:textColorHint="@color/whiteish"
+                            android:inputType="text"
+                            android:textColor="@color/user_input"
+                            android:textColorHint="@color/hint_color"
                             android:backgroundTint="@color/whiteish"/>
                     </LinearLayout>
 
                     <!-- Form row -->
+                    <!-- Spinner for vehicle type -->
                     <LinearLayout
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
@@ -278,18 +314,45 @@
                             android:layout_weight="1"
                             android:textSize="16sp"
                             android:text="Type"
-                            android:textColor="@color/whiteish"/>
+                            android:textColor="@color/whiteish"
+                            android:layout_gravity="center_vertical"/>
 
                         <!-- Input -->
+                        <Spinner
+                            android:id="@+id/vehicle_type"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:minHeight="48dp"
+                            android:layout_weight="2"
+                            android:backgroundTint="@color/whiteish"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:text="Registration"
+                            android:textColor="@color/whiteish"
+                            android:layout_gravity="center_vertical"/>
+
                         <EditText
+                            android:id="@+id/et_registration"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:minHeight="48dp"
                             android:layout_weight="2"
                             android:textSize="16sp"
-                            android:hint="type"
-                            android:textColor="@color/black"
-                            android:textColorHint="@color/whiteish"
+                            android:hint="NS320JK"
+                            android:inputType="textCapCharacters"
+                            android:textColor="@color/user_input"
+                            android:textColorHint="@color/hint_color"
                             android:backgroundTint="@color/whiteish"/>
                     </LinearLayout>
 
@@ -307,19 +370,22 @@
                             android:layout_weight="1"
                             android:textSize="16sp"
                             android:text="Baby friendly"
-                            android:textColor="@color/whiteish"/>
+                            android:textColor="@color/whiteish"
+                            android:layout_gravity="center_vertical"/>
 
                         <!-- Input -->
-                        <EditText
+                        <ToggleButton
+                            android:id="@+id/toggle_baby_friendly"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:minHeight="48dp"
                             android:layout_weight="2"
                             android:textSize="16sp"
-                            android:hint="YES"
-                            android:textColor="@color/black"
-                            android:textColorHint="@color/whiteish"
-                            android:backgroundTint="@color/whiteish"/>
+                            android:textOn="YES"
+                            android:textOff="NO"
+                            android:checked="false"
+                            android:textColor="@color/user_input"
+                            android:backgroundTint="@color/nav_bg"/>
                     </LinearLayout>
 
                     <!-- Form row -->
@@ -339,16 +405,35 @@
                             android:textColor="@color/whiteish"/>
 
                         <!-- Input -->
-                        <EditText
+                        <ToggleButton
+                            android:id="@+id/toggle_pet_friendly"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:minHeight="48dp"
                             android:layout_weight="2"
                             android:textSize="16sp"
-                            android:hint="NO"
-                            android:textColor="@color/black"
-                            android:textColorHint="@color/whiteish"
-                            android:backgroundTint="@color/whiteish"/>
+                            android:textOn="YES"
+                            android:textOff="NO"
+                            android:checked="false"
+                            android:textColor="@color/user_input"
+                            android:backgroundTint="@color/nav_bg"/>
+                    </LinearLayout>
+
+                    <!-- Back button  -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp">
+
+                        <Button
+                            android:id="@+id/btn_back_to_account"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Back"
+                            android:textColor="@color/nav_bg"
+                            android:backgroundTint="@color/profile_bg"
+                            android:textSize="16sp"/>
                     </LinearLayout>
                 </LinearLayout>
 
@@ -361,8 +446,10 @@
                     android:textColor="@color/profile_bg"
                     android:text="Confirm change"
                     android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="22dp"
                     android:padding="12dp"
-                    android:textSize="12sp"/>
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

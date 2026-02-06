@@ -8,4 +8,6 @@
     <color name="divider_color">@color/white</color>
     <color name="redish">#F55C5C</color>
     <color name="whiteish">#E8EDDF</color>
+    <color name="user_input">#CFDBD5</color>
+    <color name="hint_color">#80CFDBD5</color>
 </resources>
