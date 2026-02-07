@@ -18,4 +18,21 @@ public class NewRideFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_new_ride, container, false);
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        Fragment formFragment;
+
+        if (SessionManager.currentUserType == SessionManager.GUEST) {
+            // Fragment that displays new ride form for GUEST
+            formFragment = null;
+        } else {
+            formFragment = new NewRideUserFormFragment();
+        }
+
+        getChildFragmentManager().beginTransaction().replace(R.id.new_ride_container, formFragment).commit();
+    }
+
 }
