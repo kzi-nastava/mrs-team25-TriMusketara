@@ -2,6 +2,7 @@ package com.example.clickanddrive.clients;
 
 import com.example.clickanddrive.BuildConfig;
 import com.example.clickanddrive.clients.services.DriverService;
+import com.example.clickanddrive.clients.services.RideService;
 import com.example.clickanddrive.clients.services.UserService;
 
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -44,4 +45,5 @@ public class ClientUtils {
     // ...
     public static UserService userService = retrofit.create(UserService.class);
     public static DriverService driverService = retrofit.create(DriverService.class);
+    public static RideService rideService = retrofit.create(RideService.class);
 }
