@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -424,6 +425,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void openDriverHistoryFragment() {
+        Log.d("KLIK", "Kliknuto na Ride history!");
         DriverHistoryFragment historyFragment = new DriverHistoryFragment();
         requireActivity().getSupportFragmentManager()
                 .beginTransaction()
