@@ -174,8 +174,7 @@
                         android:layout_width="0dp"
                         android:layout_height="48dp"
                         android:layout_weight="2"
-                        android:backgroundTint="@color/whiteish"
-                        android:popupBackground="@color/home_bg"/>
+                        android:backgroundTint="@color/whiteish"/>
                 </LinearLayout>
 
                 <!-- Set time -->
@@ -268,7 +267,7 @@
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/nav_bg"
                     android:textColor="@color/profile_bg"
-                    android:text="Show Route and ETA"
+                    android:text="Show Route &amp; ETA"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="24dp"
                     android:padding="12dp"
