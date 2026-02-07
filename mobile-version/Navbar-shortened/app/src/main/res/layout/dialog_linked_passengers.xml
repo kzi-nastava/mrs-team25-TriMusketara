@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@color/home_bg">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Link passengers"
+        android:textSize="24sp"
+        android:textColor="@color/whiteish"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="24dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enter email addresses of passengers"
+        android:textSize="14sp"
+        android:textColor="@color/hint_color"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Multi-line EditText for emails -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter passenger emails"
+        android:textColorHint="@color/hint_color"
+        android:layout_marginBottom="24dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_passengers_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="150dp"
+            android:gravity="top|start"
+            android:inputType="textMultiLine|textEmailAddress"
+            android:hint="\n\...@example.com\n...@example.com\n...@example.com"
+            android:textColor="@color/user_input"
+            android:textColorHint="@color/hint_color"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <Button
+            android:id="@+id/btn_cancel_passengers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:textColor="@color/nav_bg"
+            android:backgroundTint="@color/profile_bg"
+            android:layout_marginEnd="8dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+        <Button
+            android:id="@+id/btn_confirm_passengers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add passengers"
+            android:textColor="@color/profile_bg"
+            android:backgroundTint="@color/nav_bg"/>
+    </LinearLayout>
+</LinearLayout>
