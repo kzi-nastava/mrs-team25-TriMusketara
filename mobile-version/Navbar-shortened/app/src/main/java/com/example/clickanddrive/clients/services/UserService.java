@@ -1,7 +1,9 @@
 package com.example.clickanddrive.clients.services;
 
 import com.example.clickanddrive.dtosample.requests.ChangePasswordRequest;
+import com.example.clickanddrive.dtosample.requests.LoginRequestDTO;
 import com.example.clickanddrive.dtosample.requests.UpdateProfileRequest;
+import com.example.clickanddrive.dtosample.responses.LoginResponseDTO;
 import com.example.clickanddrive.dtosample.responses.ProfileImageResponse;
 import com.example.clickanddrive.dtosample.responses.UserProfileResponse;
 
@@ -45,5 +47,8 @@ public interface UserService {
     // Get profile photo
     @GET("user/profile-images/{filename}")
     Call<ResponseBody> getProfileImage(@Path("filename") String filename);
+
+    @POST("auth/login")
+    Call<LoginResponseDTO> login(@Body LoginRequestDTO request);
 
 }
