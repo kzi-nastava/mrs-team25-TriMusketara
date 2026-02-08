@@ -384,7 +384,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void logout() {
-        if (getActivity() instanceof MainActivity) {
+        if (isAdded() && getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).logoutAndGoToLogin();
         }
     }

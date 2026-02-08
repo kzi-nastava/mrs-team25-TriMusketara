@@ -76,15 +76,22 @@ public class MainActivity extends AppCompatActivity {
 
     public void logoutAndGoToLogin() {
         SessionManager.logout();
-        getSupportFragmentManager()
-                .popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
-        refreshBottomNavigation();
+        if (!isFinishing() && !isDestroyed()) {
+            getSupportFragmentManager()
+                    .popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.flFragment, new LoginFragment())
-                .commit();
+            BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+            if (bottomNavigationView != null) {
+                bottomNavigationView.getMenu().clear();
+                bottomNavigationView.inflateMenu(R.menu.bottom_nav_user); // guest menu
+            }
+
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.flFragment, new LoginFragment())
+                    .commitAllowingStateLoss();
+        }
     }
 
     public void setCurrentFragment(Fragment fragment) {
