@@ -4,8 +4,15 @@ import com.example.clickanddrive.BuildConfig;
 import com.example.clickanddrive.clients.services.DriverService;
 import com.example.clickanddrive.clients.services.RideService;
 import com.example.clickanddrive.clients.services.UserService;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
 
 import okhttp3.logging.HttpLoggingInterceptor;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -35,9 +42,13 @@ public class ClientUtils {
     /*
      * Prvo je potrebno da definisemo retrofit instancu preko koje ce komunikacija ici
      * */
+
+    static Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context) ->
+        new JsonPrimitive(src.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))).create();
+
     public static Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(SERVICE_API_PATH)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .client(test())
             .build();
 
