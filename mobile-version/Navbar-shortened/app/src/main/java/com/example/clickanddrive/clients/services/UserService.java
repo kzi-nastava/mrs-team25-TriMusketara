@@ -3,9 +3,11 @@ package com.example.clickanddrive.clients.services;
 import com.example.clickanddrive.dtosample.requests.ChangePasswordRequest;
 import com.example.clickanddrive.dtosample.requests.LoginRequestDTO;
 import com.example.clickanddrive.dtosample.requests.UpdateProfileRequest;
+import com.example.clickanddrive.dtosample.requests.UserRegistrationRequestDTO;
 import com.example.clickanddrive.dtosample.responses.LoginResponseDTO;
 import com.example.clickanddrive.dtosample.responses.ProfileImageResponse;
 import com.example.clickanddrive.dtosample.responses.UserProfileResponse;
+import com.example.clickanddrive.dtosample.responses.UserProfileResponseDTO;
 
 import java.util.Map;
 
@@ -51,4 +53,6 @@ public interface UserService {
     @POST("user/auth/login")
     Call<LoginResponseDTO> login(@Body LoginRequestDTO request);
 
+    @POST("user/auth/register")
+    Call<UserProfileResponseDTO> registerPassenger(@Body UserRegistrationRequestDTO dto);
 }
