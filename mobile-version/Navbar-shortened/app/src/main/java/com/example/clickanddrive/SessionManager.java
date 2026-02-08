@@ -5,6 +5,8 @@ public class SessionManager {
     public static final int USER = 1;
     public static final int DRIVER = 2;
     public static final int ADMIN = 3;
+  
+    public static int currentUserType = USER;
 
     public static int currentUserType = GUEST;
     public static String token = null;  // JWT token
