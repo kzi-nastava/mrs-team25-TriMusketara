@@ -8,10 +8,11 @@ public class UserRegistrationRequestDTO {
     private String confirmPassword;
     private String address;
     private String phoneNumber;
+    private boolean mobile;
 
     public UserRegistrationRequestDTO(String name, String lastName, String email,
                                       String password, String confirmPassword,
-                                      String address, String phoneNumber) {
+                                      String address, String phoneNumber, boolean mobile) {
         this.name = name;
         this.lastName = lastName;
         this.email = email;
@@ -19,6 +20,7 @@ public class UserRegistrationRequestDTO {
         this.confirmPassword = confirmPassword;
         this.address = address;
         this.phoneNumber = phoneNumber;
+        this.mobile = mobile;
     }
 
     // Getteri i setteri
@@ -42,4 +44,7 @@ public class UserRegistrationRequestDTO {
 
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+
+    public boolean getMobile(){ return mobile; }
+    public void setMobile(boolean mobile){ this.mobile = mobile; }
 }

@@ -76,7 +76,7 @@ public class RegisterFragment extends Fragment {
         progressDialog.show();
 
         UserRegistrationRequestDTO request = new UserRegistrationRequestDTO(
-                name, lastName, email, password, confirmPassword, address, phone
+                name, lastName, email, password, confirmPassword, address, phone, true
         );
 
         userService.registerPassenger(request).enqueue(new Callback<UserProfileResponseDTO>() {

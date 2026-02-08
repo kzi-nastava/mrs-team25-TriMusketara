@@ -1,5 +1,6 @@
 package com.example.clickanddrive;
 
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -28,6 +29,18 @@ public class MainActivity extends AppCompatActivity {
         Fragment profileFragment = new ProfileFragment();
         Fragment newRideFragment = new NewRideFragment();
         // add more based on role ...
+
+        Uri data = getIntent().getData();
+        if (data != null && "activate-account".equals(data.getHost())) {
+            String token = data.getQueryParameter("token");
+            if (token != null && !token.isEmpty()) {
+                setCurrentFragment(new ActivationFragment(token));
+            } else {
+                setCurrentFragment(homeFragment);
+            }
+        } else {
+            setCurrentFragment(homeFragment);
+        }
 
 
         refreshBottomNavigation();
