@@ -238,7 +238,7 @@ public class UserServiceImpl implements UserService {
         String activationLink;
         if (dto.isMobile()) {
             // URL za mobilnu aplikaciju, npr. deep link
-            activationLink = "clickanddrive://activate-account?token=" + saved.getActivationToken();
+            activationLink = "https://abcd1234.ngrok.io/activate-account?token=" + saved.getActivationToken();
         } else {
             // URL za web frontend
             activationLink = "http://localhost:4200/activate-account?token=" + saved.getActivationToken();
