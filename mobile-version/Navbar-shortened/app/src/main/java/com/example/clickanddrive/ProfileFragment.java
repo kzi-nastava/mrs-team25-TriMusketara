@@ -359,7 +359,11 @@ public class ProfileFragment extends Fragment {
                 addButton("Reports", R.drawable.report,  () -> {});
                 addButton("Notes", R.drawable.notes, () -> {});
                 addButton("Support", R.drawable.support, () -> {});
-                addButton("Log out", R.drawable.logout, () -> logout());
+                addButton("Log out", R.drawable.logout, () -> {
+                    if (isAdded() && getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).logoutAndGoToLoginSafe();
+                    }
+                });
                 break;
 
             case SessionManager.DRIVER:
@@ -367,7 +371,11 @@ public class ProfileFragment extends Fragment {
                 addButton("Reports", R.drawable.report,  () -> {});
                 addButton("Notes", R.drawable.notes, () -> {});
                 addButton("Support", R.drawable.support, () -> {});
-                addButton("Log out", R.drawable.logout, () -> logout());
+                addButton("Log out", R.drawable.logout, () -> {
+                    if (isAdded() && getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).logoutAndGoToLoginSafe();
+                    }
+                });
                 break;
 
             case SessionManager.ADMIN:
@@ -378,15 +386,17 @@ public class ProfileFragment extends Fragment {
                 addButton("Requests", 0,  () -> {});
                 addButton("Reports", R.drawable.report,  () -> {});
                 addButton("Notes", R.drawable.notes,  () -> {});
-                addButton("Log out", R.drawable.logout, () -> logout());
+                addButton("Log out", R.drawable.logout, () -> {
+                    if (isAdded() && getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).logoutAndGoToLoginSafe();
+                    }
+                });
                 break;
         }
     }
 
     private void logout() {
-        if (isAdded() && getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).logoutAndGoToLogin();
-        }
+        //empty
     }
 
     private View createDivider() {

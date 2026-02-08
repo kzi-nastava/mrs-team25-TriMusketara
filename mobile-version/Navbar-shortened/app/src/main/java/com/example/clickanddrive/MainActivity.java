@@ -74,23 +74,27 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void logoutAndGoToLogin() {
+    public void logoutAndGoToLoginSafe() {
         SessionManager.logout();
 
+        // 2. clear fragment back stack safely
         if (!isFinishing() && !isDestroyed()) {
-            getSupportFragmentManager()
-                    .popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
-            BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-            if (bottomNavigationView != null) {
-                bottomNavigationView.getMenu().clear();
-                bottomNavigationView.inflateMenu(R.menu.bottom_nav_user); // guest menu
+            // 3. reset bottom nav
+            BottomNavigationView nav = findViewById(R.id.bottomNavigationView);
+            if (nav != null) {
+                nav.getMenu().clear();
+                nav.inflateMenu(R.menu.bottom_nav_user); // guest menu
             }
 
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.flFragment, new LoginFragment())
-                    .commitAllowingStateLoss();
+            // 4. post fragment transaction na UI thread
+            findViewById(R.id.flFragment).post(() -> {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.flFragment, new LoginFragment())
+                        .commitAllowingStateLoss();
+            });
         }
     }
 
