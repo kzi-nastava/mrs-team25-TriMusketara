@@ -195,10 +195,12 @@ public class ProfileFragment extends Fragment {
                 return;
             }
 
-            RequestBody requestFile = RequestBody.create(
-                    MediaType.parse("image/*"),
-                    file
-            );
+//            RequestBody requestFile = RequestBody.create(
+//                    MediaType.parse("image/*"),
+//                    file
+//            );
+            MediaType mediaType = MediaType.get("image/*");
+            RequestBody requestFile = RequestBody.create(file, mediaType);
             MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
 
 
