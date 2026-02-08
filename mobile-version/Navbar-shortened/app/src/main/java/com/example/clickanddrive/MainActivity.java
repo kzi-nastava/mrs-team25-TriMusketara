@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
-    private void setCurrentFragment(Fragment fragment) {
+    public void setCurrentFragment(Fragment fragment) {
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.flFragment, fragment)

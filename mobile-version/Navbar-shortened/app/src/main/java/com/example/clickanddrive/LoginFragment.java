@@ -82,6 +82,7 @@ public class LoginFragment extends Fragment {
 
                     if (getActivity() instanceof MainActivity) {
                         ((MainActivity) getActivity()).refreshBottomNavigation();
+                        ((MainActivity) getActivity()).setCurrentFragment(new HomeFragment());
                     }
 
                     Toast.makeText(getContext(), "Login successful as " + loginResponse.getRole(),
