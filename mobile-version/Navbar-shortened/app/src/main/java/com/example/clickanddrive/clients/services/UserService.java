@@ -48,7 +48,7 @@ public interface UserService {
     @GET("user/profile-images/{filename}")
     Call<ResponseBody> getProfileImage(@Path("filename") String filename);
 
-    @POST("auth/login")
+    @POST("user/auth/login")
     Call<LoginResponseDTO> login(@Body LoginRequestDTO request);
 
 }

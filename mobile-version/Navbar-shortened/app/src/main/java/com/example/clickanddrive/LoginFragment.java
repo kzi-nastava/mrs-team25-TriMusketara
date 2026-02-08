@@ -80,6 +80,10 @@ public class LoginFragment extends Fragment {
                             loginResponse.getToken(),
                             loginResponse.getUserId());
 
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).refreshBottomNavigation();
+                    }
+
                     Toast.makeText(getContext(), "Login successful as " + loginResponse.getRole(),
                             Toast.LENGTH_SHORT).show();
 

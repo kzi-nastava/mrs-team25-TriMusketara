@@ -8,6 +8,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -22,9 +23,6 @@ public class MainActivity extends AppCompatActivity {
         // However based on who is logged in, a different menu will be displayed in the nav bar
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
-        // Clear old menu
-        bottomNavigationView.getMenu().clear();
-
         // Fragments that will be displayed
         Fragment homeFragment = new HomeFragment();
         Fragment profileFragment = new ProfileFragment();
@@ -32,19 +30,7 @@ public class MainActivity extends AppCompatActivity {
         // add more based on role ...
 
 
-        // Change the menu in the navigation bar based on role
-        switch(SessionManager.currentUserType) {
-            case SessionManager.GUEST:
-            case SessionManager.USER:
-                bottomNavigationView.inflateMenu(R.menu.bottom_nav_user);
-                break;
-            case SessionManager.DRIVER:
-                bottomNavigationView.inflateMenu(R.menu.bottom_nav_driver);
-                break;
-            case SessionManager.ADMIN:
-                bottomNavigationView.inflateMenu(R.menu.bottom_nav_admin);
-                break;
-        }
+        refreshBottomNavigation();
 
 
         setCurrentFragment(homeFragment);
@@ -67,6 +53,38 @@ public class MainActivity extends AppCompatActivity {
 
             return false;
         });
+    }
+
+    public void refreshBottomNavigation() {
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+
+        bottomNavigationView.getMenu().clear();
+
+        switch(SessionManager.currentUserType) {
+            case SessionManager.GUEST:
+            case SessionManager.USER:
+                bottomNavigationView.inflateMenu(R.menu.bottom_nav_user);
+                break;
+            case SessionManager.DRIVER:
+                bottomNavigationView.inflateMenu(R.menu.bottom_nav_driver);
+                break;
+            case SessionManager.ADMIN:
+                bottomNavigationView.inflateMenu(R.menu.bottom_nav_admin);
+                break;
+        }
+    }
+
+    public void logoutAndGoToLogin() {
+        SessionManager.logout();
+        getSupportFragmentManager()
+                .popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+        refreshBottomNavigation();
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.flFragment, new LoginFragment())
+                .commit();
     }
 
     private void setCurrentFragment(Fragment fragment) {

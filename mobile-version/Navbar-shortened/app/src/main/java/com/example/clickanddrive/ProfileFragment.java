@@ -359,7 +359,7 @@ public class ProfileFragment extends Fragment {
                 addButton("Reports", R.drawable.report,  () -> {});
                 addButton("Notes", R.drawable.notes, () -> {});
                 addButton("Support", R.drawable.support, () -> {});
-                addButton("Log out", R.drawable.logout,  () -> {});
+                addButton("Log out", R.drawable.logout, () -> logout());
                 break;
 
             case SessionManager.DRIVER:
@@ -367,7 +367,7 @@ public class ProfileFragment extends Fragment {
                 addButton("Reports", R.drawable.report,  () -> {});
                 addButton("Notes", R.drawable.notes, () -> {});
                 addButton("Support", R.drawable.support, () -> {});
-                addButton("Log out", R.drawable.logout, () -> {});
+                addButton("Log out", R.drawable.logout, () -> logout());
                 break;
 
             case SessionManager.ADMIN:
@@ -378,8 +378,14 @@ public class ProfileFragment extends Fragment {
                 addButton("Requests", 0,  () -> {});
                 addButton("Reports", R.drawable.report,  () -> {});
                 addButton("Notes", R.drawable.notes,  () -> {});
-                addButton("Log out", R.drawable.logout,  () -> {});
+                addButton("Log out", R.drawable.logout, () -> logout());
                 break;
+        }
+    }
+
+    private void logout() {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).logoutAndGoToLogin();
         }
     }
 
