@@ -4,6 +4,7 @@ import { RouterOutlet, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { Map } from '../../services/map';
 import { RideOrderingService } from '../../services/ride.service';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-drive-in-progress',
@@ -120,18 +121,51 @@ export class DriveInProgress implements AfterViewInit {
 
   // onFinishDriver() {
   //   if (!this.activeRide) return;
+  // calcDistance(origin: string, destination: string): number {
+  //   const coords1 = this.mapService.geocodeAddress(origin);
+  //   const coords2 = this.mapService.geocodeAddress(destination);
+
+  //   if (!coords1 || !coords2) {
+  //     console.error('Failed to geocode addresses for distance calculation');
+  //     return 0;
+  //   }
 
 
-  onFinishDriver() {
-    if (!this.activeRide) return;
+  // }
 
-    this.rideService.finishRide(this.activeRide.id).subscribe({
-      next: () => this.completeRideFlow(),
-      error: () => {
-        this.completeRideFlow();
+  async onFinishDriver() {
+  if (!this.activeRide) return;
+
+  try {
+    // 1. Prvo geokodiramo adrese da dobijemo sveže koordinate
+    const originCoords = await this.mapService.geocodeAddress(this.activeRide.origin);
+    const destCoords = await this.mapService.geocodeAddress(this.activeRide.destination);
+
+    // 2. Tražimo distancu od Mapboxa neposredno pre slanja
+    this.mapService.getRouteDistanceOnly(originCoords, destCoords).subscribe({
+      next: (km) => {
+        console.log('Finalna distanca za slanje:', km);
+        
+        // 3. Šaljemo na backend
+        this.rideService.finishRide(this.activeRide.id, km).subscribe({
+          next: () => this.completeRideFlow(),
+          error: (err) => {
+            console.error('Greška pri završetku:', err);
+            this.completeRideFlow();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Nije moguće dobiti distancu, šaljem 0:', err);
+        this.rideService.finishRide(this.activeRide.id, 0).subscribe(() => this.completeRideFlow());
       }
     });
+  } catch (err) {
+    console.error('Greška u koordinatama:', err);
+    // Ako sve propadne, pošalji 0, backend će rešiti fallback
+    this.rideService.finishRide(this.activeRide.id, 0).subscribe(() => this.completeRideFlow());
   }
+}
 
   private completeRideFlow() {
     this.auth.setInDrive(false);

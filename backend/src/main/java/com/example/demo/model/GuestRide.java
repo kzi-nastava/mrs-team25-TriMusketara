@@ -43,4 +43,6 @@ public class GuestRide {
     private User cancelledBy;
 
     private boolean panicPressed;
+
+    private double price;
 }

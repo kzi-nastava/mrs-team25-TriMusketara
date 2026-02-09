@@ -42,6 +42,7 @@ public class RideServiceImpl implements RideService {
     private final VehicleRepository vehicleRepository;
     //Service
     private final EmailService emailService;
+    private final VehiclePriceRepository vehiclePriceRepository;
 
     // Ride creation
     @Override
@@ -351,6 +352,7 @@ public class RideServiceImpl implements RideService {
             GuestRide guestRide = guestRideRepository.findById(rideId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "GuestRide not found"));
             guestRide.setStatus(RideStatus.STARTED);
+            guestRide.setStartTime(LocalDateTime.now());
             guestRideRepository.save(guestRide);
 
             //set vehicle and driver data
@@ -363,6 +365,7 @@ public class RideServiceImpl implements RideService {
             Ride ride = rideRepository.findById(rideId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride not found"));
             ride.setStatus(RideStatus.STARTED);
+            ride.setStartTime(LocalDateTime.now());
             rideRepository.save(ride);
 
             //set vehicle and driver data
@@ -457,7 +460,7 @@ public class RideServiceImpl implements RideService {
 
     @Override
     @Transactional
-    public void finishRide(Long rideId, String driverEmail) {
+    public void finishRide(Long rideId, String driverEmail, double distance) {
         try {
 
             Ride ride = rideRepository.findById(rideId)
@@ -467,10 +470,10 @@ public class RideServiceImpl implements RideService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only started rides can be finished.");
             }
             ///TO-DO: find out why authorization doesn't work, for testing I'll put this here
+            System.out.println("sent:" + driverEmail + ", but in database: " +  ride.getDriver().getEmail());
             // Ride update
             ride.setStatus(RideStatus.FINISHED);
             ride.setEndTime(LocalDateTime.now());
-            rideRepository.save(ride);
 
             // Driver update
             Driver driver = ride.getDriver();
@@ -481,6 +484,14 @@ public class RideServiceImpl implements RideService {
             Vehicle vehicle = driver.getVehicle();
             vehicle.setBusy(false);
             vehicleRepository.save(vehicle);
+
+
+            ride.getRoute().setDistance(distance);
+            // Price calculation
+            double price = calculateRidePrice(distance, vehicle.getType());
+            ride.setPrice(price);
+
+            rideRepository.save(ride);
 
             if (!ride.getDriver().getEmail().equals(driverEmail)) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the driver of this ride.");
@@ -494,8 +505,25 @@ public class RideServiceImpl implements RideService {
             System.out.println("Error in finishRide, sending test email instead: " + e.getMessage());
             sendSummaryEmails("makspavle@gmail.com");
         }
+    }
 
+    private double calculateRidePrice(double distance, VehicleType vehicleType) {
+        double price = 0.0;
+        VehiclePrice vehiclePrice = vehiclePriceRepository
+                .findTopBy()
+                .orElseThrow(() -> new RuntimeException("Vehicle price not found"));
+        if (vehiclePrice == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle price not found");
+        }
+        switch (vehicleType) {
+            case LUXURY -> price += vehiclePrice.getLuxury();
+            case VAN ->  price += vehiclePrice.getVan();
+            default -> price += vehiclePrice.getStandard();
+        }
+        System.out.println("DEBUG: Racunam cenu za distancu: " + distance);
 
+        price += distance * vehiclePrice.getPerKm();
+        return (double) Math.round(price);
 
     }
 

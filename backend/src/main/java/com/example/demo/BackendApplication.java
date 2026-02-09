@@ -29,7 +29,8 @@ public class BackendApplication {
 			RideRepository rideRepository,
 			LocationRepository locationRepository,
 			RouteRepository routeRepository,
-			PasswordEncoder passwordEncoder) {
+			PasswordEncoder passwordEncoder,
+			VehiclePriceRepository vehiclePriceRepository) {
 		return args -> {
 
 
@@ -187,6 +188,15 @@ public class BackendApplication {
 
 				System.out.println("3 finished rides initialized.");
 			}
+
+			// VEHICLE PRICES
+			VehiclePrice vehiclePrice = new VehiclePrice();
+			vehiclePrice.setPerKm(120.0);
+			vehiclePrice.setStandard(200.0);
+			vehiclePrice.setVan(400.0);
+			vehiclePrice.setLuxury(950.0);
+
+			vehiclePriceRepository.save(vehiclePrice);
 
 		};
 	}

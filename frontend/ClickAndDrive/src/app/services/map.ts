@@ -10,6 +10,8 @@ export class Map {
 
   private bbox = '19.78,45.22,19.92,45.30';
 
+  distanceKm: number | null = null;
+
   constructor(private http: HttpClient) {}
 
   getRouteByAddress(origin: string, destination: string): Observable<any> {
@@ -64,6 +66,7 @@ export class Map {
       const distanceMeters = route.distance;
 
       this.etaMinutes = Math.round(durationSeconds / 60);
+      this.distanceKm = Math.round((distanceMeters/1000) * 100) / 100;
     });
   }
 
@@ -81,5 +84,18 @@ export class Map {
   }
 
   return data.features[0].center as [number, number];
+}
+
+getRouteDistanceOnly(origin: [number, number], destination: [number, number]): Observable<number> {
+  const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${origin[0]},${origin[1]};${destination[0]},${destination[1]}?access_token=${this.token}`;
+  
+  return this.http.get<any>(url).pipe(
+    map(res => {
+      const distanceMeters = res.routes[0].distance;
+      const km = Math.round((distanceMeters / 1000) * 100) / 100;
+      this.distanceKm = km;
+      return km;
+    })
+  );
 }
 }
