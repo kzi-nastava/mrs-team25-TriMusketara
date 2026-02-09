@@ -185,7 +185,8 @@ public class ChangeInfoFragment extends Fragment {
     private void loadUserProfile() {
         Log.d(TAG, "Loading user profile for ID: " + TEMP_USER_ID);
 
-        Call<UserProfileResponse> call = ClientUtils.userService.getUserProfile(TEMP_USER_ID);
+        Long userId = SessionManager.userId;
+        Call<UserProfileResponse> call = ClientUtils.userService.getUserProfile(userId);
 
         call.enqueue(new Callback<UserProfileResponse>() {
             @Override
@@ -212,7 +213,8 @@ public class ChangeInfoFragment extends Fragment {
     private void loadVehicle() {
         Log.d(TAG, "Loading user profile for ID: " + TEMP_USER_ID);
 
-        Call<VehicleResponse> call = ClientUtils.driverService.getVehicle(TEMP_USER_ID);
+        Long userId = SessionManager.userId;
+        Call<VehicleResponse> call = ClientUtils.driverService.getVehicle(userId);
 
         call.enqueue(new Callback<VehicleResponse>() {
             @Override
@@ -464,7 +466,8 @@ public class ChangeInfoFragment extends Fragment {
     private void updateProfile(UpdateProfileRequest request) {
         Log.d(TAG, "Updating profile:" + request.toString());
 
-        Call<UserProfileResponse> call = ClientUtils.userService.updateUserProfile(TEMP_USER_ID, request);
+        Long userId = SessionManager.userId;
+        Call<UserProfileResponse> call = ClientUtils.userService.updateUserProfile(userId, request);
 
         call.enqueue(new Callback<UserProfileResponse>() {
 
@@ -520,8 +523,9 @@ public class ChangeInfoFragment extends Fragment {
         btnConfirm.setOnClickListener(v -> {
             if (validatePasswords(etCurrentPassword, etNewPassword, etConfirmPassword)) {
                 // Build request for changing password
+                Long userId = SessionManager.userId;
                 ChangePasswordRequest request = new ChangePasswordRequest(
-                                                        TEMP_USER_ID,
+                                                        userId,
                                                         etCurrentPassword.getText().toString().trim(),
                                                         etNewPassword.getText().toString().trim(),
                                                         etConfirmPassword.getText().toString().trim());

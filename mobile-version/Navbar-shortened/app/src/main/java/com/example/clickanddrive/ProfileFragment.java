@@ -204,7 +204,8 @@ public class ProfileFragment extends Fragment {
             MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
 
 
-            Call<ProfileImageResponse> call = ClientUtils.userService.uploadProfileImage(TEMP_USER_ID, body);
+            Long userId = SessionManager.userId;
+            Call<ProfileImageResponse> call = ClientUtils.userService.uploadProfileImage(userId, body);
 
             call.enqueue(new Callback<ProfileImageResponse>() {
                 @Override
@@ -266,7 +267,8 @@ public class ProfileFragment extends Fragment {
 
     // When in profile, display both name and last name and profile photo
     private void displayUserProfileImage() {
-        Call<UserProfileResponse> call = ClientUtils.userService.getUserProfile(TEMP_USER_ID);
+        Long userId = SessionManager.userId;
+        Call<UserProfileResponse> call = ClientUtils.userService.getUserProfile(userId);
 
         call.enqueue(new Callback<UserProfileResponse>() {
             @Override
@@ -300,7 +302,8 @@ public class ProfileFragment extends Fragment {
 
     // Delete profile image
     private void deleteImage() {
-        Call<Void> call = ClientUtils.userService.deleteProfileImage(TEMP_USER_ID);
+        Long userId = SessionManager.userId;
+        Call<Void> call = ClientUtils.userService.deleteProfileImage(userId);
 
         call.enqueue(new Callback<Void>() {
             @Override
