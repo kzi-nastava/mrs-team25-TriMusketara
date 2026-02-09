@@ -6,14 +6,23 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.example.clickanddrive.map.MapHelper;
+import com.example.clickanddrive.map.MapboxDirections;
+import com.example.clickanddrive.map.MapboxGeocoder;
+import com.example.clickanddrive.models.RouteData;
 import com.mapbox.geojson.Point;
 import com.mapbox.maps.CameraOptions;
 import com.mapbox.maps.MapView;
 import com.mapbox.maps.Style;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomeFragment extends Fragment {
 
@@ -35,9 +44,38 @@ public class HomeFragment extends Fragment {
 
         mapView.getMapboxMap().setCamera(cameraOptions);
 
-        mapView.getMapboxMap().loadStyleUri(Style.DARK);
+        mapView.getMapboxMap().loadStyleUri(Style.DARK, style -> {
+            checkAndDrawIncomingRoute();
+        });
 
         return view;
+    }
+
+    private void checkAndDrawIncomingRoute() {
+        if (getArguments() != null && getArguments().containsKey("ROUTE_DATA")) {
+            RouteData routeData = (RouteData) getArguments().getSerializable("ROUTE_DATA");
+
+            if (routeData != null) {
+                MapHelper mapHelper = new MapHelper(mapView);
+
+                mapHelper.drawRoute(
+                        routeData.getOrigin(),
+                        routeData.getDestination(),
+                        routeData.getStops(),
+                        new MapHelper.RouteDrawnCallback() {
+                            @Override
+                            public void onRouteDrawn(double distanceKm, int durationMinutes) {
+                                Log.d("MAP", "Route drawn: " + distanceKm + "km");
+                            }
+
+                            @Override
+                            public void onError(String error) {
+                                Toast.makeText(getContext(), "Error: " + error, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                );
+            }
+        }
     }
 
     @Override

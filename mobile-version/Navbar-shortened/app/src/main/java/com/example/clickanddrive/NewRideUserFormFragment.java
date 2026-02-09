@@ -25,6 +25,7 @@ import com.example.clickanddrive.dtosample.enumerations.RideStatus;
 import com.example.clickanddrive.dtosample.enumerations.VehicleType;
 import com.example.clickanddrive.dtosample.requests.CreateRideRequest;
 import com.example.clickanddrive.dtosample.responses.RideResponse;
+import com.example.clickanddrive.models.RouteData;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.time.LocalDateTime;
@@ -359,9 +360,12 @@ public class NewRideUserFormFragment extends Fragment {
                 selectedTime.get(Calendar.MINUTE)
         );
 
+        // Use currently logged in users id
+        Long passengerId = SessionManager.userId;
+
         // Build and return request
         return new CreateRideRequest(
-                TEMP_PASSENGER_ID,
+                passengerId,
                 originLocation,
                 destinationLocation,
                 stops,
@@ -403,11 +407,25 @@ public class NewRideUserFormFragment extends Fragment {
             String message = String.format("Ride scheduled! Price: %.2f RSD", response.getPrice());
             Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
 
+            RouteData routeData = new RouteData();
+            routeData.setOrigin(etOrigin.getText().toString().trim());
+            routeData.setDestination(etDestination.getText().toString().trim());
+            routeData.setStops(new ArrayList<>(additionalStops));
+
+            HomeFragment homeFragment = new HomeFragment();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("ROUTE_DATA", routeData);
+            homeFragment.setArguments(bundle);
+
+            if (getActivity() != null) {
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.flFragment, homeFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+
             // Clear form
             clearForm();
-
-            // Navigate to main draw out the route
-            // ...
         } else if (response.getStatus() == RideStatus.FAILED) {
             // No available driver
             Toast.makeText(getContext(),
