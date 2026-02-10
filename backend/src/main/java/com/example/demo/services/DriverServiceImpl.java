@@ -76,7 +76,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public DriverRegistrationResponseDTO registerDriver(DriverRegistrationRequestDTO request) {
+    public DriverRegistrationResponseDTO registerDriver(DriverRegistrationRequestDTO request, String platform) {
 
         // Validation
         if (driverRepository.existsByEmail(request.getEmail())) {
@@ -111,6 +111,16 @@ public class DriverServiceImpl implements DriverService {
         // Write in database
         Driver saved = driverRepository.save(driver);
 
+        // Determine registration link based on platform
+        String registrationLink;
+        if (platform.equalsIgnoreCase("mobile")) {
+            // Deep link android app
+            registrationLink = "clickanddrive://complete-registration?token=" + driver.getRegistrationToken();
+        } else {
+            // Web app by default
+            registrationLink = "http://localhost:4200/complete-registration?token=" + driver.getRegistrationToken();
+        }
+
         // Sending driver email to set up password
         EmailDetails email = new EmailDetails();
         email.setRecipient(driver.getEmail());
@@ -118,7 +128,7 @@ public class DriverServiceImpl implements DriverService {
         email.setMsgBody(
                 "Hello " + driver.getName() + ",\n\n" +
                         "Welcome to ClickAndDrive! Please complete your registration by setting your password:\n\n" +
-                        "http://localhost:4200/complete-registration?token=" + driver.getRegistrationToken() + "\n\n" +
+                        registrationLink + "\n\n" +
                         "This link will expire in 24 hours.\n\n" +
                         "Best regards,\nClickAndDrive Team"
         );

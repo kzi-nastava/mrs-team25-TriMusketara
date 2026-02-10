@@ -31,10 +31,11 @@ public class AdminController {
 
     @PostMapping("/drivers")
     public ResponseEntity<DriverRegistrationResponseDTO> registerDriver(
-            @Valid @RequestBody DriverRegistrationRequestDTO request) {
+            @Valid @RequestBody DriverRegistrationRequestDTO request,
+            @RequestParam(defaultValue = "web") String platform) {
 
         // Call service function to register a new driver into the app
-        DriverRegistrationResponseDTO response = driverService.registerDriver(request);
+        DriverRegistrationResponseDTO response = driverService.registerDriver(request, platform);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
