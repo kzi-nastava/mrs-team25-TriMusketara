@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/drivers")
@@ -35,10 +37,10 @@ public class DriverController {
     }
 
     @PostMapping("/complete-registration")
-    public ResponseEntity<String> completeRegistration(@Valid @RequestBody CompleteRegistrationRequestDTO request) {
+    public ResponseEntity<Map<String, String>> completeRegistration(@Valid @RequestBody CompleteRegistrationRequestDTO request) {
 
         driverService.completeRegistration(request);
-        return ResponseEntity.ok("Registration is successful");
+        return ResponseEntity.ok(Collections.singletonMap("message", "Completed registration"));
     }
 
     @GetMapping("/{id}/vehicle")

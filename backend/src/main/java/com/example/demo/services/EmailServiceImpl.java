@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.model.Driver;
 import com.example.demo.model.EmailDetails;
 import com.example.demo.model.Passenger;
 import com.example.demo.services.interfaces.EmailService;
@@ -88,6 +89,27 @@ public class EmailServiceImpl implements EmailService {
             System.out.println(activationLink);
         } catch (Exception e) {
             throw new RuntimeException("Failed to send activation email", e);
+        }
+    }
+
+    @Override
+    public void sendDriverRegistrationEmail(Driver driver, String registrationLink) {
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(driver.getEmail());
+            helper.setSubject("Complete your registration");
+            helper.setText(
+                    "<p>Hello " + driver.getName() + ",</p>" +
+                            "<p>Welcome to ClickAndDrive! Please complete your registration by setting your password:</p>" +
+                            "<a href=\"" + registrationLink + "\">Complete Registration</a>" +
+                            "<p>This link will expire in 24 hours.</p>" +
+                            "<p>Best regards,<br/>ClickAndDrive Team</p>",
+                    true
+            );
+            javaMailSender.send(message);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send driver registration email", e);
         }
     }
 }

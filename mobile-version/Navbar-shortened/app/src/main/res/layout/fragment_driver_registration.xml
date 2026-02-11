@@ -23,7 +23,7 @@
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="@color/profile_bg"
-            android:layout_marginBottom="24dp"/>
+            android:layout_marginBottom="18dp"/>
 
         <!-- Driver info card -->
         <androidx.cardview.widget.CardView
@@ -140,6 +140,31 @@
                         android:textColor="@color/white"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Vehicle Type Spinner -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="15sp"
+                        android:layout_marginLeft="15dp"
+                        android:text="Gender"
+                        android:textColor="@color/whiteish"
+                        android:layout_gravity="center_vertical"/>
+
+                    <Spinner
+                        android:id="@+id/spinner_gender"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1.5"
+                        android:backgroundTint="@color/whiteish"/>
+                </LinearLayout>
+
                 <!-- Phone -->
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -210,29 +235,30 @@
                         android:textColor="@color/white"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Type -->
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                <!-- Vehicle Type Spinner -->
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:boxStrokeColor="@color/text_input_box_stroke"
-                    app:boxStrokeWidth="2dp"
-                    android:textColorHint="@color/white"
                     android:layout_marginBottom="12dp">
 
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/vehicle_type_input"
-                        android:layout_width="match_parent"
-                        android:minHeight="48dp"
+                    <TextView
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:hint="Type"
-                        android:textSize="16sp"
-                        android:padding="12dp"
-                        android:textColor="@color/white"
-                        android:inputType="none"
-                        android:focusable="false"
-                        android:clickable="true"/>
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_weight="1"
+                        android:textSize="15sp"
+                        android:layout_marginLeft="15dp"
+                        android:text="Vehicle Type"
+                        android:textColor="@color/whiteish"
+                        android:layout_gravity="center_vertical"/>
+
+                    <Spinner
+                        android:id="@+id/spinner_vehicle_type"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1.5"
+                        android:backgroundTint="@color/whiteish"/>
+                </LinearLayout>
 
                 <!-- Plate number -->
                 <com.google.android.material.textfield.TextInputLayout
@@ -270,32 +296,63 @@
                         android:textColor="@color/white"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Pet friendly -->
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/switch_pet_friendly"
+                <!-- Baby Friendly Toggle -->
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Pet friendly"
-                    android:textColor="@color/white"
-                    app:thumbTint="@color/switch_thumb"
-                    app:trackTint="@color/switch_track"
-                    android:textSize="16sp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="4dp"/>
+                    android:layout_marginBottom="12dp">
 
-                <!-- Baby friendly -->
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/switch_baby_friendly"
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="15sp"
+                        android:layout_marginLeft="15dp"
+                        android:text="Baby Friendly"
+                        android:textColor="@color/whiteish"
+                        android:layout_gravity="center_vertical"/>
+
+                    <ToggleButton
+                        android:id="@+id/toggle_baby_friendly"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1.5"
+                        android:textOn="YES"
+                        android:textOff="NO"
+                        android:checked="false"
+                        android:backgroundTint="@color/nav_bg"
+                        android:textColor="@color/whiteish"/>
+                </LinearLayout>
+
+                <!-- Pet Friendly Toggle -->
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Baby friendly"
-                    app:thumbTint="@color/switch_thumb"
-                    app:trackTint="@color/switch_track"
-                    android:textSize="16sp"
-                    android:layout_marginStart="16dp"
-                    android:textColor="@color/white"
-                    android:layout_marginBottom="12dp"/>
+                    android:layout_marginBottom="20dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="15sp"
+                        android:text="Pet Friendly"
+                        android:layout_marginLeft="15dp"
+                        android:textColor="@color/whiteish"
+                        android:layout_gravity="center_vertical"/>
+
+                    <ToggleButton
+                        android:id="@+id/toggle_pet_friendly"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1.5"
+                        android:textOn="YES"
+                        android:textOff="NO"
+                        android:checked="false"
+                        android:backgroundTint="@color/nav_bg"
+                        android:textColor="@color/whiteish"/>
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"

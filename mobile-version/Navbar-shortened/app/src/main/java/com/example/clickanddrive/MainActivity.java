@@ -45,6 +45,12 @@ public class MainActivity extends AppCompatActivity {
 
         refreshBottomNavigation();
 
+        // Check if we should open login fragment
+        if (getIntent().hasExtra("OPEN_LOGIN") && getIntent().getBooleanExtra("OPEN_LOGIN", false)) {
+            logoutAndGoToLoginSafe();
+        } else {
+            setCurrentFragment(homeFragment);
+        }
 
         setCurrentFragment(homeFragment);
 

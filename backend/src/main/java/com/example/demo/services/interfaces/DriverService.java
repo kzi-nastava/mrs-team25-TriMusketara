@@ -9,7 +9,7 @@ import com.example.demo.dto.response.DriverRideHistoryResponseDTO;
 import java.util.List;
 
 public interface DriverService {
-    DriverRegistrationResponseDTO registerDriver(DriverRegistrationRequestDTO request);
+    DriverRegistrationResponseDTO registerDriver(DriverRegistrationRequestDTO request, String platform);
     void completeRegistration(CompleteRegistrationRequestDTO request);
     boolean isTokenValid(String token);
     VehicleResponseDTO getDriverVehicle(Long id);

@@ -7,7 +7,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
 
     <application
@@ -20,13 +21,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ClickAndDrive"
         android:usesCleartextTraffic="true">
+
         <meta-data
             android:name="MAPBOX_ACCESS_TOKEN"
-            android:value="pk.eyJ1IjoicmliaWNuaWtvbGEiLCJhIjoiY21qbTJvNHFlMmV6OTNncXhpOGNiaTVnayJ9.Bhzo0Euk2D923K3smmoVaQ"/>
+            android:value="pk.eyJ1IjoicmliaWNuaWtvbGEiLCJhIjoiY21qbTJvNHFlMmV6OTNncXhpOGNiaTVnayJ9.Bhzo0Euk2D923K3smmoVaQ" />
+
         <activity
             android:name=".MainActivity"
-            android:windowSoftInputMode="adjustPan|stateHidden"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan|stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -40,6 +43,24 @@
                     android:scheme="clickanddrive"
                     android:host="activate-account" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".CompleteRegistration"
+            android:exported="true">
+
+            <!-- Deep link intent filter -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:scheme="https"
+                    android:host="www.clickanddrive.com"
+                    android:pathPrefix="/complete-registration"/>
+            </intent-filter>
+
         </activity>
     </application>
 

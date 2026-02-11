@@ -63,7 +63,6 @@ public class NewRideUserFormFragment extends Fragment {
     private static final VehicleType[] VEHICLE_TYPES = VehicleType.values();
 
     // HARDcODED VALUES FOR NOW
-    private static final Long TEMP_PASSENGER_ID = 5L;
     private static final double TEMP_DISTANCE_KM = 10.5;
     private static final int TEMP_DURATION_MINUTES = 25;
     private static final double TEMP_LONGITUDE = 20.44897;
