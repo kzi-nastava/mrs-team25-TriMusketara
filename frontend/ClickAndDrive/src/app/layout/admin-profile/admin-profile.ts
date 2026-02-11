@@ -24,6 +24,7 @@ export class AdminProfile {
     { label: 'Support' },
     { label: 'Reports' },
     { label: 'Notes' },
+    { label: 'Block a user', route: 'block-a-user'},
     { label: 'Log out', redText: true, logout: true }
   ];
 
