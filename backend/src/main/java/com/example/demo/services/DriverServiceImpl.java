@@ -115,25 +115,14 @@ public class DriverServiceImpl implements DriverService {
         String registrationLink;
         if (platform.equalsIgnoreCase("mobile")) {
             // Deep link android app
-            registrationLink = "clickanddrive://complete-registration?token=" + driver.getRegistrationToken();
+            registrationLink = "https://www.clickanddrive.com/complete-registration?token=" + driver.getRegistrationToken();
         } else {
             // Web app by default
             registrationLink = "http://localhost:4200/complete-registration?token=" + driver.getRegistrationToken();
         }
 
         // Sending driver email to set up password
-        EmailDetails email = new EmailDetails();
-        email.setRecipient(driver.getEmail());
-        email.setSubject("Complete your registration");
-        email.setMsgBody(
-                "Hello " + driver.getName() + ",\n\n" +
-                        "Welcome to ClickAndDrive! Please complete your registration by setting your password:\n\n" +
-                        registrationLink + "\n\n" +
-                        "This link will expire in 24 hours.\n\n" +
-                        "Best regards,\nClickAndDrive Team"
-        );
-
-        emailService.sendsSimpleMail(email);
+        emailService.sendDriverRegistrationEmail(driver, registrationLink);
 
         // Map object to response
         return new DriverRegistrationResponseDTO(

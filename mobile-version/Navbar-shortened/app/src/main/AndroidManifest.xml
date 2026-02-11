@@ -21,9 +21,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ClickAndDrive"
         android:usesCleartextTraffic="true">
-        <activity
-            android:name=".CompleteRegistration"
-            android:exported="false" />
 
         <meta-data
             android:name="MAPBOX_ACCESS_TOKEN"
@@ -38,6 +35,24 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".CompleteRegistration"
+            android:exported="true">
+
+            <!-- Deep link intent filter -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:scheme="https"
+                    android:host="www.clickanddrive.com"
+                    android:pathPrefix="/complete-registration"/>
+            </intent-filter>
+
         </activity>
     </application>
 

@@ -6,6 +6,7 @@ import com.example.clickanddrive.dtosample.responses.UserProfileResponse;
 import com.example.clickanddrive.dtosample.responses.VehicleResponse;
 
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -24,6 +25,6 @@ public interface DriverService {
 
     // Complete driver registration
     @POST("drivers/complete-registration")
-    Call<String> completeRegistration(@Body CompleteRegistrationRequest request);
+    Call<Map<String, String>> completeRegistration(@Body CompleteRegistrationRequest request);
 
 }
