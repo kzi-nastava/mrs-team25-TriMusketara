@@ -1,0 +1,39 @@
+<div class="page-wrapper">
+    <div class="inner-container">
+        <div class="container">
+            <div class="title">
+                <p>Block a User</p>
+            </div>
+            <div class="roles-btn-container">
+                <button>Drivers</button>
+                <button>Passengers</button>
+            </div>
+            <div class="card-container">
+                @for (field of fields; track field.name) {
+                <!-- set of favoriteRoutes -->
+                    <div class="card">
+                        <div class="top-card-part">
+                            <!-- The card part where we have users Name: and Lastname: -->
+                            <div class="info">
+                                <div class="user-pin"></div>
+                                <div class="user-info">
+                                    <p><b>Name:</b> {{field.name}}</p>
+                                    <p><b>Lastname:</b> {{field.lastname}}</p>
+                                </div>
+                            </div>
+                            <!-- The card part where the buttons are -->
+                            <div class="interactable">
+                                <button class="block-btn">Block</button>
+                                <button class="note-btn">Note</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="button-container">
+                <button>Previous</button>
+                <button>Next</button>
+            </div>
+        </div>
+    </div>
+</div>
