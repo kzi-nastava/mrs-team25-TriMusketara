@@ -53,7 +53,8 @@ public class SecurityConfig {
                                 "/api/guest-rides/**",
                                 "/api/rides/**",
                                 "/api/vehicles/active",                     //map view
-                                "/api/user/profile-images/**").permitAll() // login, register...
+                                "/api/user/profile-images/**",
+                                "/api/activation/**").permitAll() // login, register...
                         // PANIC endpoints - must be BEFORE anyRequest().authenticated()
                         .requestMatchers("/api/panic/**").permitAll()
                         // Admin endpoints

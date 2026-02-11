@@ -235,14 +235,21 @@ public class UserServiceImpl implements UserService {
         Passenger saved = passengerRepository.save(passenger);
 
 
-        System.out.println(saved.getEmail());
+        String activationLink;
+        if (dto.isMobile()) {
+            // URL za mobilnu aplikaciju, npr. deep link
+            activationLink = "https://abcd1234.ngrok.io/activate-account?token=" + saved.getActivationToken();
+        } else {
+            // URL za web frontend
+            activationLink = "http://localhost:4200/activate-account?token=" + saved.getActivationToken();
+        }
         EmailDetails email = new EmailDetails();
         email.setRecipient(saved.getEmail());
         email.setSubject("Activate your account");
         email.setMsgBody(
                 "Hello " + saved.getName() + ",\n\n" +
                         "Welcome to ClickAndDrive! Please complete your registration by setting your password:\n\n" +
-                        "http://localhost:4200/activate-account?token=" + saved.getActivationToken() + "\n\n" +
+                        activationLink + "\n\n" +
                         "This link will expire in 24 hours.\n\n" +
                         "Best regards,\nClickAndDrive Team"
         );
