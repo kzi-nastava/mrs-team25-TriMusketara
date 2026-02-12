@@ -403,7 +403,7 @@ public class RideServiceImpl implements RideService {
         Route route = ride.getRoute();
         route.setDestination(savedLocation);
 
-        ride.setStatus(RideStatus.FINISHED);
+        ride.setStatus(RideStatus.STOPPED);
         ride.setEndTime(LocalDateTime.now());
 
         rideRepository.save(ride);
@@ -433,7 +433,7 @@ public class RideServiceImpl implements RideService {
         Route route = guestRide.getRoute();
         route.setDestination(savedLocation);
 
-        guestRide.setStatus(RideStatus.FINISHED);
+        guestRide.setStatus(RideStatus.STOPPED);
         guestRide.setEndTime(LocalDateTime.now());
 
         guestRideRepository.save(guestRide);
@@ -460,51 +460,73 @@ public class RideServiceImpl implements RideService {
 
     @Override
     @Transactional
-    public void finishRide(Long rideId, String driverEmail, double distance) {
-        try {
+    public void finishRide(Long rideId, String driverEmail, double distance, boolean isGuest) {
+        if (isGuest) {
+            finishGuestRide(rideId, driverEmail, distance);
+        } else {
+            finishRegularRide(rideId, driverEmail, distance);
+        }
+    }
 
-            Ride ride = rideRepository.findById(rideId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride not found"));
+    private void finishRegularRide(Long rideId, String driverEmail, double distance) {
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride not found"));
 
-            if (ride.getStatus() != RideStatus.STARTED) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only started rides can be finished.");
-            }
-            ///TO-DO: find out why authorization doesn't work, for testing I'll put this here
-            System.out.println("sent:" + driverEmail + ", but in database: " +  ride.getDriver().getEmail());
-            // Ride update
-            ride.setStatus(RideStatus.FINISHED);
-            ride.setEndTime(LocalDateTime.now());
+        if (ride.getStatus() != RideStatus.STARTED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only started rides can be finished.");
+        }
 
-            // Driver update
-            Driver driver = ride.getDriver();
-            driver.setActiveRide(null);
-            driverRepository.save(driver);
+        ride.setStatus(RideStatus.FINISHED);
+        ride.setEndTime(LocalDateTime.now());
 
-            // Vehicle update
-            Vehicle vehicle = driver.getVehicle();
-            vehicle.setBusy(false);
-            vehicleRepository.save(vehicle);
-
-
-            ride.getRoute().setDistance(distance);
-            // Price calculation
-            double price = calculateRidePrice(distance, vehicle.getType());
+        Driver driver = ride.getDriver();
+        updateDriverAndVehicleAfterRide(driver, distance, ride.getRoute(), (dist, type) -> {
+            double price = calculateRidePrice(dist, type);
             ride.setPrice(price);
-
+            ride.getRoute().setDistance(dist);
             rideRepository.save(ride);
-
-            if (!ride.getDriver().getEmail().equals(driverEmail)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the driver of this ride.");
-            }
-
-
-            // Sending emails
             sendSummaryEmails(ride);
+        });
+    }
+
+    private void finishGuestRide(Long rideId, String driverEmail, double distance) {
+        GuestRide guestRide = guestRideRepository.findById(rideId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Guest ride not found"));
+
+        if (guestRide.getStatus() != RideStatus.STARTED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only started guest rides can be finished.");
         }
-        catch (Exception e) {
-            System.out.println("Error in finishRide, sending test email instead: " + e.getMessage());
-            sendSummaryEmails("makspavle@gmail.com");
-        }
+
+        guestRide.setStatus(RideStatus.FINISHED);
+        guestRide.setEndTime(LocalDateTime.now());
+
+        Driver driver = guestRide.getDriver();
+
+        //GuestRide specific logic, no emails
+        Vehicle vehicle = driver.getVehicle();
+        driver.setActiveRide(null);
+        vehicle.setBusy(false);
+
+        double price = calculateRidePrice(distance, vehicle.getType());
+        guestRide.setPrice(price);
+        guestRide.getRoute().setDistance(distance);
+
+        driverRepository.save(driver);
+        vehicleRepository.save(vehicle);
+        guestRideRepository.save(guestRide);
+    }
+
+    // Helper
+    private void updateDriverAndVehicleAfterRide(Driver driver, double distance, Route route,
+                                                 java.util.function.BiConsumer<Double, VehicleType> extraLogic) {
+        driver.setActiveRide(null);
+        driverRepository.save(driver);
+
+        Vehicle vehicle = driver.getVehicle();
+        vehicle.setBusy(false);
+        vehicleRepository.save(vehicle);
+
+        extraLogic.accept(distance, vehicle.getType());
     }
 
     private double calculateRidePrice(double distance, VehicleType vehicleType) {

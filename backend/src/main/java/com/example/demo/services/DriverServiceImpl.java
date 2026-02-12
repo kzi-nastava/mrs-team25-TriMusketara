@@ -50,7 +50,8 @@ public class DriverServiceImpl implements DriverService {
         List<DriverRideHistoryResponseDTO> dtos = new ArrayList<>();
 
         for (Ride ride : rides) {
-            if (ride.getStatus() != RideStatus.FINISHED) continue;
+            if (ride.getStatus() != RideStatus.FINISHED
+                    && ride.getStatus() != RideStatus.STOPPED) continue;
 
             // DTO Mapping
             DriverRideHistoryResponseDTO dto = getRideHistoryResponseDTO(ride);
@@ -59,7 +60,8 @@ public class DriverServiceImpl implements DriverService {
 
         List<GuestRide>  guestRides = guestRideRepository.findAllByDriverId(driverId);
         for (GuestRide guestRide : guestRides) {
-            if (guestRide.getStatus() != RideStatus.FINISHED) continue;
+            if (guestRide.getStatus() != RideStatus.FINISHED
+                    && guestRide.getStatus() != RideStatus.STOPPED) continue;
 
             DriverRideHistoryResponseDTO dto = getGuestRideHistoryResponseDTO(guestRide);
             dtos.add(dto);
@@ -76,6 +78,14 @@ public class DriverServiceImpl implements DriverService {
         dto.setEndTime(ride.getEndTime());
         dto.setTotalPrice(ride.getPrice());
         dto.setPanicPressed(ride.isPanicPressed());
+
+        /// set ride status
+        if(ride.getStatus() == RideStatus.FINISHED){
+            dto.setStatus("Completed");
+        }
+        if(ride.getStatus() == RideStatus.STOPPED){
+            dto.setStatus("Stopped");
+        }
 
         /// Check on front if this is even sent
         List<String> passengerEmails = new ArrayList<>();
@@ -110,6 +120,14 @@ public class DriverServiceImpl implements DriverService {
             dto.setOrigin(new LocationDTO(start.getLongitude(), start.getLatitude(), start.getAddress()));
             dto.setDestination(new LocationDTO(end.getLongitude(), end.getLatitude(), end.getAddress()));
         }
+
+        if(guestRide.getStatus() == RideStatus.FINISHED){
+            dto.setStatus("Completed");
+        }
+        if(guestRide.getStatus() == RideStatus.STOPPED){
+            dto.setStatus("Stopped");
+        }
+
         return dto;
     }
 

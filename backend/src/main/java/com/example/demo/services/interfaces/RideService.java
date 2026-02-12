@@ -15,7 +15,7 @@ public interface RideService {
     void panic(Long rideId);
     void startRide(Long rideId, boolean isGuest);
     void stopRide(Long rideId, RideStopRequestDTO request);
-    void finishRide(Long rideId, String driverEmail, double distance);
+    void finishRide(Long rideId, String driverEmail, double distance, boolean isGuest);
 
     InconsistencyReportResponseDTO reportInconsistency(Long id,
                                                        @Valid InconsistencyReportRequestDTO dto,

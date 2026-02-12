@@ -149,6 +149,7 @@ public class RideController {
     public ResponseEntity<Void> finishRide(@PathVariable Long id,
                                            @RequestParam(name = "distanceKm", required = false)
                                                 Double distance,
+                                           @RequestParam boolean isGuest,
                                            Authentication authentication) {
         Driver driver = (Driver) authentication.getPrincipal();
         String driverEmail = driver.getEmail();
@@ -156,7 +157,7 @@ public class RideController {
             distance = 0.0;
         }
 
-        rideService.finishRide(id, driverEmail, distance);
+        rideService.finishRide(id, driverEmail, distance, isGuest);
         return ResponseEntity.ok().build();
     }
 

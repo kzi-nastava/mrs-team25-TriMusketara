@@ -180,6 +180,10 @@ public class BackendApplication {
 					ride.setEndTime(LocalDateTime.now().minusDays(i + 1).plusMinutes(20));
 					ride.setStatus(RideStatus.FINISHED);
 
+					// Stopped only on second one
+					if(i == 1)
+						ride.setStatus(RideStatus.STOPPED);
+
 					// Passenger
 					ride.setPassengers(new ArrayList<>(List.of(passenger1)));
 

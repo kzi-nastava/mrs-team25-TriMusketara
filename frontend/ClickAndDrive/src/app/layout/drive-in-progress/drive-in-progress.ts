@@ -137,40 +137,43 @@ export class DriveInProgress implements AfterViewInit {
   if (!this.activeRide) return;
 
   try {
-    // 1. Prvo geokodiramo adrese da dobijemo sveže koordinate
     const originCoords = await this.mapService.geocodeAddress(this.activeRide.origin);
     const destCoords = await this.mapService.geocodeAddress(this.activeRide.destination);
 
-    // 2. Tražimo distancu od Mapboxa neposredno pre slanja
     this.mapService.getRouteDistanceOnly(originCoords, destCoords).subscribe({
       next: (km) => {
-        console.log('Finalna distanca za slanje:', km);
+        console.log('Finalna distanca:', km);
         
-        // 3. Šaljemo na backend
-        this.rideService.finishRide(this.activeRide.id, km).subscribe({
-          next: () => this.completeRideFlow(),
+        const isGuest = this.activeRide.guest || false;
+
+        this.rideService.finishRide(this.activeRide.id, km, isGuest).subscribe({
+          next: () => this.completeRideFlow(isGuest),
           error: (err) => {
             console.error('Greška pri završetku:', err);
-            this.completeRideFlow();
+            this.completeRideFlow(isGuest);
           }
         });
       },
       error: (err) => {
-        console.error('Nije moguće dobiti distancu, šaljem 0:', err);
-        this.rideService.finishRide(this.activeRide.id, 0).subscribe(() => this.completeRideFlow());
+        console.error('Greška sa distancom:', err);
+        const isGuest = this.activeRide.guest || false;
+        this.rideService.finishRide(this.activeRide.id, 0, isGuest).subscribe(() => this.completeRideFlow(isGuest));
       }
     });
   } catch (err) {
-    console.error('Greška u koordinatama:', err);
-    // Ako sve propadne, pošalji 0, backend će rešiti fallback
-    this.rideService.finishRide(this.activeRide.id, 0).subscribe(() => this.completeRideFlow());
+    const isGuest = this.activeRide.guest || false;
+    this.rideService.finishRide(this.activeRide.id, 0, isGuest).subscribe(() => this.completeRideFlow(isGuest));
   }
 }
 
-  private completeRideFlow() {
+  private completeRideFlow(isGuest: boolean = false) {
     this.auth.setInDrive(false);
     this.showFinishNotification.set(true);
-    alert("Ride finished! Summary sent via email.");
+    if (!isGuest) {
+      alert("Ride finished! Summary sent via email.");
+    } else {
+      alert("Ride finished! Thank you for using our service.");
+    }
     this.router.navigate(['/map']);
   }
 

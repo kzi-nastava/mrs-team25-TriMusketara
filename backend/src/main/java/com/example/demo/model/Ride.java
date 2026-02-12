@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -42,13 +43,6 @@ public class Ride {
 
     private String cancellationReason;
 
-//    @ElementCollection
-//    @CollectionTable(
-//            name = "passenger_linked_emails",
-//            joinColumns = @JoinColumn(name = "ride_id")
-//    )
-//    @Column(name = "email")
-//    private List<String> linkedPassengerEmails;
     @ManyToMany
     @JoinTable(
             name = "ride_passengers",
@@ -68,9 +62,8 @@ public class Ride {
     @ManyToMany
     private List<Location> stops;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "review_id")
-    private Review review;
+    @OneToMany(mappedBy = "ride", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "ride", cascade = CascadeType.ALL)
     private List<InconsistencyReport> inconsistencyReports;

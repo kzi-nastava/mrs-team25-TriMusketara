@@ -36,8 +36,8 @@ export class RideOrderingService {
         return this.http.post(`${this.apiUrl}/${rideId}/inconsistency-report`, { reason });
     }
 
-    finishRide(rideId: number, distanceKm: number): Observable<any> {
-    const url = `${this.apiUrl}/${rideId}/finish?distanceKm=${distanceKm}`;
+    finishRide(rideId: number, distanceKm: number, isGuest: boolean): Observable<any> {
+    const url = `${this.apiUrl}/${rideId}/finish?distanceKm=${distanceKm}&isGuest=${isGuest}`;
     
     // PUT zahtev zahteva body, pa šaljemo prazan objekat {} kao drugi parametar
     return this.http.put(url, {}); 
