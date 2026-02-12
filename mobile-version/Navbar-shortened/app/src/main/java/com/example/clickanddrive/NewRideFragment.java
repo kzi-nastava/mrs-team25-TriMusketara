@@ -27,7 +27,7 @@ public class NewRideFragment extends Fragment {
 
         if (SessionManager.currentUserType == SessionManager.GUEST) {
             // Fragment that displays new ride form for GUEST
-            formFragment = null;
+            formFragment = new NewRideGuestFormFragment();
         } else {
             formFragment = new NewRideUserFormFragment();
         }

@@ -49,7 +49,7 @@ public class MapHelper {
     public MapHelper(MapView mapView) {
         this.mapView = mapView;
         this.mainHandler = new Handler(Looper.getMainLooper());
-        initializeAnnotationManager();
+        mapView.getMapboxMap().getStyle(style -> initializeAnnotationManager());
     }
 
     private void initializeAnnotationManager() {
