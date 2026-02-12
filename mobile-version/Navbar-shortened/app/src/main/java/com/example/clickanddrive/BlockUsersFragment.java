@@ -3,62 +3,156 @@ package com.example.clickanddrive;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link BlockUsersFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class BlockUsersFragment extends Fragment {
+import com.example.clickanddrive.adapters.BlockUsersAdapter;
+import com.example.clickanddrive.dtosample.responses.UserProfileResponse;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
-    public BlockUsersFragment() {
-        // Required empty public constructor
-    }
+public class BlockUsersFragment extends Fragment implements BlockUsersAdapter.OnUserActionListener {
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment BlockUsersFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static BlockUsersFragment newInstance(String param1, String param2) {
-        BlockUsersFragment fragment = new BlockUsersFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private RecyclerView recyclerView;
+    private BlockUsersAdapter adapter;
+    private EditText searchBar;
+    private Button btnDrivers, btnPassengers;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    private List<UserProfileResponse> allUsers = new ArrayList<>();
+    private List<UserProfileResponse> filteredUsers = new ArrayList<>();
+
+    private boolean showingDrivers = true;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_block_users, container, false);
+        View view = inflater.inflate(R.layout.fragment_block_users, container, false);
+
+        initializeViews(view);
+
+        // Setup recyclerView
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new BlockUsersAdapter(filteredUsers, this);
+        recyclerView.setAdapter(adapter);
+
+        setUpToggleButtons();
+
+        // Search functionality
+        setUpSearch();
+
+        loadDrivers();
+
+        return view;
+
+    }
+
+    private void initializeViews(View view) {
+        recyclerView = view.findViewById(R.id.users_recycler_view);
+        searchBar = view.findViewById(R.id.search_bar);
+        btnDrivers = view.findViewById(R.id.btn_drivers);
+        btnPassengers = view.findViewById(R.id.btn_passengers);
+    }
+
+    private void setUpToggleButtons() {
+        // Drivers button click
+        btnDrivers.setOnClickListener(v -> {
+            if (!showingDrivers) {
+                showingDrivers = true;
+                //...
+                loadDrivers();
+            }
+        });
+
+        // Passengers button click
+        btnPassengers.setOnClickListener(v -> {
+            if (showingDrivers) {
+                showingDrivers = false;
+                //...
+                loadPassengers();
+            }
+        });
+    }
+
+    private void setUpSearch() {
+        searchBar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterUsers(s.toString());
+            }
+        });
+    }
+
+    private void filterUsers(String query) {
+        filteredUsers.clear();
+
+        if (query.isEmpty()) {
+            filteredUsers.addAll(allUsers);
+        } else {
+            for (UserProfileResponse user : allUsers) {
+                String fullName = (user.getName() + " " + user.getSurname()).toLowerCase();
+                if (fullName.contains(query.toLowerCase())) {
+                    filteredUsers.add(user);
+                }
+            }
+        }
+
+        adapter.updateList(filteredUsers);
+    }
+
+    @Override
+    public void onBlockClick(UserProfileResponse user) {
+        Toast.makeText(getContext(), "Block user: " + user.getName() + " " + user.getSurname(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onNoteClick(UserProfileResponse user) {
+        Toast.makeText(getContext(), "Add note for: " + user.getName() + " " + user.getSurname(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onUserClick(UserProfileResponse user) {
+        Toast.makeText(getContext(), "View details: " + user.getName() + " " + user.getSurname(), Toast.LENGTH_SHORT).show();
+    }
+
+    private void loadDrivers() {
+        // mock
+        allUsers.clear();
+        allUsers.add(new UserProfileResponse(1L, "driver1@test.com", "Marko", "Marković", "Beograd", "0601234567", null));
+        allUsers.add(new UserProfileResponse(2L, "driver2@test.com", "Petar", "Petrović", "Novi Sad", "0607654321", null));
+        allUsers.add(new UserProfileResponse(3L, "driver3@test.com", "Jovan", "Jovanović", "Niš", "0609876543", null));
+
+        filteredUsers.clear();
+        filteredUsers.addAll(allUsers);
+        adapter.updateList(filteredUsers);
+    }
+
+    private void loadPassengers() {
+        // mock
+        allUsers.clear();
+        allUsers.add(new UserProfileResponse(4L, "passenger1@test.com", "Ana", "Anić", "Beograd", "0611234567", null));
+        allUsers.add(new UserProfileResponse(5L, "passenger2@test.com", "Milica", "Milić", "Subotica", "0617654321", null));
+
+        filteredUsers.clear();
+        filteredUsers.addAll(allUsers);
+        adapter.updateList(filteredUsers);
     }
 }

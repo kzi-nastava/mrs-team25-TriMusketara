@@ -11,51 +11,80 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:padding="14dp">
 
-        <ImageView
-            android:id="@+id/user_avatar"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/no_profile_picture"
-            android:background="@drawable/circle_background"
-            android:padding="8dp"
-            app:tint="@color/profile_bg"/>
-
-        <TextView
-            android:ud="@+id/user_name"
-            android:layout_width="0dp"
+        <!-- Top horizontal -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="12dp"
-            android:text="Name Lastname"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/whiteish"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <!-- Block button -->
-        <Button
-            android:id="@+id/btn_block"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Block"
-            android:textColor="@android:color/white"
-            android:backgroundTint="#E74C3C"
-            android:layout_marginEnd="8dp"
-            style="?attr/materialButtonStyle"/>
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/user_avatar"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="14dp"
+                android:background="@drawable/circle_background"
+                android:src="@drawable/no_profile_picture"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/CircleImageView"
+                app:strokeColor="@color/nav_bg"
+                app:strokeWidth="0dp"/>
 
-        <!-- Note button -->
-        <Button
-            android:id="@+id/btn_note"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/user_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="16dp"
+                android:text="Name Lastname"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/whiteish"/>
+        </LinearLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="@color/whiteish"
+            android:alpha="0.5"/>
+
+        <!-- Bottom horizontal -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Note"
-            android:textColor="@android:color/white"
-            android:backgroundTint="#F39C12"
-            android:layout_marginEnd="8dp"
-            style="?attr/materialButtonStyle"/>
+            android:orientation="horizontal"
+            android:gravity="center_horizontal">
+
+            <!-- Block button -->
+            <Button
+                android:id="@+id/btn_block"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Block"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#E74C3C"
+                android:layout_marginEnd="8dp"
+                style="?attr/materialButtonStyle"/>
+
+            <!-- Note button -->
+            <Button
+                android:id="@+id/btn_note"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Note"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#F39C12"
+                android:layout_marginEnd="8dp"
+                style="?attr/materialButtonStyle"/>
+        </LinearLayout>
 
     </LinearLayout>
 

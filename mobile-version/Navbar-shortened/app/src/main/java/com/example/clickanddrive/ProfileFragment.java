@@ -388,7 +388,7 @@ public class ProfileFragment extends Fragment {
                 addButton("Ride history", R.drawable.history, () -> {});
                 addButton("Requests", 0,  () -> {});
                 addButton("Reports", R.drawable.report,  () -> {});
-                addButton("Notes", R.drawable.notes,  () -> {});
+                addButton("Block a user", R.drawable.notes,  () -> openBlockAUserFragment());
                 addButton("Log out", R.drawable.logout, () -> {
                     if (isAdded() && getActivity() instanceof MainActivity) {
                         ((MainActivity) getActivity()).logoutAndGoToLoginSafe();
@@ -466,4 +466,11 @@ public class ProfileFragment extends Fragment {
         requireActivity().getSupportFragmentManager()
                 .beginTransaction().replace(R.id.flFragment, fragment).addToBackStack(null).commit();
     }
+
+    private void openBlockAUserFragment() {
+        BlockUsersFragment fragment = new BlockUsersFragment();
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction().replace(R.id.flFragment, fragment).addToBackStack(null).commit();
+    }
+
 }
