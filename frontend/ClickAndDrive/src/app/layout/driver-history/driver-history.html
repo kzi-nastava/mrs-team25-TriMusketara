@@ -58,7 +58,7 @@
             </td>
             <td>{{ ride.startTime | date:'MM/dd/yyyy' }}</td>
             <td><button class="btn-details">Details</button></td>
-            <td><span class="badge badge-completed">Completed</span></td>
+            <td><span class="badge" [ngClass]="ride.status === 'Completed' ? 'badge-completed' : 'badge-stopped'">{{ ride.status }}</span></td>
           </tr>
           <tr *ngIf="rides.length === 0">
             <td colspan="7" style="text-align: center;">No drives found for selected range.</td>

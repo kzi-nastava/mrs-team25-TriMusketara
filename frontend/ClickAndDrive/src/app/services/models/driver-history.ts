@@ -8,4 +8,5 @@ export interface DriverRideHistory{
     totalPrice: number;
     passengerEmails: string[];
     panicPressed: boolean;
+    status: string;
 }

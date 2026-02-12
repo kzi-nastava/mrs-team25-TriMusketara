@@ -11,10 +11,7 @@ import com.example.demo.model.EmailDetails;
 import com.example.demo.model.Vehicle;
 import com.example.demo.dto.response.DriverRideHistoryResponseDTO;
 import com.example.demo.model.*;
-import com.example.demo.repositories.DriverRepository;
-import com.example.demo.repositories.RideRepository;
-import com.example.demo.repositories.UserRepository;
-import com.example.demo.repositories.VehicleRepository;
+import com.example.demo.repositories.*;
 import com.example.demo.services.interfaces.DriverService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
@@ -25,7 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -41,6 +37,7 @@ public class DriverServiceImpl implements DriverService {
     private final PasswordEncoder passwordEncoder;
     private final RideRepository rideRepository;
     private final UserRepository userRepository;
+    private final GuestRideRepository guestRideRepository;
 
     @Override
     public List<DriverRideHistoryResponseDTO> getDriverRideHistory(Long driverId) {
@@ -53,26 +50,85 @@ public class DriverServiceImpl implements DriverService {
         List<DriverRideHistoryResponseDTO> dtos = new ArrayList<>();
 
         for (Ride ride : rides) {
-            if (ride.getStatus() != RideStatus.FINISHED) continue;
+            if (ride.getStatus() != RideStatus.FINISHED
+                    && ride.getStatus() != RideStatus.STOPPED) continue;
 
             // DTO Mapping
-            DriverRideHistoryResponseDTO dto = new DriverRideHistoryResponseDTO();
-            dto.setId(ride.getId());
-            dto.setStartTime(ride.getStartTime());
-            dto.setEndTime(ride.getEndTime());
-            dto.setTotalPrice(ride.getPrice());
-            dto.setPanicPressed(ride.isPanicPressed());
-
-            if (ride.getRoute() != null) {
-                Location start = ride.getRoute().getOrigin();
-                Location end = ride.getRoute().getDestination();
-                dto.setOrigin(new LocationDTO(start.getLongitude(), start.getLatitude(), start.getAddress()));
-                dto.setDestination(new LocationDTO(end.getLongitude(), end.getLatitude(), end.getAddress()));
-            }
+            DriverRideHistoryResponseDTO dto = getRideHistoryResponseDTO(ride);
             dtos.add(dto);
         }
-        /// TO-DO: Add GuestRides too
+
+        List<GuestRide>  guestRides = guestRideRepository.findAllByDriverId(driverId);
+        for (GuestRide guestRide : guestRides) {
+            if (guestRide.getStatus() != RideStatus.FINISHED
+                    && guestRide.getStatus() != RideStatus.STOPPED) continue;
+
+            DriverRideHistoryResponseDTO dto = getGuestRideHistoryResponseDTO(guestRide);
+            dtos.add(dto);
+
+        }
+
         return dtos;
+    }
+
+    private static DriverRideHistoryResponseDTO getRideHistoryResponseDTO(Ride ride) {
+        DriverRideHistoryResponseDTO dto = new DriverRideHistoryResponseDTO();
+        dto.setId(ride.getId());
+        dto.setStartTime(ride.getStartTime());
+        dto.setEndTime(ride.getEndTime());
+        dto.setTotalPrice(ride.getPrice());
+        dto.setPanicPressed(ride.isPanicPressed());
+
+        /// set ride status
+        if(ride.getStatus() == RideStatus.FINISHED){
+            dto.setStatus("Completed");
+        }
+        if(ride.getStatus() == RideStatus.STOPPED){
+            dto.setStatus("Stopped");
+        }
+
+        /// Check on front if this is even sent
+        List<String> passengerEmails = new ArrayList<>();
+        for(Passenger p : ride.getPassengers()) {
+            passengerEmails.add(p.getEmail());
+        }
+
+        dto.setPassengerEmails(passengerEmails);
+
+        if (ride.getRoute() != null) {
+            Location start = ride.getRoute().getOrigin();
+            Location end = ride.getRoute().getDestination();
+            dto.setOrigin(new LocationDTO(start.getLongitude(), start.getLatitude(), start.getAddress()));
+            dto.setDestination(new LocationDTO(end.getLongitude(), end.getLatitude(), end.getAddress()));
+        }
+        return dto;
+    }
+
+    private static DriverRideHistoryResponseDTO getGuestRideHistoryResponseDTO(GuestRide guestRide) {
+        DriverRideHistoryResponseDTO dto = new DriverRideHistoryResponseDTO();
+        dto.setId(guestRide.getId());
+        dto.setStartTime(guestRide.getStartTime());
+        dto.setEndTime(guestRide.getEndTime());
+        dto.setTotalPrice(guestRide.getPrice());
+        dto.setPanicPressed(false);
+
+        // Guest can't add passenger emails, so it will be null here
+
+        if(guestRide.getRoute() != null) {
+            Location start = guestRide.getRoute().getOrigin();
+            Location end = guestRide.getRoute().getDestination();
+            dto.setOrigin(new LocationDTO(start.getLongitude(), start.getLatitude(), start.getAddress()));
+            dto.setDestination(new LocationDTO(end.getLongitude(), end.getLatitude(), end.getAddress()));
+        }
+
+        if(guestRide.getStatus() == RideStatus.FINISHED){
+            dto.setStatus("Completed");
+        }
+        if(guestRide.getStatus() == RideStatus.STOPPED){
+            dto.setStatus("Stopped");
+        }
+
+        return dto;
     }
 
     @Override

@@ -8,6 +8,8 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { switchMap } from 'rxjs/internal/operators/switchMap';
 import { startWith } from 'rxjs/internal/operators/startWith';
 import { interval } from 'rxjs/internal/observable/interval';
+import { map } from 'rxjs/internal/operators/map';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Component({
   selector: 'app-map-view',

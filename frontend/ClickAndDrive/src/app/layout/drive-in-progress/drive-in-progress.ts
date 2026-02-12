@@ -4,6 +4,7 @@ import { RouterOutlet, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { Map } from '../../services/map';
 import { RideOrderingService } from '../../services/ride.service';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-drive-in-progress',
@@ -120,23 +121,59 @@ export class DriveInProgress implements AfterViewInit {
 
   // onFinishDriver() {
   //   if (!this.activeRide) return;
+  // calcDistance(origin: string, destination: string): number {
+  //   const coords1 = this.mapService.geocodeAddress(origin);
+  //   const coords2 = this.mapService.geocodeAddress(destination);
+
+  //   if (!coords1 || !coords2) {
+  //     console.error('Failed to geocode addresses for distance calculation');
+  //     return 0;
+  //   }
 
 
-  onFinishDriver() {
-    if (!this.activeRide) return;
+  // }
 
-    this.rideService.finishRide(this.activeRide.id).subscribe({
-      next: () => this.completeRideFlow(),
-      error: () => {
-        this.completeRideFlow();
+  async onFinishDriver() {
+  if (!this.activeRide) return;
+
+  try {
+    const originCoords = await this.mapService.geocodeAddress(this.activeRide.origin);
+    const destCoords = await this.mapService.geocodeAddress(this.activeRide.destination);
+
+    this.mapService.getRouteDistanceOnly(originCoords, destCoords).subscribe({
+      next: (km) => {
+        console.log('Finalna distanca:', km);
+        
+        const isGuest = this.activeRide.guest || false;
+
+        this.rideService.finishRide(this.activeRide.id, km, isGuest).subscribe({
+          next: () => this.completeRideFlow(isGuest),
+          error: (err) => {
+            console.error('Greška pri završetku:', err);
+            this.completeRideFlow(isGuest);
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Greška sa distancom:', err);
+        const isGuest = this.activeRide.guest || false;
+        this.rideService.finishRide(this.activeRide.id, 0, isGuest).subscribe(() => this.completeRideFlow(isGuest));
       }
     });
+  } catch (err) {
+    const isGuest = this.activeRide.guest || false;
+    this.rideService.finishRide(this.activeRide.id, 0, isGuest).subscribe(() => this.completeRideFlow(isGuest));
   }
+}
 
-  private completeRideFlow() {
+  private completeRideFlow(isGuest: boolean = false) {
     this.auth.setInDrive(false);
     this.showFinishNotification.set(true);
-    alert("Ride finished! Summary sent via email.");
+    if (!isGuest) {
+      alert("Ride finished! Summary sent via email.");
+    } else {
+      alert("Ride finished! Thank you for using our service.");
+    }
     this.router.navigate(['/map']);
   }
 

@@ -147,11 +147,17 @@ public class RideController {
     @PutMapping("/{id}/finish")
     @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<Void> finishRide(@PathVariable Long id,
+                                           @RequestParam(name = "distanceKm", required = false)
+                                                Double distance,
+                                           @RequestParam boolean isGuest,
                                            Authentication authentication) {
         Driver driver = (Driver) authentication.getPrincipal();
         String driverEmail = driver.getEmail();
+        if(distance == null) {
+            distance = 0.0;
+        }
 
-        rideService.finishRide(id, driverEmail);
+        rideService.finishRide(id, driverEmail, distance, isGuest);
         return ResponseEntity.ok().build();
     }
 

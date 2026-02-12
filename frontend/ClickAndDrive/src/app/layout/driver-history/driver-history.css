@@ -149,12 +149,12 @@
     min-width: 200px;
 }
 
-.badge-cancelled, .badge-panic-yes {
+.badge-stopped, .badge-panic-yes {
     background: #F55C5C; /* Red */
     color: #E7E7E7;
 }
 
-.badge-cancelled {
+.badge-stopped {
     background: #F55C5C; /* Red */
     color: #E7E7E7;
     min-width: 200px;

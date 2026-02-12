@@ -1,6 +1,7 @@
 package com.example.demo.dto.response;
 
 import com.example.demo.dto.LocationDTO;
+import com.example.demo.model.RideStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,4 +25,6 @@ public class DriverRideHistoryResponseDTO {
 
     private List<String> passengerEmails;
     private boolean panicPressed;
+
+    private String status;
 }
