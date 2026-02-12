@@ -21,8 +21,6 @@ public class BlockUsersAdapter extends RecyclerView.Adapter<BlockUsersAdapter.Us
     private OnUserActionListener listener;
 
     public interface OnUserActionListener {
-        void onBlockClick(UserProfileResponse user);
-        void onNoteClick(UserProfileResponse user);
         void onUserClick(UserProfileResponse user);
     }
 
@@ -48,21 +46,10 @@ public class BlockUsersAdapter extends RecyclerView.Adapter<BlockUsersAdapter.Us
         holder.userName.setText(fullName);
 
         // Load image
+        //...
 
-        // Block button
-        holder.btnBlock.setOnClickListener(v -> {
-            if (listener != null) {
-                // Call backend function
-                listener.onBlockClick(user);
-            }
-        });
-
-        // Note button
-        holder.btnNote.setOnClickListener(v -> {
-            if (listener != null) {
-                // Call backend function
-                listener.onNoteClick(user);
-            }
+        holder.itemView.setOnClickListener(v -> {
+            listener.onUserClick(user);
         });
     }
 
@@ -79,15 +66,11 @@ public class BlockUsersAdapter extends RecyclerView.Adapter<BlockUsersAdapter.Us
     static class UserViewHolder extends RecyclerView.ViewHolder {
         ImageView userAvatar;
         TextView userName;
-        Button btnBlock;
-        Button btnNote;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             userAvatar = itemView.findViewById(R.id.user_avatar);
             userName = itemView.findViewById(R.id.user_name);
-            btnBlock = itemView.findViewById(R.id.btn_block);
-            btnNote = itemView.findViewById(R.id.btn_note);
         }
     }
 }

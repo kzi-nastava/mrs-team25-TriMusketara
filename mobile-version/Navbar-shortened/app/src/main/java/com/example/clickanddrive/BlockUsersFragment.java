@@ -119,18 +119,15 @@ public class BlockUsersFragment extends Fragment implements BlockUsersAdapter.On
     }
 
     @Override
-    public void onBlockClick(UserProfileResponse user) {
-        Toast.makeText(getContext(), "Block user: " + user.getName() + " " + user.getSurname(), Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onNoteClick(UserProfileResponse user) {
-        Toast.makeText(getContext(), "Add note for: " + user.getName() + " " + user.getSurname(), Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
     public void onUserClick(UserProfileResponse user) {
-        Toast.makeText(getContext(), "View details: " + user.getName() + " " + user.getSurname(), Toast.LENGTH_SHORT).show();
+        BlockAUserBottomSheet sheet = BlockAUserBottomSheet.newInstance(
+                user.getName(),
+                user.getSurname(),
+                user.getAddress(),
+                user.getEmail(),
+                user.getPhone()
+        );
+        sheet.show(getChildFragmentManager(), "admin_block_sheet");
     }
 
     private void loadDrivers() {

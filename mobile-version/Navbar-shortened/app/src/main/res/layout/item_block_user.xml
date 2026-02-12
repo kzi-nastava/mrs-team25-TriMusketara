@@ -44,48 +44,6 @@
                 android:textStyle="bold"
                 android:textColor="@color/whiteish"/>
         </LinearLayout>
-
-        <!-- Divider -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
-            android:background="@color/whiteish"
-            android:alpha="0.5"/>
-
-        <!-- Bottom horizontal -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_horizontal">
-
-            <!-- Block button -->
-            <Button
-                android:id="@+id/btn_block"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Block"
-                android:textColor="@android:color/white"
-                android:backgroundTint="#E74C3C"
-                android:layout_marginEnd="8dp"
-                style="?attr/materialButtonStyle"/>
-
-            <!-- Note button -->
-            <Button
-                android:id="@+id/btn_note"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Note"
-                android:textColor="@android:color/white"
-                android:backgroundTint="#F39C12"
-                android:layout_marginEnd="8dp"
-                style="?attr/materialButtonStyle"/>
-        </LinearLayout>
-
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
