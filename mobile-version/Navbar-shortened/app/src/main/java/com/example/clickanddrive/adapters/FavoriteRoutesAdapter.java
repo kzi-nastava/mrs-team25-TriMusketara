@@ -13,19 +13,21 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.clickanddrive.OnRouteClickListener;
 import com.example.clickanddrive.R;
-import com.example.clickanddrive.dtosample.FavoriteRouteSampleDTO;
+import com.example.clickanddrive.dtosample.responses.RouteFromFavoritesResponse;
 
 import java.util.List;
 
 public class FavoriteRoutesAdapter extends RecyclerView.Adapter<FavoriteRoutesAdapter.RouteViewHolder> {
 
     // List of users favorite routes
-    private List<FavoriteRouteSampleDTO> favRoutes;
+    private List<RouteFromFavoritesResponse> favRoutes;
     private OnRouteClickListener listener;
+    private OnFavoriteToggleListener favoriteToggleListener;
 
-    public FavoriteRoutesAdapter(List<FavoriteRouteSampleDTO> routes, OnRouteClickListener listener) {
+    public FavoriteRoutesAdapter(List<RouteFromFavoritesResponse> routes, OnRouteClickListener listener, OnFavoriteToggleListener favoriteToggleListener) {
         this.favRoutes = routes;
         this.listener = listener;
+        this.favoriteToggleListener = favoriteToggleListener;
     }
 
     @NonNull
@@ -37,27 +39,26 @@ public class FavoriteRoutesAdapter extends RecyclerView.Adapter<FavoriteRoutesAd
 
     @Override
     public void onBindViewHolder(@NonNull RouteViewHolder holder, int position) {
-        FavoriteRouteSampleDTO route = favRoutes.get(position);
+        RouteFromFavoritesResponse route = favRoutes.get(position);
 
-        holder.title.setText(route.getRouteTitle());
-        holder.distance.setText(route.getDistance());
-        holder.duration.setText(route.getDuration());
+        String routeTitle = route.getOrigin().getAddress() + " - " + route.getDestination().getAddress();
+        holder.title.setText(routeTitle);
+
+        holder.distance.setText(String.format("%.1f km", route.getDistance()));
+        holder.duration.setText(String.format("%.1f min", route.getDuration()));
         holder.used.setText(route.getTimesUsed() + "x");
+        holder.favoriteBtn.setImageResource(R.drawable.heart_full_red);
 
-        if(route.isFavorite()) {
-            holder.favoriteBtn.setImageResource(R.drawable.heart_full_red);
-        } else {
-            holder.favoriteBtn.setImageResource(R.drawable.heart);
-        }
-
-        // Favorite button listener
-        // For now only change icon style
+        // Button listeners
         holder.favoriteBtn.setOnClickListener(v -> {
-            route.setFavorite(!route.isFavorite()); // Change state
-            notifyItemChanged(position); // Refresh only this card
+            if (favoriteToggleListener != null) {
+                // Send routeId and position
+                favoriteToggleListener.onFavoriteToggle(route.getId(), position);
+            }
         });
 
-        holder.itemView.setOnClickListener(v -> { // itemView = card
+        // Listener for bottom sheet
+        holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onRouteClick(route);
             }
@@ -67,6 +68,20 @@ public class FavoriteRoutesAdapter extends RecyclerView.Adapter<FavoriteRoutesAd
     @Override
     public int getItemCount() {
         return favRoutes.size();
+    }
+
+    // For removing a route from favorites
+    // Called upon after successful API call to backend
+    public void removeItem(int position) {
+        favRoutes.remove(position);
+        notifyItemRemoved(position);
+        // Refresh
+        notifyItemRangeChanged(position, favRoutes.size());
+    }
+
+    public void updateRoutes(List<RouteFromFavoritesResponse> newRoutes) {
+        this.favRoutes = newRoutes;
+        notifyDataSetChanged();
     }
 
     static class RouteViewHolder extends RecyclerView.ViewHolder {
@@ -83,4 +98,9 @@ public class FavoriteRoutesAdapter extends RecyclerView.Adapter<FavoriteRoutesAd
             favoriteBtn = itemView.findViewById(R.id.btn_favorite);
         }
     }
+
+    public interface OnFavoriteToggleListener {
+        void onFavoriteToggle(Long routeId, int position);
+    }
+
 }
