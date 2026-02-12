@@ -11,21 +11,28 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.clickanddrive.dtosample.responses.RouteFromFavoritesResponse;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class FavoriteRouteBottomSheet extends BottomSheetDialogFragment {
 
-    public static FavoriteRouteBottomSheet newInstance(String from, String to, String distance, String duration,
-                                                       int timesUsed) {
+    public static FavoriteRouteBottomSheet newInstance(RouteFromFavoritesResponse route) {
 
         FavoriteRouteBottomSheet sheet = new FavoriteRouteBottomSheet();
         Bundle args = new Bundle();
 
-        args.putString("from", from);
-        args.putString("to", to);
-        args.putString("distance", distance);
-        args.putString("duration", duration);
-        args.putInt("timesUsed", timesUsed);
+        args.putLong("routeId", route.getId());
+        args.putString("origin", route.getOrigin().getAddress());
+        args.putString("destination", route.getDestination().getAddress());
+        args.putDouble("distance", route.getDistance());
+        args.putInt("duration", route.getDuration());
+        args.putInt("timesUsed", route.getTimesUsed());
+
+        // Save and coords for later use
+        args.putDouble("originLat", route.getOrigin().getLatitude());
+        args.putDouble("originLng", route.getOrigin().getLongitude());
+        args.putDouble("destLat", route.getDestination().getLatitude());
+        args.putDouble("destLng", route.getDestination().getLongitude());
 
         sheet.setArguments(args);
         return sheet;
@@ -52,15 +59,16 @@ public class FavoriteRouteBottomSheet extends BottomSheetDialogFragment {
         Button orderAgainBtn = view.findViewById(R.id.btn_order_again);
 
         if (getArguments() != null) {
-            String from = getArguments().getString("from");
-            String to = getArguments().getString("to");
-            String distance = getArguments().getString("distance");
-            String duration = getArguments().getString("duration");
+            Long routeId = getArguments().getLong("routeId");
+            String from = getArguments().getString("origin");
+            String to = getArguments().getString("destination");
+            double distance = getArguments().getDouble("distance");
+            int duration = getArguments().getInt("duration");
             int usageCount = getArguments().getInt("timesUsed");
 
             routeTitle.setText(from + " - " + to);
-            distanceTv.setText(distance);
-            durationTv.setText(duration);
+            distanceTv.setText(String.format("%.1f", distance));
+            durationTv.setText(String.format("%d min", duration));
             usageTv.setText(usageCount + "x");
         }
 

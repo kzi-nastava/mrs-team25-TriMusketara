@@ -45,7 +45,7 @@ public class FavoriteRoutesAdapter extends RecyclerView.Adapter<FavoriteRoutesAd
         holder.title.setText(routeTitle);
 
         holder.distance.setText(String.format("%.1f km", route.getDistance()));
-        holder.duration.setText(String.format("%.1f min", route.getDuration()));
+        holder.duration.setText(String.format("%d min", route.getDuration()));
         holder.used.setText(route.getTimesUsed() + "x");
         holder.favoriteBtn.setImageResource(R.drawable.heart_full_red);
 
