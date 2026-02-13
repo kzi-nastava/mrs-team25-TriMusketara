@@ -251,7 +251,7 @@ describe('validateForm', () => {
       
     expect(component.fieldErrors['fname']).toBe('Field should contain letters only');
     expect(component.fieldErrors['email']).toBe('Invalid email format');
-    expect(component.fieldErrors['mobile']).toBe('Inavlid mobile format');
+    expect(component.fieldErrors['mobile']).toBe('Invalid mobile format');
   });
 });
 

@@ -98,7 +98,7 @@ export class DriverRegistration {
     // Mobile
     if (label === 'mobile' && value) {
       if (!this.isValidMobile(value)) {
-        this.fieldErrors[label] = 'Inavlid mobile format';
+        this.fieldErrors[label] = 'Invalid mobile format';
         return false;
       }
     }
