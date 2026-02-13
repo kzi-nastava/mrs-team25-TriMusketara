@@ -28,6 +28,7 @@ import com.example.clickanddrive.dtosample.responses.RideResponse;
 import com.example.clickanddrive.map.MapboxDirections;
 import com.example.clickanddrive.map.MapboxGeocoder;
 import com.example.clickanddrive.models.RouteData;
+import com.example.clickanddrive.models.RouteCalculator;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.time.LocalDateTime;
@@ -65,9 +66,15 @@ public class NewRideUserFormFragment extends Fragment {
     // Vehicle types
     private static final VehicleType[] VEHICLE_TYPES = VehicleType.values();
 
-    // Mapbox services
-    private MapboxGeocoder geocoder;
-    private MapboxDirections directions;
+    // Service for route calculation
+    private RouteCalculator routeCalculator;
+
+    // Data from favored route if a user orders from favorites
+    private boolean isFromFavorite = false;
+    private Double prefilledOriginLat = null;
+    private Double prefilledOriginLng = null;
+    private Double prefilledDestLat = null;
+    private Double prefilledDestLng = null;
 
     @Nullable
     @Override
@@ -80,12 +87,13 @@ public class NewRideUserFormFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceBundle) {
         super.onViewCreated(view, savedInstanceBundle);
 
-        geocoder = new MapboxGeocoder();
-        directions = new MapboxDirections();
+        routeCalculator = new RouteCalculator();
 
         initializeViews(view);
         setUpVehicleTypeSpinner();
         setUpButtonListeners();
+
+        checkForPrefillData();
     }
 
     // Initialize views (find by id)
@@ -102,6 +110,28 @@ public class NewRideUserFormFragment extends Fragment {
         btnLinkedPassengers = view.findViewById(R.id.btn_linked_passengers);
         btnSetTime = view.findViewById(R.id.btn_set_time);
         btnScheduleRide = view.findViewById(R.id.btn_schedule_ride);
+    }
+
+    private void checkForPrefillData() {
+        Bundle args = getArguments();
+        if (args == null) {
+            return;
+        }
+
+        if (args.containsKey("PREFILL_ORIGIN")) {
+            String origin = args.getString("PREFILL_ORIGIN");
+            String destination = args.getString("PREFILL_DESTINATION");
+
+            prefilledOriginLat = args.getDouble("PREFILL_ORIGIN_LAT", 0.0);
+            prefilledOriginLng = args.getDouble("PREFILL_ORIGIN_LNG", 0.0);
+            prefilledDestLat = args.getDouble("PREFILL_DEST_LAT", 0.0);
+            prefilledDestLng = args.getDouble("PREFILL_DEST_LNG", 0.0);
+
+            isFromFavorite = true;
+
+            etOrigin.setText(origin);
+            etDestination.setText(destination);
+        }
     }
 
     private void setUpVehicleTypeSpinner() {
@@ -264,177 +294,59 @@ public class NewRideUserFormFragment extends Fragment {
         if (!validateInput()) {
             return;
         }
-
         btnScheduleRide.setEnabled(false);
         btnScheduleRide.setText("Processing...");
 
         String origin = etOrigin.getText().toString().trim();
         String destination = etDestination.getText().toString().trim();
 
-        // Geocode origin and destination
-        geocodeAddresses(origin, destination);
-    }
-
-    private void geocodeAddresses(String origin, String destination) {
-        final double[] originCoords = new double[2];
-        final double[] destCoords = new double[2];
-        final AtomicInteger completedGeocodes = new AtomicInteger(0);
-
-        // Geocode origin
-        geocoder.geocode(origin, new MapboxGeocoder.GeocodeCallback() {
-            @Override
-            public void onSuccess(double lng, double lat) {
-                originCoords[0] = lng;
-                originCoords[1] = lat;
-
-                if (completedGeocodes.incrementAndGet() == 2) {
-                    geocodeStops(origin, destination, originCoords, destCoords);
-                }
-            }
-
-            @Override
-            public void onError(String error) {
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> {
-                        Toast.makeText(getContext(), "Failed to geocode origin: " + error, Toast.LENGTH_LONG).show();
-                        resetScheduleButton();
-                    });
-                }
-            }
-        });
-
-        // Geocode destination
-        geocoder.geocode(destination, new MapboxGeocoder.GeocodeCallback() {
-            @Override
-            public void onSuccess(double lng, double lat) {
-                System.out.println("Destination geocoded: [" + lng + ", " + lat + "]");
-                destCoords[0] = lng;
-                destCoords[1] = lat;
-
-                if (completedGeocodes.incrementAndGet() == 2) {
-                    geocodeStops(origin, destination, originCoords, destCoords);
-                }
-            }
-
-            @Override
-            public void onError(String error) {
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> {
-                        Toast.makeText(getContext(), "Failed to geocode destination: " + error, Toast.LENGTH_LONG).show();
-                        resetScheduleButton();
-                    });
-                }
-            }
-        });
-    }
-
-    private void geocodeStops(String origin, String destination, double[] originCoords, double[] destCoords) {
-        // No additional stops
-        if (additionalStops.isEmpty()) {
-            calculateRoute(origin, destination, originCoords, destCoords, new ArrayList<>());
-            return;
-        }
-
-        List<LocationDTO> stopLocations = new ArrayList<>();
-        AtomicInteger completedStops = new AtomicInteger(0);
-        int totalStops = additionalStops.size();
-
-        for (int i = 0; i < additionalStops.size(); i++) {
-            String stopAddress = additionalStops.get(i);
-            final int index = i;
-
-            geocoder.geocode(stopAddress, new MapboxGeocoder.GeocodeCallback() {
-                @Override
-                public void onSuccess(double lng, double lat) {
-                    System.out.println("Stop " + index + " geocoded: [" + lng + ", " + lat + "]");
-
-                    synchronized (stopLocations) {
-                        stopLocations.add(new LocationDTO(lng, lat, stopAddress));
+        // Route calculation service
+        routeCalculator.calculateRoute(origin,
+                destination,
+                additionalStops,
+                prefilledOriginLng,
+                prefilledOriginLat,
+                prefilledDestLng,
+                prefilledDestLat,
+                new RouteCalculator.RouteCalculationCallback() {
+                    @Override
+                    public void onSuccess(RouteCalculator.RouteCalculationResult result) {
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                createAndSendRide(result);
+                            });
+                        }
                     }
 
-                    // Check geocoding of stops
-                    if (completedStops.incrementAndGet() == totalStops) {
-                        calculateRoute(origin, destination, originCoords, destCoords, stopLocations);
+                    @Override
+                    public void onError(String error) {
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
+                                resetScheduleButton();
+                            });
+                        }
                     }
-                }
-
-                @Override
-                public void onError(String error) {
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(() -> {
-                            Toast.makeText(getContext(), "Failed to geocode stop '" + stopAddress + "': " + error, Toast.LENGTH_LONG).show();
-                            resetScheduleButton();
-                        });
-                    }
-                }
-            });
-        }
+                });
     }
 
-    private void calculateRoute(String origin, String destination, double[] originCoords, double[] destCoords, List<LocationDTO> stopLocations) {
-
-        // List of coordinates
-        List<MapboxDirections.Coordinate> waypoints = new ArrayList<>();
-
-        // Add origin
-        waypoints.add(new MapboxDirections.Coordinate(originCoords[0], originCoords[1]));
-
-        // Add stops if there are any
-        for (LocationDTO stop : stopLocations) {
-            waypoints.add(new MapboxDirections.Coordinate(stop.getLongitude(), stop.getLatitude()));
-        }
-
-        // Add destination
-        waypoints.add(new MapboxDirections.Coordinate(destCoords[0], destCoords[1]));
-
-        // Call API
-        directions.getRoute(waypoints, new MapboxDirections.DirectionsCallback() {
-            @Override
-            public void onSuccess(MapboxDirections.RouteResult result) {
-                System.out.println("Route calculated: " + result.distanceKm + " km, " + result.durationMinutes + " min");
-
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> {
-                        createRideWithRealData(
-                                origin, destination,
-                                originCoords, destCoords,
-                                stopLocations,
-                                result.distanceKm,
-                                result.durationMinutes
-                        );
-                    });
-                }
-            }
-
-            @Override
-            public void onError(String error) {
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> {
-                        Toast.makeText(getContext(), "Failed to calculate route: " + error, Toast.LENGTH_LONG).show();
-                        resetScheduleButton();
-                    });
-                }
-            }
-        });
-    }
-
-    private void createRideWithRealData(String origin, String destination, double[] originCoords, double[] destCoords, List<LocationDTO> stopLocations, double distanceKm, int durationMinutes) {
-        // Form data
+    private void createAndSendRide(RouteCalculator.RouteCalculationResult routeResult) {
+        // Take data from form
         int selectedVehicleTypeIndex = spinnerVehicleType.getSelectedItemPosition();
         VehicleType vehicleType = VEHICLE_TYPES[selectedVehicleTypeIndex];
         boolean babyFriendly = toggleBabyFriendly.isChecked();
         boolean petFriendly = togglePetFriendly.isChecked();
 
         LocationDTO originLocation = new LocationDTO(
-                originCoords[0], // lng
-                originCoords[1], // lat
-                origin           // address
+                routeResult.originLng,
+                routeResult.originLat,
+                routeResult.origin
         );
 
         LocationDTO destinationLocation = new LocationDTO(
-                destCoords[0],  // lng
-                destCoords[1],  // lat
-                destination     // address
+                routeResult.destLng,
+                routeResult.destLat,
+                routeResult.destination
         );
 
         // Convert Calendar to LocalDateTime
@@ -452,20 +364,20 @@ public class NewRideUserFormFragment extends Fragment {
                 passengerId,
                 originLocation,
                 destinationLocation,
-                stopLocations,
+                routeResult.stopLocations,
                 linkedPassengers,
                 vehicleType,
                 scheduledTime,
                 babyFriendly,
                 petFriendly,
-                durationMinutes,
-                distanceKm
+                routeResult.durationMinutes,
+                routeResult.distanceKm
         );
-        sendRideRequestToBackend(request, origin, destination, stopLocations, distanceKm, durationMinutes);
+
+        sendRideToBackend(request, routeResult);
     }
 
-    private void sendRideRequestToBackend(CreateRideRequest request, String origin, String destination, List<LocationDTO> stopLocations, double distanceKm, int durationMinutes) {
-
+    private void sendRideToBackend(CreateRideRequest request, RouteCalculator.RouteCalculationResult routeResult) {
         Call<RideResponse> call = ClientUtils.rideService.createRide(request);
 
         call.enqueue(new Callback<RideResponse>() {
@@ -474,8 +386,7 @@ public class NewRideUserFormFragment extends Fragment {
                 resetScheduleButton();
 
                 if (response.isSuccessful() && response.body() != null) {
-                    RideResponse rideResponse = response.body();
-                    handleRideResponse(rideResponse, origin, destination, stopLocations, distanceKm, durationMinutes);
+                    handleRideResponse(response.body(), routeResult);
                 } else {
                     Toast.makeText(getContext(), "Failed to create ride: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
@@ -489,45 +400,52 @@ public class NewRideUserFormFragment extends Fragment {
         });
     }
 
-    private void handleRideResponse(RideResponse response, String origin, String destination, List<LocationDTO> stopLocations, double distanceKm, int durationMinutes) {
+    private void handleRideResponse(RideResponse response, RouteCalculator.RouteCalculationResult routeResult) {
 
         if (response.getStatus() == RideStatus.SCHEDULED) {
-            String message = String.format("Ride scheduled! Price: %.2f RSD", response.getPrice());
-            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Ride scheduled", Toast.LENGTH_LONG).show();
 
-            RouteData routeData = new RouteData();
-            routeData.setOrigin(origin);
-            routeData.setDestination(destination);
+            // Create routedata with all inputs
+            RouteData routeData = createRouteData(routeResult);
 
-            // Stops addresses
-            List<String> stopAddresses = new ArrayList<>();
-            for (LocationDTO stop : stopLocations) {
-                stopAddresses.add(stop.getAddress());
-            }
-            routeData.setStops(stopAddresses);
-
-            routeData.setDistanceKm(distanceKm);
-            routeData.setDurationMinutes(durationMinutes);
-            routeData.setStopLocations(stopLocations);
-
-            HomeFragment homeFragment = new HomeFragment();
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("ROUTE_DATA", routeData);
-            homeFragment.setArguments(bundle);
-
-            if (getActivity() != null) {
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.flFragment, homeFragment)
-                        .addToBackStack(null)
-                        .commit();
-            }
+            // Navigate to map
+            navigateToMap(routeData);
 
             clearForm();
-
         } else if (response.getStatus() == RideStatus.FAILED) {
-            Toast.makeText(getContext(), "No available driver at the moment. Please try again later.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "No available drivers at the moment", Toast.LENGTH_LONG).show();
         } else {
-            Toast.makeText(getContext(), "Ride status: " + response.getStatus(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Ride status: " + response.getStatus(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private RouteData createRouteData(RouteCalculator.RouteCalculationResult result) {
+        RouteData routeData = new RouteData();
+        routeData.setOrigin(result.origin);
+        routeData.setDestination(result.destination);
+        routeData.setStops(result.stops);
+        routeData.setOriginLng(result.originLng);
+        routeData.setOriginLat(result.originLat);
+        routeData.setDestinationLng(result.destLng);
+        routeData.setDestinationLat(result.destLat);
+        routeData.setDistanceKm(result.distanceKm);
+        routeData.setDurationMinutes(result.durationMinutes);
+        routeData.setStopLocations(result.stopLocations);
+        routeData.setRouteCoordinates(result.routeCoordinates);
+        return routeData;
+    }
+
+    private void navigateToMap(RouteData routeData) {
+        HomeFragment homeFragment = new HomeFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("ROUTE_DATA", routeData);
+        homeFragment.setArguments(bundle);
+
+        if (getActivity() != null) {
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.flFragment, homeFragment)
+                    .addToBackStack(null)
+                    .commit();
         }
     }
 

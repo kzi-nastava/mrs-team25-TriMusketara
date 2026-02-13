@@ -1,6 +1,7 @@
 package com.example.clickanddrive.models;
 
 import com.example.clickanddrive.dtosample.LocationDTO;
+import com.example.clickanddrive.map.MapboxDirections;
 
 import java.io.Serializable;
 import java.util.List;
@@ -18,8 +19,8 @@ public class RouteData implements Serializable {
     private double destinationLat;
     private double distanceKm;
     private int durationMinutes;
-
     private List<LocationDTO> stopLocations;
+    private List<MapboxDirections.Coordinate> routeCoordinates;
 
     public RouteData() {}
 
@@ -107,5 +108,13 @@ public class RouteData implements Serializable {
 
     public void setStopLocations(List<LocationDTO> stopLocations) {
         this.stopLocations = stopLocations;
+    }
+
+    public List<MapboxDirections.Coordinate> getRouteCoordinates() {
+        return routeCoordinates;
+    }
+
+    public void setRouteCoordinates(List<MapboxDirections.Coordinate> routeCoordinates) {
+        this.routeCoordinates = routeCoordinates;
     }
 }

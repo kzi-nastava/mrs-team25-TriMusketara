@@ -74,10 +74,47 @@ public class FavoriteRouteBottomSheet extends BottomSheetDialogFragment {
 
         // Order route again...
         orderAgainBtn.setOnClickListener(v -> {
-            dismiss();
+            handleOrderAgain();
         });
 
         return view;
     }
+
+    private void handleOrderAgain() {
+        if (getArguments() == null) {
+            return;
+        }
+
+        // Get every data from arguments
+        String origin = getArguments().getString("origin");
+        String destination = getArguments().getString("destination");
+        double originLat = getArguments().getDouble("originLat");
+        double originLng = getArguments().getDouble("originLng");
+        double destLat = getArguments().getDouble("destLat");
+        double destLng = getArguments().getDouble("destLng");
+        Long routeId = getArguments().getLong("routeId");
+
+        // Bundle creation
+        Bundle bundle = new Bundle();
+        bundle.putString("PREFILL_ORIGIN", origin);
+        bundle.putString("PREFILL_ORIGIN", origin);
+        bundle.putString("PREFILL_DESTINATION", destination);
+        bundle.putDouble("PREFILL_ORIGIN_LAT", originLat);
+        bundle.putDouble("PREFILL_ORIGIN_LNG", originLng);
+        bundle.putDouble("PREFILL_DEST_LAT", destLat);
+        bundle.putDouble("PREFILL_DEST_LNG", destLng);
+        bundle.putLong("FAVORITE_ROUTE_ID", routeId);
+
+        NewRideUserFormFragment formFragment = new NewRideUserFormFragment();
+        formFragment.setArguments(bundle);
+
+        // Navigate to fragment
+        if (getActivity() != null) {
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, formFragment).addToBackStack(null).commit();
+        }
+
+        dismiss();
+    }
+
 }
 
