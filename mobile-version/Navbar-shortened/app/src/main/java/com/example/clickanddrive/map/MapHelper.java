@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.clickanddrive.R;
+import com.example.clickanddrive.dtosample.LocationDTO;
 import com.mapbox.bindgen.Value;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
@@ -60,90 +61,35 @@ public class MapHelper {
         );
     }
 
-    public interface RouteDrawnCallback {
-        void onRouteDrawn(double distanceKm, int durationMinutes);
-        void onError(String error);
-    }
+    public void drawPreCalculatedRoute(
+            List<MapboxDirections.Coordinate> routeCoordinates,
+            double originLng,
+            double originLat,
+            double destLng,
+            double destLat,
+            List<LocationDTO> stopLocations) {
 
-    public void drawRoute(String origin, String destination, List<String> stops, RouteDrawnCallback callback) {
-        Log.d(TAG, "Drawing route: " + origin + " -> " + destination + " (with " + stops.size() + " stops)");
+        mainHandler.post(() -> {
+            // Draw route line
+            drawRouteLine(routeCoordinates);
 
-        geocodeAllAddresses(origin, destination, stops, new GeocodeAllCallback() {
-            @Override
-            public void onSuccess(List<MapboxDirections.Coordinate> coordinates) {
-                calculateAndDrawRoute(coordinates, callback);
-            }
-            @Override
-            public void onError(String error) {
-                Log.e(TAG, "Geocoding failed: " + error);
-                callback.onError(error);
-            }
-        });
-    }
+            // Markers
+            List<MapboxDirections.Coordinate> markerCoords = new ArrayList<>();
+            markerCoords.add(new MapboxDirections.Coordinate(originLng, originLat));
 
-    private interface GeocodeAllCallback {
-        void onSuccess(List<MapboxDirections.Coordinate> coordinates);
-        void onError(String error);
-    }
-
-    private void geocodeAllAddresses(String origin, String destination, List<String> stops, GeocodeAllCallback callback) {
-        List<String> allAddresses = new ArrayList<>();
-        allAddresses.add(origin);
-        allAddresses.addAll(stops);
-        allAddresses.add(destination);
-
-        List<MapboxDirections.Coordinate> coordinates = new ArrayList<>();
-        MapboxGeocoder geocoder = new MapboxGeocoder();
-
-        geocodeNext(geocoder, allAddresses, 0, coordinates, callback);
-    }
-
-    private void geocodeNext(MapboxGeocoder geocoder, List<String> addresses, int index,
-                             List<MapboxDirections.Coordinate> coordinates, GeocodeAllCallback callback) {
-        if (index >= addresses.size()) {
-            Log.d(TAG, "All addresses geocoded successfully (" + coordinates.size() + " points)");
-            callback.onSuccess(coordinates);
-            return;
-        }
-
-        String currentAddress = addresses.get(index);
-        Log.d(TAG, "Geocoding address " + (index + 1) + "/" + addresses.size() + ": " + currentAddress);
-
-        geocoder.geocode(currentAddress, new MapboxGeocoder.GeocodeCallback() {
-            @Override
-            public void onSuccess(double lng, double lat) {
-                coordinates.add(new MapboxDirections.Coordinate(lng, lat));
-                geocodeNext(geocoder, addresses, index + 1, coordinates, callback);
-            }
-            @Override
-            public void onError(String error) {
-                Log.e(TAG, "Failed to geocode address: " + currentAddress);
-                callback.onError("Failed to geocode: " + currentAddress + " - " + error);
-            }
-        });
-    }
-
-    private void calculateAndDrawRoute(List<MapboxDirections.Coordinate> coordinates, RouteDrawnCallback callback) {
-        MapboxDirections directions = new MapboxDirections();
-
-        directions.getRoute(coordinates, new MapboxDirections.DirectionsCallback() {
-            @Override
-            public void onSuccess(MapboxDirections.RouteResult result) {
-                Log.d(TAG, "Route calculated, now drawing on map...");
-
-                mainHandler.post(() -> {
-                    drawRouteLine(result.routeCoordinates);
-                    addRouteMarkers(coordinates);
-                    fitCameraToRoute(result.routeCoordinates);
-                    callback.onRouteDrawn(result.distanceKm, result.durationMinutes);
-                });
+            if (stopLocations != null) {
+                for (LocationDTO stop : stopLocations) {
+                    markerCoords.add(new MapboxDirections.Coordinate(
+                            stop.getLongitude(),
+                            stop.getLatitude()
+                    ));
+                }
             }
 
-            @Override
-            public void onError(String error) {
-                Log.e(TAG, "Route calculation failed: " + error);
-                mainHandler.post(() -> callback.onError(error));
-            }
+            markerCoords.add(new MapboxDirections.Coordinate(destLng, destLat));
+            addRouteMarkers(markerCoords);
+
+            fitCameraToRoute(routeCoordinates);
         });
     }
 

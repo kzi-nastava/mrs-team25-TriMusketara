@@ -58,22 +58,18 @@ public class HomeFragment extends Fragment {
             if (routeData != null) {
                 MapHelper mapHelper = new MapHelper(mapView);
 
-                mapHelper.drawRoute(
-                        routeData.getOrigin(),
-                        routeData.getDestination(),
-                        routeData.getStops(),
-                        new MapHelper.RouteDrawnCallback() {
-                            @Override
-                            public void onRouteDrawn(double distanceKm, int durationMinutes) {
-                                Log.d("MAP", "Route drawn: " + distanceKm + "km");
-                            }
-
-                            @Override
-                            public void onError(String error) {
-                                Toast.makeText(getContext(), "Error: " + error, Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                );
+                if (routeData.getRouteCoordinates() != null && !routeData.getRouteCoordinates().isEmpty()) {
+                    mapHelper.drawPreCalculatedRoute(
+                            routeData.getRouteCoordinates(),
+                            routeData.getOriginLng(),
+                            routeData.getOriginLat(),
+                            routeData.getDestinationLng(),
+                            routeData.getDestinationLat(),
+                            routeData.getStopLocations()
+                    );
+                } else {
+                    Toast.makeText(getContext(), "Recalculating route (coordinates missing", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
