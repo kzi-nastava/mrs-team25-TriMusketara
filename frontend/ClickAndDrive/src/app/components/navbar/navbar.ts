@@ -7,6 +7,8 @@ import { RidePopup } from '../../shared/ride-popup';
 import { ProfileSidebarService } from '../../services/profile-sidebar.service';
 import { AuthService } from '../../services/auth.service';
 import { PanicRequest, PanicService } from '../../services/panic.service';
+import { WebSocketService } from '../../services/web-socket.service';
+import { Toast, ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-navbar',
@@ -19,14 +21,31 @@ export class NavbarComponent {
 
   panicPressed = signal(false); // Da li je panic već pritisnut
   private panicService = inject(PanicService);
+  private toastr = inject(ToastrService)
+
 
   constructor(
     private router: Router,
     private ridePopup: RidePopup,
     public profileSidebar: ProfileSidebarService,
     private route: ActivatedRoute,
-    public auth: AuthService
-    ) {}
+    public auth: AuthService,
+    private webSocketService: WebSocketService,
+    ) {
+      this.webSocketService.rideUpdates$.subscribe((msg) => {
+        if (msg.type === 'RIDE_STARTED') {
+            const activeRideRaw = localStorage.getItem('activeRideData');
+          if (!activeRideRaw) return;
+            const activeRide = JSON.parse(activeRideRaw);
+
+          if (activeRide.id === msg.rideId) {
+            this.auth.setInDrive(true);
+            this.router.navigate(['/drive-in-progress']);
+            // Opciono: Toastr notifikacija
+          }
+        }
+      });
+  }
 
   onProfileClick() {
     this.profileSidebar.toggle();
@@ -64,7 +83,7 @@ export class NavbarComponent {
   // Logic for PANIC button 
   onPanic() {
   if (this.panicPressed()) {
-    alert('PANIC already triggered for this ride!');
+    this.toastr.error('PANIC already triggered for this ride!');
     return;
   }
 
@@ -76,7 +95,7 @@ export class NavbarComponent {
 
   const rideDataStr = localStorage.getItem('activeRideData');
   if (!rideDataStr) {
-    alert('No active ride found!');
+    this.toastr.error('No active ride found!');
     return;
   }
 
@@ -84,7 +103,7 @@ export class NavbarComponent {
   const userId = this.auth.getUserId();
 
   if (!userId) {
-    alert('User not found');
+    this.toastr.error('User not found');
     return;
   }
 
@@ -97,12 +116,12 @@ export class NavbarComponent {
   this.panicService.triggerPanic(panicRequest).subscribe({
     next: (response) => {
       this.panicPressed.set(true);
-      alert('🚨 PANIC TRIGGERED!\n\nAdministrators have been notified and will take immediate action.');
+      this.toastr.success('🚨 PANIC TRIGGERED!\n\nAdministrators have been notified and will take immediate action.');
       console.log('Panic response:', response);
     },
     error: (err) => {
       console.error('Failed to trigger panic:', err);
-      alert('Failed to trigger PANIC: ' + (err.error?.message || 'Unknown error'));
+      this.toastr.error('Failed to trigger PANIC: ' + (err.error?.message || 'Unknown error'));
     }
   });
 }

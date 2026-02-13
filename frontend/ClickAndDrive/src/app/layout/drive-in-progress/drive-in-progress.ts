@@ -5,6 +5,8 @@ import { AuthService } from '../../services/auth.service';
 import { Map } from '../../services/map';
 import { RideOrderingService } from '../../services/ride.service';
 import { map } from 'rxjs';
+import { WebSocketService } from '../../services/web-socket.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-drive-in-progress',
@@ -18,6 +20,8 @@ export class DriveInProgress implements AfterViewInit {
   router = inject(Router);
   private mapService = inject(Map);
   private rideService = inject(RideOrderingService);
+  private webSocketService = inject(WebSocketService);
+  private toastr = inject(ToastrService);
 
   @ViewChild(MapViewComponent) mapView!: MapViewComponent;
 
@@ -40,6 +44,7 @@ export class DriveInProgress implements AfterViewInit {
     if (this.auth.origin() && this.auth.destination()) {
       await this.drawRouteOnLoad();
     }
+    this.listenForFinish();
   }
 
   private async drawRouteOnLoad() {
@@ -88,6 +93,27 @@ export class DriveInProgress implements AfterViewInit {
 
   // ---------------- Driver actions ----------------
 
+ private listenForFinish() {
+  this.webSocketService.rideUpdates$.subscribe((msg) => {
+    // Check the message
+    if (msg.type === 'RIDE_FINISHED' && this.activeRide?.id === msg.rideId) {
+      
+      console.log('WebSocket: Ride finish detected', msg);
+
+      //Passenger logic
+      if (this.auth.userType() !== 'driver') {
+        //Passenger only needs to see the notification
+        this.completeRideFlow(msg.isGuest);
+      } 
+      
+      // Driver logic is handled in onFinishDriver() where the HTTP call is made
+      else {
+        console.log('Driver received his own finish confirmation via WS.');
+      }
+    }
+  });
+}
+
   onStopDriver() {
     const rideDataStr = localStorage.getItem('activeRideData');
     if (!rideDataStr) {
@@ -134,47 +160,48 @@ export class DriveInProgress implements AfterViewInit {
   // }
 
   async onFinishDriver() {
-  if (!this.activeRide) return;
+    if (!this.activeRide) return;
 
-  try {
-    const originCoords = await this.mapService.geocodeAddress(this.activeRide.origin);
-    const destCoords = await this.mapService.geocodeAddress(this.activeRide.destination);
+    try {
+      const originCoords = await this.mapService.geocodeAddress(this.activeRide.origin);
+      const destCoords = await this.mapService.geocodeAddress(this.activeRide.destination);
 
-    this.mapService.getRouteDistanceOnly(originCoords, destCoords).subscribe({
-      next: (km) => {
-        console.log('Finalna distanca:', km);
-        
-        const isGuest = this.activeRide.guest || false;
+      this.mapService.getRouteDistanceOnly(originCoords, destCoords).subscribe({
+        next: (km) => {
+          console.log('Finalna distanca:', km);
+          
+          const isGuest = this.activeRide.guest || false;
 
-        this.rideService.finishRide(this.activeRide.id, km, isGuest).subscribe({
-          next: () => this.completeRideFlow(isGuest),
-          error: (err) => {
-            console.error('Greška pri završetku:', err);
-            this.completeRideFlow(isGuest);
-          }
-        });
-      },
-      error: (err) => {
-        console.error('Greška sa distancom:', err);
-        const isGuest = this.activeRide.guest || false;
-        this.rideService.finishRide(this.activeRide.id, 0, isGuest).subscribe(() => this.completeRideFlow(isGuest));
-      }
-    });
-  } catch (err) {
-    const isGuest = this.activeRide.guest || false;
-    this.rideService.finishRide(this.activeRide.id, 0, isGuest).subscribe(() => this.completeRideFlow(isGuest));
+          this.rideService.finishRide(this.activeRide.id, km, isGuest).subscribe({
+            next: () => this.completeRideFlow(isGuest),
+            error: (err) => {
+              console.error('Greška pri završetku:', err);
+              this.completeRideFlow(isGuest);
+            }
+          });
+        },
+        error: (err) => {
+          console.error('Greška sa distancom:', err);
+          const isGuest = this.activeRide.guest || false;
+          this.rideService.finishRide(this.activeRide.id, 0, isGuest).subscribe(() => this.completeRideFlow(isGuest));
+        }
+      });
+    } catch (err) {
+      const isGuest = this.activeRide.guest || false;
+      this.rideService.finishRide(this.activeRide.id, 0, isGuest).subscribe(() => this.completeRideFlow(isGuest));
+    }
   }
-}
 
   private completeRideFlow(isGuest: boolean = false) {
     this.auth.setInDrive(false);
-    this.showFinishNotification.set(true);
+    this.showFinishNotification.set(true); 
+    localStorage.removeItem('activeRideData');
+
     if (!isGuest) {
-      alert("Ride finished! Summary sent via email.");
+      this.toastr.success("Ride finished! Summary sent via email.", "Success");
     } else {
-      alert("Ride finished! Thank you for using our service.");
+      this.toastr.info("Ride finished! Thank you for using Click&Drive.", "Visit us again!");
     }
-    this.router.navigate(['/map']);
   }
 
   // ---------------- Reporting route issues ----------------
@@ -183,14 +210,24 @@ export class DriveInProgress implements AfterViewInit {
     if (!reason) return;
 
     const trimmed = reason.trim();
-    if (trimmed.length === 0) { alert("Reason cannot be empty."); return; }
-    if (trimmed.length > 500) { alert("Reason too long."); return; }
+    if (trimmed.length === 0) { 
+      this.toastr.warning("Reason cannot be empty.", "Warning"); 
+      return; 
+    }
+    
+    if (trimmed.length > 500) { 
+      this.toastr.warning("Reason is too long (max 500 chars).", "Warning"); 
+      return; 
+    }
 
-    if (!this.activeRide) { alert("No active ride."); return; }
+    if (!this.activeRide) { 
+      this.toastr.error("No active ride found.", "Error"); 
+      return; 
+    }
 
     this.rideService.reportInconsistency(this.activeRide.id, trimmed).subscribe({
-      next: () => alert("Inconsistency reported successfully."),
-      error: err => alert("Failed to report inconsistency: " + (err.error?.message || "Unknown"))
+      next: () => this.toastr.success("Inconsistency reported successfully.", "Report Sent"),
+      error: err => this.toastr.error("Failed to report: " + (err.error?.message || "Unknown error"), "Error")
     });
   }
 }
