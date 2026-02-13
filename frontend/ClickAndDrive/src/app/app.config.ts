@@ -4,7 +4,6 @@ import { HTTP_INTERCEPTORS, HttpClientModule, provideHttpClient, withInterceptor
 import { FormsModule } from '@angular/forms';
 import { routes } from './app.routes';
 import { AuthInterceptor } from './infrastructure/interceptor';
-import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideToastr } from 'ngx-toastr';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 

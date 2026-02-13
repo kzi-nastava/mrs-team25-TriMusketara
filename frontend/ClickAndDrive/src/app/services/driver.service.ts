@@ -15,8 +15,8 @@ export class DriverService {
     private driverUrl = "http://localhost:8080/api/drivers";
 
     // Register driver function
-    registerDriver(data: DriverCreate): Observable<DriverCreate> {
-        return this.http.post<DriverCreate>(`${this.adminUrl}/drivers`, data);
+    registerDriver(data: DriverCreate): Observable<Driver> {
+        return this.http.post<Driver>(`${this.adminUrl}/drivers`, data);
     }
 
     // Complete driver registration
