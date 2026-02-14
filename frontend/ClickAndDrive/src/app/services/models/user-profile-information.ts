@@ -14,7 +14,7 @@ export interface UserProfileInformation {
     // Only for drivers
     vehicle?: VehicleInformation,
     profileImageUrl?: string,
-    isBlocked: boolean,
+    blocked: boolean,
     blockReason: string
 }
 

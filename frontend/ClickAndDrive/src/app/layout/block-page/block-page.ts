@@ -60,7 +60,7 @@ export class BlockPage implements OnInit {
 
   // Block/unblock button
   toggleBlockStatus(user: UserProfileInformation) {
-    if (user.isBlocked) {
+    if (user.blocked) {
       if (confirm(`Are you sure you want to unblock ${user.name}`)) {
         this.adminService.unblockUser(user.id).subscribe(updatedUser => {
           this.updateUserInList(updatedUser);

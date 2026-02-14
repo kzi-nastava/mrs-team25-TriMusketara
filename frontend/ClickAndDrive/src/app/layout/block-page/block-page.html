@@ -11,7 +11,7 @@
             <div class="card-container">
                 @for (user of users; track user.id) {
                 <!-- set of favoriteRoutes -->
-                    <div class="card" [class.blocked-card]="user.isBlocked">
+                    <div class="card" [class.blocked-card]="user.blocked">
                         <div class="top-card-part">
                             <!-- The card part where we have users Name: and Lastname: -->
                             <div class="info">
@@ -23,7 +23,7 @@
                             </div>
                             <!-- The card part where the buttons are -->
                             <div class="interactable">
-                                <button class="block-btn" (click)="toggleBlockStatus(user)">{{user.isBlocked ? 'Unblock' : 'Block'}}</button>
+                                <button class="block-btn" (click)="toggleBlockStatus(user)">{{user.blocked ? 'Unblock' : 'Block'}}</button>
                                 <button class="note-btn" (click)="openNoteModal(user)">Note</button>
                             </div>
                         </div>

@@ -20,7 +20,6 @@ public class UserProfileResponseDTO {
     private String phone;
     private String profileImageUrl;
 
-    @JsonProperty("isBlocked")
-    private boolean isBlocked;
+    private boolean blocked;
     private String blockReason;
 }
