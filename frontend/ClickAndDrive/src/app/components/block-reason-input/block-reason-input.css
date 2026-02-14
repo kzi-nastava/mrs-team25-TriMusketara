@@ -1,0 +1,97 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(36, 36, 37, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-container {
+  width: min(440px, 92vw);
+  background: #333533;
+  color: #ffffff;
+  padding: 22px 22px 18px;
+  border-radius: 14px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(245, 203, 92, 0.22);
+}
+
+.modal-container h3 {
+  margin: 0 0 14px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: #F5CB5C;
+}
+
+textarea {
+  display: block;            
+  width: 100%;
+  box-sizing: border-box;    
+  margin: 0 auto 16px;        
+  padding: 12px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(245, 203, 92, 0.28);
+  background: #242425;
+  color: #ffffff;
+  outline: none;
+  resize: none;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+textarea:focus {
+  border-color: #F5CB5C;
+  box-shadow: 0 0 0 3px rgba(245, 203, 92, 0.18);
+}
+
+.buttons-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+button {
+  padding: 9px 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: transform 0.08s ease, filter 0.15s ease, opacity 0.15s ease;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+.cancel-btn {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.cancel-btn:hover {
+  opacity: 0.9;
+}
+
+.confirm-btn {
+  background: #F5CB5C;
+  color: #242425;
+}
+
+.confirm-btn:hover {
+  filter: brightness(0.96);
+}
+
+textarea.ng-invalid.ng-touched {
+  border-color: #F55C5C;
+  box-shadow: 0 0 0 3px rgba(245, 92, 92, 0.16);
+}

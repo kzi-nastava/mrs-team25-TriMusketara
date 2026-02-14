@@ -44,4 +44,10 @@ public abstract class User {
 
     @Column(name = "profile_image_url")
     private String profileImageUrl;
+
+    @Column(name = "is_blocked", nullable = false)
+    private boolean isBlocked = false;
+
+    @Column(name = "block_reason")
+    private String blockReason;
 }

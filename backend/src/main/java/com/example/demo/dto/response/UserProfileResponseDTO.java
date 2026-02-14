@@ -18,4 +18,7 @@ public class UserProfileResponseDTO {
     private String address;
     private String phone;
     private String profileImageUrl;
+
+    private boolean isBlocked;
+    private String blockReason;
 }

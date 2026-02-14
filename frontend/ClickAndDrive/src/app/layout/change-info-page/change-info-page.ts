@@ -136,6 +136,8 @@ export class ChangeInfoPage {
       email: this.userForm.email,
       address: this.userForm.address,
       phone: this.userForm.phone,
+      isBlocked: false,
+      blockReason: ''
     };
 
     let updatedVehicle: VehicleInformation | undefined;

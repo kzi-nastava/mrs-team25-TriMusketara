@@ -72,6 +72,11 @@ public class RideServiceImpl implements RideService {
         Passenger creator = passengerRepository.findById(request.getPassengerId())
                 .orElseThrow(() -> new RuntimeException("Passenger not found with id: " + request.getPassengerId()));
 
+        // Check if creator is maybe blocked
+        if (creator.isBlocked()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Your are blocked! Reason " + creator.getBlockReason());
+        }
+
         // Create origin Location
         Location origin = new Location();
         origin.setLongitude(request.getOrigin().getLongitude());

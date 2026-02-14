@@ -49,6 +49,7 @@ export class LoginPage {
         // console.log(res.userId);
         this.authService.setUserType(res.role);
         this.authService.setUsername(res.email);
+        this.authService.setBlockStatus(res.isBlocked, res.blockReason);
 
         this.router.navigate(['/']);  // redirect na početnu
       },

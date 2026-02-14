@@ -23,6 +23,9 @@ export class AuthService {
 
     currentRouteCoordinates = signal<[number, number][]>([]);
 
+    isBlocked = signal(false);
+    blockReason = signal('');
+
     private apiUrl = 'http://localhost:8080/api/user';
 
     constructor(private http: HttpClient, private router: Router) {}
@@ -104,6 +107,8 @@ export class AuthService {
     logout() {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        localStorage.removeItem('isBlocked');
+        localStorage.removeItem('blockReason');
         window.location.reload();
     }
 
@@ -132,4 +137,22 @@ export class AuthService {
     activateAccount(token: string) {
         return this.http.get(`${this.apiUrl}/auth/activate/${token}`);
     }
+
+    // User blocking helpers
+    setBlockStatus(blocked: boolean, reason: string | null) {
+        this.isBlocked.set(blocked);
+        this.blockReason.set(reason || '');
+
+        // Save users state to localSotrage
+        localStorage.setItem('isBlocked', String(blocked));
+        if (reason) localStorage.setItem('blockReason', reason);
+    }
+
+    loadBlockStatus() {
+        const blocked = localStorage.getItem('isBlocked') === 'true';
+        const reason = localStorage.getItem('blockReason') || '';
+        this.isBlocked.set(blocked);
+        this.blockReason.set(reason);
+    }
+
 }

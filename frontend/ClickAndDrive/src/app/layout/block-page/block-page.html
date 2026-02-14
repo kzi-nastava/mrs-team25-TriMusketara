@@ -5,26 +5,26 @@
                 <p>Block a User</p>
             </div>
             <div class="roles-btn-container">
-                <button>Drivers</button>
-                <button>Passengers</button>
+                <button (click)="showDrivers()" [class.active]="currentView === 'drivers'">Drivers</button>
+                <button (click)="showPassengers()" [class.active]="currentView === 'passengers'">Passengers</button>
             </div>
             <div class="card-container">
-                @for (field of fields; track field.name) {
+                @for (user of users; track user.id) {
                 <!-- set of favoriteRoutes -->
-                    <div class="card">
+                    <div class="card" [class.blocked-card]="user.isBlocked">
                         <div class="top-card-part">
                             <!-- The card part where we have users Name: and Lastname: -->
                             <div class="info">
                                 <div class="user-pin"></div>
                                 <div class="user-info">
-                                    <p><b>Name:</b> {{field.name}}</p>
-                                    <p><b>Lastname:</b> {{field.lastname}}</p>
+                                    <p><b>Name:</b> {{user.name}}</p>
+                                    <p><b>Lastname:</b> {{user.surname}}</p>
                                 </div>
                             </div>
                             <!-- The card part where the buttons are -->
                             <div class="interactable">
-                                <button class="block-btn">Block</button>
-                                <button class="note-btn">Note</button>
+                                <button class="block-btn" (click)="toggleBlockStatus(user)">{{user.isBlocked ? 'Unblock' : 'Block'}}</button>
+                                <button class="note-btn" (click)="openNoteModal(user)">Note</button>
                             </div>
                         </div>
                     </div>
@@ -37,3 +37,8 @@
         </div>
     </div>
 </div>
+
+<app-block-reason-input 
+    title="Manage User Note"
+    (onConfirm)="onNoteSaved($event)">
+</app-block-reason-input>

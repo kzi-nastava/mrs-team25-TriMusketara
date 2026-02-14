@@ -19,4 +19,7 @@ public interface UserService {
     boolean activatePassenger(String token);
     ProfileImageResponseDTO uploadProfileImage(Long id, MultipartFile file);
     void deleteProfileImage(Long id);
+    UserProfileResponseDTO blockUser(Long id, String reason);
+    UserProfileResponseDTO unblockUser(Long id);
+    UserProfileResponseDTO setNote(Long id, String reason);
 }
