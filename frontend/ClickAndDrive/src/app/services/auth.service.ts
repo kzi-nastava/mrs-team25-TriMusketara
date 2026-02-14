@@ -28,7 +28,9 @@ export class AuthService {
 
     private apiUrl = 'http://localhost:8080/api/user';
 
-    constructor(private http: HttpClient, private router: Router) {}
+    constructor(private http: HttpClient, private router: Router) {
+        this.loadBlockStatus();
+    }
 
     // Set which user
     setUserType(type: 'guest' | 'user' | 'driver' | 'admin') {
@@ -140,11 +142,11 @@ export class AuthService {
 
     // User blocking helpers
     setBlockStatus(blocked: boolean, reason: string | null) {
-        this.isBlocked.set(blocked);
+        this.isBlocked.set(!!blocked);
         this.blockReason.set(reason || '');
 
         // Save users state to localSotrage
-        localStorage.setItem('isBlocked', String(blocked));
+        localStorage.setItem('isBlocked', String(!!blocked));
         if (reason) localStorage.setItem('blockReason', reason);
     }
 
@@ -153,6 +155,14 @@ export class AuthService {
         const reason = localStorage.getItem('blockReason') || '';
         this.isBlocked.set(blocked);
         this.blockReason.set(reason);
+    }
+
+    isUserBlocked(): boolean {
+        return this.isBlocked();
+    }
+
+    getBlockedReason(): string {
+        return this.blockReason();
     }
 
 }

@@ -56,8 +56,8 @@ export class NavbarComponent {
   // Order route navigation
   orderRideClick() {
     // Check users status - if blocked he can not order new rides
-    if (this.auth.isBlocked()) {
-      const reason = this.auth.blockReason();
+    if (this.auth.isUserBlocked()) {
+      const reason = this.auth.getBlockedReason();
       this.blockedAlert.open(reason || 'No specific reason provided');
       return;
     } 
