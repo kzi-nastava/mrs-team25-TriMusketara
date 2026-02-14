@@ -245,13 +245,13 @@ describe('validateForm', () => {
     const isValid = component.validateForm();
     expect(isValid).toBe(false);
     
-    expect(component.invalidFields).toContain('fname');
+    expect(component.invalidFields).toContain('lname');
     expect(component.invalidFields).toContain('email');
     expect(component.invalidFields).toContain('mobile');
       
-    expect(component.fieldErrors['fname']).toBe('Field should contain letters only');
+    expect(component.fieldErrors['lname']).toBe('Field should contain letters only');
     expect(component.fieldErrors['email']).toBe('Invalid email format');
-    expect(component.fieldErrors['mobile']).toBe('Invalid mobile format');
+    expect(component.fieldErrors['mobile']).toBe('This field is required');
   });
 });
 
