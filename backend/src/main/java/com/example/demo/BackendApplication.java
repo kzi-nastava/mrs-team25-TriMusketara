@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import jakarta.transaction.Transactional;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class BackendApplication {
 	}
 
 	@Bean
+	@Profile("!test")
 	@Transactional
 	public CommandLineRunner initData(
 			AdministratorRepository administratorRepository,
