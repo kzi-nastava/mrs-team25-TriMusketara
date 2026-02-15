@@ -5,6 +5,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -24,6 +25,12 @@ public class RideOrderingForm {
 
     @FindBy(id = "time")
     private WebElement timeInput;
+
+    @FindBy(id = "baby-friendly")
+    private WebElement babyFriendlyCheck;
+
+    @FindBy(id = "pet-friendly")
+    private WebElement petFriendlyCheck;
 
     @FindBy(className = "finish-ride-ordering")
     private WebElement showRouteButton;
@@ -49,27 +56,38 @@ public class RideOrderingForm {
         return destinationInput.getAttribute("value");
     }
 
-    public void enterOrigin(String origin) {
-        wait.until(ExpectedConditions.visibilityOf(originInput));
-        originInput.clear();
-        originInput.sendKeys(origin);
-    }
-
-    public void enterDestination(String destination) {
-        wait.until(ExpectedConditions.visibilityOf(destinationInput));
-        destinationInput.clear();
-        destinationInput.sendKeys(destination);
-    }
-
     public void selectVehicleType(String type) {
         wait.until(ExpectedConditions.visibilityOf(typeSelect));
-        typeSelect.sendKeys(type);
+        try {
+            Select select = new Select(typeSelect);
+            select.selectByVisibleText(type);
+        } catch (Exception e) {
+            typeSelect.sendKeys(type);
+        }
     }
 
     public void enterTime(String time) {
         wait.until(ExpectedConditions.visibilityOf(timeInput));
         timeInput.clear();
         timeInput.sendKeys(time);
+    }
+
+    // Check baby friendly
+    public void checkBabyFriendly() {
+        wait.until(ExpectedConditions.elementToBeClickable(babyFriendlyCheck));
+
+        if (!babyFriendlyCheck.isSelected()) {
+            babyFriendlyCheck.click();
+        }
+    }
+
+    // Check pet friendly
+    public void checkPetFriendly() {
+        wait.until(ExpectedConditions.elementToBeClickable(petFriendlyCheck));
+
+        if (!petFriendlyCheck.isSelected()) {
+            petFriendlyCheck.click();
+        }
     }
 
     public void orderRoute() {
