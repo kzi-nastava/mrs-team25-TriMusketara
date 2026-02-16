@@ -11,9 +11,16 @@ public class SessionManager {
     public static String token = null;  // JWT token
     public static Long userId = null;   // ID korisnika
 
-    public static void login(String role, String jwtToken, Long id) {
+    // Fields for following the status of a user
+    // If he is blocked or not
+    private static boolean isBlocked = false;
+    private static String blockReason = null;
+
+    public static void login(String role, String jwtToken, Long id, boolean blocked, String reason) {
         token = jwtToken;
         userId = id;
+        isBlocked = blocked;
+        blockReason = reason;
 
         switch (role.toLowerCase()) {
             case "user":
@@ -35,5 +42,13 @@ public class SessionManager {
         currentUserType = GUEST;
         token = null;
         userId = null;
+    }
+
+    public static boolean isUserBlocked() {
+        return isBlocked;
+    }
+
+    public static String getBlockReason() {
+        return blockReason;
     }
 }

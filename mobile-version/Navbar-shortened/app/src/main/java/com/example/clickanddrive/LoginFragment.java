@@ -78,7 +78,9 @@ public class LoginFragment extends Fragment {
 
                     SessionManager.login(loginResponse.getRole(),
                             loginResponse.getToken(),
-                            loginResponse.getUserId());
+                            loginResponse.getUserId(),
+                            loginResponse.isBlocked(),
+                            loginResponse.getBlockReason());
 
                     if (getActivity() instanceof MainActivity) {
                         ((MainActivity) getActivity()).refreshBottomNavigation();

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:minWidth="320dp"
+    android:layout_margin="20dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/dialog_background">
+
+    <!-- Icon -->
+    <ImageView
+        android:id="@+id/dialog_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:src="@drawable/block_icon"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Confirm Action"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/whiteish"
+        android:gravity="center"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Message -->
+    <TextView
+        android:id="@+id/dialog_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Are you sure?"
+        android:textSize="16sp"
+        android:textColor="@color/whiteish"
+        android:alpha="0.8"
+        android:gravity="center"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btn_negative"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="No"
+            android:textColor="@color/whiteish"
+            android:backgroundTint="@color/nav_bg"
+            android:layout_marginEnd="8dp"
+            style="?attr/materialButtonOutlinedStyle"/>
+
+        <Button
+            android:id="@+id/btn_positive"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Yes"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#E74C3C"
+            android:layout_marginStart="8dp"
+            style="?attr/materialButtonStyle"/>
+    </LinearLayout>
+
+</LinearLayout>

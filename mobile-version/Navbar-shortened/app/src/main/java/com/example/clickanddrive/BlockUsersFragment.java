@@ -16,11 +16,16 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.clickanddrive.adapters.BlockUsersAdapter;
+import com.example.clickanddrive.clients.ClientUtils;
 import com.example.clickanddrive.dtosample.responses.UserProfileResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class BlockUsersFragment extends Fragment implements BlockUsersAdapter.OnUserActionListener {
@@ -118,38 +123,61 @@ public class BlockUsersFragment extends Fragment implements BlockUsersAdapter.On
         adapter.updateList(filteredUsers);
     }
 
-    @Override
-    public void onUserClick(UserProfileResponse user) {
-        BlockAUserBottomSheet sheet = BlockAUserBottomSheet.newInstance(
-                user.getName(),
-                user.getSurname(),
-                user.getAddress(),
-                user.getEmail(),
-                user.getPhone()
-        );
-        sheet.show(getChildFragmentManager(), "admin_block_sheet");
-    }
-
     private void loadDrivers() {
-        // mock
-        allUsers.clear();
-        allUsers.add(new UserProfileResponse(1L, "driver1@test.com", "Marko", "Marković", "Beograd", "0601234567", null));
-        allUsers.add(new UserProfileResponse(2L, "driver2@test.com", "Petar", "Petrović", "Novi Sad", "0607654321", null));
-        allUsers.add(new UserProfileResponse(3L, "driver3@test.com", "Jovan", "Jovanović", "Niš", "0609876543", null));
+        Call<List<UserProfileResponse>> call = ClientUtils.adminService.getAllDrivers();
 
-        filteredUsers.clear();
-        filteredUsers.addAll(allUsers);
-        adapter.updateList(filteredUsers);
+        call.enqueue(new Callback<List<UserProfileResponse>>() {
+            @Override
+            public void onResponse(Call<List<UserProfileResponse>> call, Response<List<UserProfileResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    allUsers.clear();
+                    allUsers.addAll(response.body());
+
+                    filteredUsers.clear();
+                    filteredUsers.addAll(allUsers);
+
+                    adapter.updateList(filteredUsers);
+                } else {
+                    Toast.makeText(getContext(), "Failed to load drivers", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<UserProfileResponse>> call, Throwable t) {
+                Toast.makeText(getContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void loadPassengers() {
-        // mock
-        allUsers.clear();
-        allUsers.add(new UserProfileResponse(4L, "passenger1@test.com", "Ana", "Anić", "Beograd", "0611234567", null));
-        allUsers.add(new UserProfileResponse(5L, "passenger2@test.com", "Milica", "Milić", "Subotica", "0617654321", null));
+        Call<List<UserProfileResponse>> call = ClientUtils.adminService.getAllPassengers();
 
-        filteredUsers.clear();
-        filteredUsers.addAll(allUsers);
-        adapter.updateList(filteredUsers);
+        call.enqueue(new Callback<List<UserProfileResponse>>() {
+            @Override
+            public void onResponse(Call<List<UserProfileResponse>> call, Response<List<UserProfileResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    allUsers.clear();
+                    allUsers.addAll(response.body());
+
+                    filteredUsers.clear();
+                    filteredUsers.addAll(allUsers);
+
+                    adapter.updateList(filteredUsers);
+                } else {
+                    Toast.makeText(getContext(), "Failed to load passengers", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<UserProfileResponse>> call, Throwable t) {
+                Toast.makeText(getContext(), "Failed to load passengers", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onUserClick(UserProfileResponse user) {
+        BlockAUserBottomSheet sheet = BlockAUserBottomSheet.newInstance(user);
+        sheet.show(getChildFragmentManager(), "admin_block_sheet");
     }
 }

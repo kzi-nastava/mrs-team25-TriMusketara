@@ -1,7 +1,13 @@
 package com.example.clickanddrive;
 
+import android.app.Dialog;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -64,8 +70,13 @@ public class MainActivity extends AppCompatActivity {
                 setCurrentFragment(profileFragment);
                 return true;
             } else if (id == R.id.new_ride) {
-                setCurrentFragment(newRideFragment);
-                return true;
+                if (SessionManager.isUserBlocked()) {
+                    showBlockedPassengerDialog();
+                    return false;
+                } else {
+                    setCurrentFragment(newRideFragment);
+                    return true;
+                }
             }
             // ...
             // will add other cases when other role fragments are created
@@ -122,6 +133,35 @@ public class MainActivity extends AppCompatActivity {
                 .beginTransaction()
                 .replace(R.id.flFragment, fragment)
                 .commit();
+    }
+
+    private void showBlockedPassengerDialog() {
+        Dialog dialog = new Dialog(MainActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_confirmation);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        ImageView dialogIcon = dialog.findViewById(R.id.dialog_icon);
+        TextView dialogTitle = dialog.findViewById(R.id.dialog_title);
+        TextView dialogMessage = dialog.findViewById(R.id.dialog_message);
+        Button btnNegative = dialog.findViewById(R.id.btn_negative);
+        Button btnPositive = dialog.findViewById(R.id.btn_positive);
+
+        dialogIcon.setImageResource(R.drawable.block_icon);
+        dialogTitle.setText("Account Blocked");
+
+        String message = "Your account has been blocked and you cannot create new rides.";
+        if (SessionManager.getBlockReason() != null && !SessionManager.getBlockReason().isEmpty()) {
+            message += "\n\nReason: " + SessionManager.getBlockReason();
+        }
+        dialogMessage.setText(message);
+
+        btnNegative.setVisibility(View.GONE);
+        btnPositive.setText("OK");
+
+        btnPositive.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
     }
 
 }
