@@ -1,5 +1,7 @@
 package com.example.clickanddrive.adapters;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,9 +13,15 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.clickanddrive.R;
+import com.example.clickanddrive.clients.ClientUtils;
 import com.example.clickanddrive.dtosample.responses.UserProfileResponse;
 
+import java.io.InputStream;
 import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
 
 public class BlockUsersAdapter extends RecyclerView.Adapter<BlockUsersAdapter.UserViewHolder> {
 
@@ -46,7 +54,34 @@ public class BlockUsersAdapter extends RecyclerView.Adapter<BlockUsersAdapter.Us
         holder.userName.setText(fullName);
 
         // Load image
-        //...
+        if (user.getProfileImageUrl() != null && !user.getProfileImageUrl().isEmpty()) {
+            String filename = user.getProfileImageUrl().substring(user.getProfileImageUrl().lastIndexOf("/")+1);
+
+            Call<ResponseBody> call = ClientUtils.userService.getProfileImage(filename);
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        try {
+                            InputStream inputStream = response.body().byteStream();
+                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                            holder.userAvatar.setImageBitmap(bitmap);
+                        } catch (Exception e) {
+                            holder.userAvatar.setImageResource(R.drawable.no_profile_picture);
+                        }
+                    } else {
+                        holder.userAvatar.setImageResource(R.drawable.no_profile_picture);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    holder.userAvatar.setImageResource(R.drawable.no_profile_picture);
+                }
+            });
+        } else {
+            holder.userAvatar.setImageResource(R.drawable.no_profile_picture);
+        }
 
         holder.itemView.setOnClickListener(v -> {
             listener.onUserClick(user);

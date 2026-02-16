@@ -372,7 +372,7 @@ public class ProfileFragment extends Fragment {
             case SessionManager.DRIVER:
                 addButton("Ride history", R.drawable.history,  () -> openDriverHistoryFragment());
                 addButton("Reports", R.drawable.report,  () -> {});
-                addButton("Notes", R.drawable.notes, () -> {});
+                addButton("Notes", R.drawable.notes, () -> openDriverNotesFragment());
                 addButton("Support", R.drawable.support, () -> {});
                 addButton("Log out", R.drawable.logout, () -> {
                     if (isAdded() && getActivity() instanceof MainActivity) {
@@ -472,5 +472,12 @@ public class ProfileFragment extends Fragment {
         requireActivity().getSupportFragmentManager()
                 .beginTransaction().replace(R.id.flFragment, fragment).addToBackStack(null).commit();
     }
+
+    private void openDriverNotesFragment() {
+        DriverNotesFragment fragment = new DriverNotesFragment();
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction().replace(R.id.flFragment, fragment).addToBackStack(null).commit();
+    }
+
 
 }

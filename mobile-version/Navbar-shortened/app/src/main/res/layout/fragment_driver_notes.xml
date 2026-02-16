@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/home_bg"
+    android:padding="16dp"
+    tools:context=".DriverNotesFragment">
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Account Notes"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@color/profile_bg"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="24dp"/>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="6dp"
+        android:backgroundTint="@color/nav_bg">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/block_icon"
+                    app:tint="@color/redish"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Account Blocked"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/redish"
+                    android:layout_marginStart="12dp"/>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/whiteish"
+                android:alpha="0.3"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Reason -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Reason: "
+                android:textSize="16sp"
+                android:textColor="@color/whiteish"
+                android:alpha="0.7"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/tv_block_reason"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Your account has been blocked by admin."
+                android:textSize="17sp"
+                android:textColor="@color/whiteish"
+                android:lineSpacingExtra="4dp"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Please contact support if you believe this is a mistake."
+        android:textSize="14sp"
+        android:textColor="@color/whiteish"
+        android:alpha="0.7"
+        android:gravity="center"
+        android:layout_marginTop="24dp"/>
+
+</LinearLayout>
