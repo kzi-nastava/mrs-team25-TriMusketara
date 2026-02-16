@@ -326,6 +326,15 @@ export class RideOrdering implements OnChanges {
 
           // Check created rides status...
           if (response.status === 'CREATED' || response.status === 'SCHEDULED') {
+            
+            const rideToSave = {
+              id: response.id, // ID koji je backend dodelio vožnji
+              origin: ride.origin.address,
+              destination: ride.destination.address,
+              guest: false
+            };
+            localStorage.setItem('activeRideData', JSON.stringify(rideToSave));
+
             this.toastr.success('Your ride has been scheduled successfully', 'Success');
             this.rideSubmitted = false; 
             this.rideCreatedSuccessfully.emit();

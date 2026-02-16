@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -40,6 +41,8 @@ public class RideController {
     private final GuestRideService guestRideService;
     private final UserRepository userRepository;
     private final RideRepository rideRepository;
+
+    private final SimpMessagingTemplate messagingTemplate;
 
     @PostMapping("/create-ride")
     public ResponseEntity<RideResponseDTO> createRide(
@@ -86,6 +89,14 @@ public class RideController {
 
         boolean isGuest = body.getOrDefault("isGuest", false);
         rideService.startRide(id, isGuest);
+
+        // WebSocket msg
+        Map<String, Object> message = Map.of(
+                "type", "RIDE_STARTED",
+                "rideId", id,
+                "isGuest", isGuest
+        );
+        messagingTemplate.convertAndSend("/topic/ride-events", message);
 
         return ResponseEntity.ok().build();
     }
@@ -158,6 +169,14 @@ public class RideController {
         }
 
         rideService.finishRide(id, driverEmail, distance, isGuest);
+
+        Map<String, Object> message = Map.of(
+                "type", "RIDE_FINISHED",
+                "rideId", id,
+                "isGuest", isGuest
+        );
+        messagingTemplate.convertAndSend("/topic/ride-events", message);
+
         return ResponseEntity.ok().build();
     }
 
