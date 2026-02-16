@@ -218,6 +218,12 @@ public class RideServiceImpl implements RideService {
         List<Driver> busyButFinishingCandidates = new ArrayList<>();
 
         for (Driver d : drivers) {
+
+            // Check if the driver is blocked
+            if (d.isBlocked()) {
+                continue; // Skip him
+            }
+
             // Check work minutes
             int workMinutes = calculateDriverWorkMinutes(d);
 

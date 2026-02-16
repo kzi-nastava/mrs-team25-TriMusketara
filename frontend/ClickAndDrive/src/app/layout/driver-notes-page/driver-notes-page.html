@@ -1,0 +1,33 @@
+<div class="page-wrapper">
+    <div class="inner-container">
+        <div class="container">
+            <div class="title">
+                <p>Notes</p>
+            </div>
+            <div class="card-container">
+                @if (isBlocked()) {
+                  <div class="card">
+                    <h2>BLOCKED</h2>
+                    <hr>
+                    
+                    <h3>REASON: </h3>
+                    <p style="font-size: 20px;"><em> {{ blockReason() }} </em></p>
+        
+                    <hr>
+                    <p>
+                      If you feel that you have been blocked unfairly do not be afraid to contact our
+                      <b>support team</b>.
+                    </p>
+                    <p><b>You are ineligible for ride assignment until further notice</b>.</p>
+                  </div>
+                } @else {
+                  <div class="card">
+                    <h2>No notes</h2>
+                    <hr>
+                    <p>You are not blocked.</p>
+                  </div>
+                }
+              </div>
+        </div>
+    </div>
+</div>
