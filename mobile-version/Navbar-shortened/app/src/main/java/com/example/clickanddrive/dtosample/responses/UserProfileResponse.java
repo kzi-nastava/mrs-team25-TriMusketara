@@ -12,6 +12,9 @@ public class UserProfileResponse {
     private String phone;
     private String profileImageUrl;
 
+    private boolean blocked;
+    private String blockReason;
+
     public UserProfileResponse() {}
 
     public UserProfileResponse(Long id, String email, String name, String surname, String address, String phone, String profileImageUrl) {
@@ -79,6 +82,22 @@ public class UserProfileResponse {
 
     public void setProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
+    }
+
+    public String getBlockReason() {
+        return blockReason;
+    }
+
+    public void setBlockReason(String blockReason) {
+        this.blockReason = blockReason;
     }
 
     @NonNull

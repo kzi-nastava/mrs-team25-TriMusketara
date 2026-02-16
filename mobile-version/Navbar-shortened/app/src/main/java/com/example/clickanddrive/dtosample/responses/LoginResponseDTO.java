@@ -6,6 +6,9 @@ public class LoginResponseDTO {
     private String role;
     private String token;
 
+    private boolean blocked;
+    private String blockReason;
+
     public LoginResponseDTO() {}
 
     public LoginResponseDTO(Long userId, String email, String role, String token) {
@@ -39,5 +42,21 @@ public class LoginResponseDTO {
     }
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
+    }
+
+    public String getBlockReason() {
+        return blockReason;
+    }
+
+    public void setBlockReason(String blockReason) {
+        this.blockReason = blockReason;
     }
 }
