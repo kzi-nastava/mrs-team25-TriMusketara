@@ -10,8 +10,14 @@ export interface UserProfileInformation {
     name: string,
     surname: string,
     address: string,
-    phone: string
+    phone: string,
     // Only for drivers
-    vehicle?: VehicleInformation
-    profileImageUrl?: string;
+    vehicle?: VehicleInformation,
+    profileImageUrl?: string,
+    blocked: boolean,
+    blockReason: string
+}
+
+export interface NoteRequest {
+    message: string;
 }

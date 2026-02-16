@@ -50,6 +50,9 @@ export class LoginPage {
         this.authService.setUserType(res.role);
         this.authService.setUsername(res.email);
 
+        const blocked = res.isBlocked ?? res.blocked ?? false;
+        const reason = res.blockReason ?? '';
+        this.authService.setBlockStatus(blocked, reason);
         this.router.navigate(['/']);  // redirect na početnu
       },
       error: (err) => {
