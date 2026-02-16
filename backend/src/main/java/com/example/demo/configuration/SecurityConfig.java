@@ -57,6 +57,8 @@ public class SecurityConfig {
                                 "/api/activation/**").permitAll() // login, register...
                         // PANIC endpoints - must be BEFORE anyRequest().authenticated()
                         .requestMatchers("/api/panic/**").permitAll()
+                        //WebSocket endpoints
+                        .requestMatchers("/ws/**").permitAll()
                         // Admin endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // Driver endpoints

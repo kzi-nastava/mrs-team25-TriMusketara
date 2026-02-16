@@ -38,7 +38,7 @@ export class NavbarComponent {
           if (!activeRideRaw) return;
             const activeRide = JSON.parse(activeRideRaw);
 
-          if (activeRide.id === msg.rideId) {
+          if (Number(activeRide.id) === Number(msg.rideId)) {
             this.auth.setInDrive(true);
             this.router.navigate(['/drive-in-progress']);
             // Opciono: Toastr notifikacija
