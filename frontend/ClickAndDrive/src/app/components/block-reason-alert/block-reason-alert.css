@@ -1,0 +1,66 @@
+.modal-overlay { 
+    position: fixed; 
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    z-index: 2000; 
+}
+
+.modal-container { 
+    background: #333533; 
+    color: white;
+    padding: 28px; 
+    border-radius: 14px; 
+    width: 400px; 
+    text-align: center; 
+    border-top: 5px solid #F5CB5C; 
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    animation: popIn 0.2s ease-out;
+}
+
+.error-title { 
+    color: #F5CB5C; 
+    margin-bottom: 10px; 
+}
+
+.reason-box { 
+    background: #242425; 
+    color: #F5CB5C; 
+    padding: 15px; 
+    border-radius: 8px; 
+    margin: 20px 0; 
+    text-align: left; 
+    border-left: 4px solid #F5CB5C;
+}
+
+/* Dugme */
+.close-btn { 
+    background: #F5CB5C; 
+    color: #242425; 
+    padding: 10px 22px; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-size: 1rem; 
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.close-btn:hover { 
+    transform: translateY(-1px);
+    filter: brightness(0.95);
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

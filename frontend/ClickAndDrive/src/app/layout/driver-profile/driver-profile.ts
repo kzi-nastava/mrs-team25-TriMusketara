@@ -20,7 +20,7 @@ export class DriverProfile {
     { label: 'Ride history', route: 'driver-history' },
     { label: 'Change information', route: 'change-information-page' },
     { label: 'Reports', route: 'reports' },
-    { label: 'Notes', route: 'notes' },
+    { label: 'Notes', route: 'driver-notes' },
     { label: 'Support', route: 'support' },
     { label: 'Log out', redText: true, logout: true }
   ];

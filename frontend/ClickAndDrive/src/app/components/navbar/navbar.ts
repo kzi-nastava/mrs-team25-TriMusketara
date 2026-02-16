@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, ViewChild } from '@angular/core';
 import { Router, RouterOutlet, ActivatedRoute } from '@angular/router';
 import { PassengerProfile } from '../../layout/passenger-profile/passenger-profile'
 import { DriverProfile } from '../../layout/driver-profile/driver-profile';
@@ -9,13 +9,14 @@ import { AuthService } from '../../services/auth.service';
 import { PanicRequest, PanicService } from '../../services/panic.service';
 import { WebSocketService } from '../../services/web-socket.service';
 import { Toast, ToastrService } from 'ngx-toastr';
+import { BlockReasonAlert } from '../block-reason-alert/block-reason-alert';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
-  imports: [PassengerProfile, DriverProfile, AdminProfile, RouterOutlet]
+  imports: [PassengerProfile, DriverProfile, AdminProfile, RouterOutlet, BlockReasonAlert]
 })
 export class NavbarComponent {
 
@@ -23,6 +24,8 @@ export class NavbarComponent {
   private panicService = inject(PanicService);
   private toastr = inject(ToastrService)
 
+
+  @ViewChild(BlockReasonAlert) blockedAlert!: BlockReasonAlert;
 
   constructor(
     private router: Router,
@@ -71,6 +74,14 @@ export class NavbarComponent {
 
   // Order route navigation
   orderRideClick() {
+    // Check users status - if blocked he can not order new rides
+    if (this.auth.isUserBlocked()) {
+      const reason = this.auth.getBlockedReason();
+      this.blockedAlert.open(reason || 'No specific reason provided');
+      return;
+    } 
+
+    // If not blocked, continue
     this.ridePopup.open();
   }
 

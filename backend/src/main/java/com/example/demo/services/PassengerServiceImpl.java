@@ -2,6 +2,8 @@ package com.example.demo.services;
 
 import com.example.demo.dto.LocationDTO;
 import com.example.demo.dto.response.RouteFromFavoritesResponseDTO;
+import com.example.demo.dto.response.UserProfileResponseDTO;
+import com.example.demo.model.Driver;
 import com.example.demo.model.Passenger;
 import com.example.demo.model.Route;
 import com.example.demo.repositories.PassengerRepository;
@@ -12,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,5 +53,27 @@ public class PassengerServiceImpl implements PassengerService {
                         .removeIf(route -> route.getId().equals(routeId));
 
         passengerRepository.save(passenger);
+    }
+
+    @Override
+    public List<UserProfileResponseDTO> getAllPassengers() {
+        List<Passenger> passengers = passengerRepository.findAll();
+
+        return passengers.stream().map(this::mapPassengerToDTO).collect(Collectors.toList());
+    }
+
+    // Helper
+    private UserProfileResponseDTO mapPassengerToDTO(Passenger passenger) {
+        return new UserProfileResponseDTO(
+                passenger.getId(),
+                passenger.getEmail(),
+                passenger.getName(),
+                passenger.getSurname(),
+                passenger.getAddress(),
+                passenger.getPhone(),
+                passenger.getProfileImageUrl(),
+                passenger.isBlocked(),
+                passenger.getBlockReason()
+        );
     }
 }

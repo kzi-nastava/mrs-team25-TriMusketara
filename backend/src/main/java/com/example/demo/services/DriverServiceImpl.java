@@ -4,6 +4,7 @@ import com.example.demo.dto.LocationDTO;
 import com.example.demo.dto.request.CompleteRegistrationRequestDTO;
 import com.example.demo.dto.request.DriverRegistrationRequestDTO;
 import com.example.demo.dto.response.DriverRegistrationResponseDTO;
+import com.example.demo.dto.response.UserProfileResponseDTO;
 import com.example.demo.dto.response.VehicleResponseDTO;
 import com.example.demo.model.Driver;
 import com.example.demo.model.DriverStatus;
@@ -25,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -285,5 +287,28 @@ public class DriverServiceImpl implements DriverService {
         }
 
         return false;
+    }
+
+    @Override
+    public List<UserProfileResponseDTO> getAllDrivers() {
+        List<Driver> drivers = driverRepository.findAll();
+
+        // Convert object to responseDTO
+        return drivers.stream().map(this::mapDriverToDTO).collect(Collectors.toList());
+    }
+
+    // Helper
+    private UserProfileResponseDTO mapDriverToDTO(Driver driver) {
+        return new UserProfileResponseDTO(
+                driver.getId(),
+                driver.getEmail(),
+                driver.getName(),
+                driver.getSurname(),
+                driver.getAddress(),
+                driver.getPhone(),
+                driver.getProfileImageUrl(),
+                driver.isBlocked(),
+                driver.getBlockReason()
+        );
     }
 }

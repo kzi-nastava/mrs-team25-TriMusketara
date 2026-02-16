@@ -125,7 +125,9 @@ public class UserController {
                 user.getId(),
                 user.getEmail(),
                 user.getClass().getSimpleName(),
-                token
+                token,
+                user.isBlocked(),
+                user.getBlockReason()
         );
 
         return ResponseEntity.ok(response);

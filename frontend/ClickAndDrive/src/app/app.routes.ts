@@ -15,6 +15,7 @@ import { ActivateAccount } from './layout/activate-account/activate-account';
 import { AuthGuard } from './services/auth.guard';
 import { PanicNotifications } from './layout/panic-notifications/panic-notifications';
 import { BlockPage } from './layout/block-page/block-page';
+import { DriverNotesPage } from './layout/driver-notes-page/driver-notes-page';
 
 
 export const routes: Routes = [
@@ -28,6 +29,7 @@ export const routes: Routes = [
   // DRIVER ROUTES
   { path: 'driver-history', component: DriverHistory, canActivate: [AuthGuard], data: { role: 'driver' } },
   { path: 'scheduled-rides', component: ScheduledRides, canActivate: [AuthGuard], data: { role: 'driver' } },
+  { path: 'driver-notes', component: DriverNotesPage, canActivate: [AuthGuard], data: {role: 'driver'} },
 
   // ADMIN ROUTES
   { path: 'reports', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'admin' } },

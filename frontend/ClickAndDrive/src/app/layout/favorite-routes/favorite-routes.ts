@@ -7,7 +7,6 @@ import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { SharedRideDataService } from '../../services/shared-ride-data.service';
 
-
 /* RouteDTO for dummy data - for now */
 interface RouteDTO {
   id: number;
@@ -41,7 +40,6 @@ export class FavoriteRoutes {
 
   ngOnInit(): void {
     const userIdFromToken = this.authService.getUserIdFromToken();
-    console.log('User ID from token:', userIdFromToken);
     if (userIdFromToken) {
       this.userId = userIdFromToken;
     } else {
@@ -52,7 +50,6 @@ export class FavoriteRoutes {
 
     this.passengerService.getFavoriteRoutes(this.userId).subscribe({
       next: (routes) => {
-        console.log('Routes received:', routes);
         this.favoriteRoutes = routes.map(r => ({ ...r, favorite: true }));
         if (this.favoriteRoutes.length === 0) {
           this.toastr.info('Add some routes to favorite', 'Info');
@@ -72,7 +69,6 @@ export class FavoriteRoutes {
   // Click on the heart button (remove from favorites)
   onFavoriteToggle(route: RouteFromFavorites, active:boolean) {
     route.favorite = active;
-    console.log('Toggled favorite for route ID:', route.id);
     this.passengerService.removeFavoriteRoute(this.userId, route.id).subscribe({
         next: () => {
           this.toastr.info("Route successfully removed from favorites", "Info");
@@ -89,19 +85,12 @@ export class FavoriteRoutes {
 
   // Order favorite route
   onOrderClick(route: RouteFromFavorites) {
-    console.log(' FavoriteRoutes: Order clicked for route:', route); // DODAJ
-    console.log(' FavoriteRoutes: Setting prefilled data:', {
-    origin: route.origin.address,
-    destination: route.destination.address
-    });
-
     // Send origin and destination to ride ordering form
     this.sharedRideDataService.setPrefilledData({
       origin: route.origin.address,
       destination: route.destination.address
     });
 
-    console.log(' FavoriteRoutes: Navigating to main page'); // DODAJ
     // Navigate to main page
     this.router.navigate(['/']);
   }

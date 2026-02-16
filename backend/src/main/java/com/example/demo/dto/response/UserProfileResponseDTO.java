@@ -1,6 +1,7 @@
 package com.example.demo.dto.response;
 
 import com.example.demo.model.Gender;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,4 +19,7 @@ public class UserProfileResponseDTO {
     private String address;
     private String phone;
     private String profileImageUrl;
+
+    private boolean blocked;
+    private String blockReason;
 }

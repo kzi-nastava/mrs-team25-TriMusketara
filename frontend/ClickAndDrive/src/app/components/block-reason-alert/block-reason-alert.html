@@ -1,0 +1,15 @@
+<div class="modal-overlay" *ngIf="isOpen">
+    <div class="modal-container">
+      <h2 class="error-title">Account Blocked</h2>
+      <p>You cannot order a ride because your account has been blocked.</p>
+      
+      <div class="reason-box" *ngIf="reason">
+        <strong>Reason:</strong>
+        <p>{{ reason }}</p>
+      </div>
+      
+      <div class="buttons-container">
+        <button class="close-btn" (click)="close()">Close</button>
+      </div>
+    </div>
+  </div>

@@ -72,6 +72,11 @@ public class RideServiceImpl implements RideService {
         Passenger creator = passengerRepository.findById(request.getPassengerId())
                 .orElseThrow(() -> new RuntimeException("Passenger not found with id: " + request.getPassengerId()));
 
+        // Check if creator is maybe blocked
+        if (creator.isBlocked()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Your are blocked! Reason " + creator.getBlockReason());
+        }
+
         // Create origin Location
         Location origin = new Location();
         origin.setLongitude(request.getOrigin().getLongitude());
@@ -213,6 +218,12 @@ public class RideServiceImpl implements RideService {
         List<Driver> busyButFinishingCandidates = new ArrayList<>();
 
         for (Driver d : drivers) {
+
+            // Check if the driver is blocked
+            if (d.isBlocked()) {
+                continue; // Skip him
+            }
+
             // Check work minutes
             int workMinutes = calculateDriverWorkMinutes(d);
 

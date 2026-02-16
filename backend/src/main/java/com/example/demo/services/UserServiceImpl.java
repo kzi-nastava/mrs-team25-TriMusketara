@@ -9,18 +9,14 @@ import com.example.demo.repositories.*;
 import com.example.demo.dto.request.UserRegistrationRequestDTO;
 import com.example.demo.dto.response.LoginResponseDTO;
 import com.example.demo.dto.response.UserProfileResponseDTO;
-import com.example.demo.model.*;
-import com.example.demo.repositories.AdministratorRepository;
-import com.example.demo.repositories.DriverRepository;
 import com.example.demo.repositories.PassengerRepository;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.services.interfaces.EmailService;
 import com.example.demo.services.interfaces.UserService;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.apache.coyote.BadRequestException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,7 +30,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -95,7 +90,7 @@ public class UserServiceImpl implements UserService {
 
         String token = jwtUtil.generateToken(user);
 
-        return new LoginResponseDTO(user.getId(), user.getEmail(), role, token);
+        return new LoginResponseDTO(user.getId(), user.getEmail(), role, token, user.isBlocked(), user.getBlockReason());
     }
 
     public UserProfileResponseDTO getUserProfile(Long id) {
@@ -110,7 +105,9 @@ public class UserServiceImpl implements UserService {
                 user.getSurname(),
                 user.getAddress(),
                 user.getPhone(),
-                user.getProfileImageUrl()
+                user.getProfileImageUrl(),
+                user.isBlocked(),
+                user.getBlockReason()
         );
     }
 
@@ -179,7 +176,9 @@ public class UserServiceImpl implements UserService {
                 user.getSurname(),
                 user.getAddress(),
                 user.getPhone(),
-                user.getProfileImageUrl()
+                user.getProfileImageUrl(),
+                user.isBlocked(),
+                user.getBlockReason()
         );
     }
 
@@ -263,7 +262,9 @@ public class UserServiceImpl implements UserService {
                 saved.getSurname(),
                 saved.getAddress(),
                 saved.getPhone(),
-                saved.getProfileImageUrl()
+                saved.getProfileImageUrl(),
+                saved.isBlocked(),
+                saved.getBlockReason()
         );
     }
 
@@ -338,6 +339,73 @@ public class UserServiceImpl implements UserService {
                 throw new RuntimeException("Failed to delete file", e);
             }
         }
+    }
+
+    @Override
+    public UserProfileResponseDTO blockUser(Long id, String reason) {
+        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        // Block him
+        user.setBlocked(true);
+        if (reason != null && !reason.trim().isEmpty()) {
+            user.setBlockReason(reason);
+        }
+
+        userRepository.save(user);
+
+        return new UserProfileResponseDTO(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                user.getSurname(),
+                user.getAddress(),
+                user.getPhone(),
+                user.getProfileImageUrl(),
+                user.isBlocked(),
+                user.getBlockReason()
+        );
+    }
+
+    @Override
+    public UserProfileResponseDTO unblockUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        user.setBlocked(false);
+        user.setBlockReason(null);
+
+        userRepository.save(user);
+
+        return new UserProfileResponseDTO(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                user.getSurname(),
+                user.getAddress(),
+                user.getPhone(),
+                user.getProfileImageUrl(),
+                user.isBlocked(),
+                user.getBlockReason()
+        );
+    }
+
+    @Override
+    public UserProfileResponseDTO setNote(Long id, String reason) {
+        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        user.setBlockReason(reason);
+        userRepository.save(user);
+
+        return new UserProfileResponseDTO(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                user.getSurname(),
+                user.getAddress(),
+                user.getPhone(),
+                user.getProfileImageUrl(),
+                user.isBlocked(),
+                user.getBlockReason()
+        );
     }
 
     @Transactional

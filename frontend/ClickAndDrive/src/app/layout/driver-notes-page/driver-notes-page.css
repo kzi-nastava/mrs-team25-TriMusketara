@@ -1,0 +1,243 @@
+:host {
+    position: relative;
+    display: block;
+    height: 100vh;
+  }
+
+  hr {
+    margin: 0;
+  }
+  
+  /*put the whole div below nav bar*/
+  .page-wrapper {
+    position: fixed;   
+    top: 80px;            
+    left: 0;            
+    width: 100vw;          
+    height: calc(100vh - 80px);
+
+    background-image: linear-gradient(rgba(36, 36, 35, 0.45), rgba(36, 36, 35, 0.45)), url(../../../../public/notes-page-background.jpeg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  .inner-container {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* border: 1px solid green; */
+  }
+
+  .container {
+    width: 90%;
+    min-height: 92%;
+    max-height: 92%;
+    height: 92%;
+    /* border: 2px solid red; */
+    background-color: rgba(36, 36, 35, 0.25);
+    /* height: calc((100vh - 80px) * 0.9); */
+  }
+  
+  .title {
+    /* border: 2px solid salmon; */
+    width: 100%;
+    height: 15%;
+    box-sizing: border-box;
+    padding-top: 4%;
+  }
+
+  .title p {
+    color: white;
+    text-decoration: underline;
+    font-size: 40px;
+    margin-left: 10%;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .card-container {
+    /* border: 2px solid blue; */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    width: 100%;
+    height: 75%;
+    box-sizing: border-box;
+    gap: 15px;
+    padding-right: 5%;
+  }
+
+  .card-container .card {
+    /* border: 2px solid darkgreen; */
+    margin-left: 5%;
+    width: 45%;
+    height: auto;
+    border-radius: 8px;
+    box-sizing: border-box;
+    background-color: rgba(36, 36, 35, 0.4);
+  }
+
+  hr {
+    opacity: 20%;
+  }
+
+  h2 {
+    margin: 0;
+    padding: 15px;
+    color: #F55C5C;
+  }
+
+  h3 {
+    margin: 0;
+    padding: 15px;
+    color: #F5CB5C
+  }
+
+  .card p {
+    margin: 0;
+    font-size: 16px;
+    padding: 20px;
+    color: white;
+  }
+
+  @media (max-width: 1200px) {
+    .title p {
+      font-size: 36px;
+      margin-left: 10%;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .location-pin {
+      height: 44px;
+      width: 44px;
+      margin-left: 10px;
+    }
+  }
+
+  @media (max-width: 992px) {
+    .title {
+      padding-top: 2.4%;
+    }
+
+    .route-info p {
+      font-size: 18px;
+    }
+
+    .card-container .card {
+      margin-left: 3%;
+      width: 82%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .title {
+      padding-top: 3.5%;
+    }
+
+    .title p {
+      font-size: 34px;
+    }
+
+    .card-container .card {
+      margin-left: 3%;
+      width: 92%;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .title {
+      padding-top: 4%;;
+    }
+
+    .title p {
+      font-size: 30px;
+    }
+
+    .route-info p {
+      font-size: 14px;
+      margin-left: 10px;
+    }
+
+    .location-pin {
+      display: none;
+    }
+
+    .interactable {
+      gap: 10px;
+    }
+
+    .interactable button {
+      padding: 8px 12px;
+    }
+
+    .bottom-card-part .distance {
+      font-size: 14px;
+    }
+  
+    .bottom-card-part .duration {
+      /* border: 1px solid salmon; */
+      font-size: 14px;
+    }
+  
+    .bottom-card-part .times-used {
+      font-size: 14px;
+    }
+
+    .button-container button {
+      width: 16%;
+      padding: 8px;
+      font-size: 14px;
+    }
+  }
+
+  @media (max-width: 400px) {
+
+    hr {
+      display: none;
+    }
+
+    .title {
+      padding-top: 7%;
+    }
+
+    .card-container .card {
+      margin-left: 2%;
+      margin-right: 2%;
+      width: auto;
+    }
+
+    .top-card-part {
+      flex-direction: column;
+    }
+
+    .interactable {
+      margin-top: 10px;
+      margin-left: 53px;
+    }
+
+    .bottom-card-part {
+      justify-content: end;
+      gap: 10px;
+    }
+
+    .bottom-card-part .duration {
+      margin-right: 20px;
+    }
+
+    .bottom-card-part .times-used {
+      display: none;
+    }
+
+    .button-container button {
+      width: 22%;
+      padding: 8px;
+      font-size: 14px;
+    }
+  }

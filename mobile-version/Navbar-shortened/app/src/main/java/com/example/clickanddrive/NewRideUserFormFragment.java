@@ -25,13 +25,17 @@ import com.example.clickanddrive.dtosample.enumerations.RideStatus;
 import com.example.clickanddrive.dtosample.enumerations.VehicleType;
 import com.example.clickanddrive.dtosample.requests.CreateRideRequest;
 import com.example.clickanddrive.dtosample.responses.RideResponse;
+import com.example.clickanddrive.map.MapboxDirections;
+import com.example.clickanddrive.map.MapboxGeocoder;
 import com.example.clickanddrive.models.RouteData;
+import com.example.clickanddrive.models.RouteCalculator;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -62,11 +66,15 @@ public class NewRideUserFormFragment extends Fragment {
     // Vehicle types
     private static final VehicleType[] VEHICLE_TYPES = VehicleType.values();
 
-    // HARDcODED VALUES FOR NOW
-    private static final double TEMP_DISTANCE_KM = 10.5;
-    private static final int TEMP_DURATION_MINUTES = 25;
-    private static final double TEMP_LONGITUDE = 20.44897;
-    private static final double TEMP_LATITUDE = 44.7866;
+    // Service for route calculation
+    private RouteCalculator routeCalculator;
+
+    // Data from favored route if a user orders from favorites
+    private boolean isFromFavorite = false;
+    private Double prefilledOriginLat = null;
+    private Double prefilledOriginLng = null;
+    private Double prefilledDestLat = null;
+    private Double prefilledDestLng = null;
 
     @Nullable
     @Override
@@ -79,9 +87,13 @@ public class NewRideUserFormFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceBundle) {
         super.onViewCreated(view, savedInstanceBundle);
 
+        routeCalculator = new RouteCalculator();
+
         initializeViews(view);
         setUpVehicleTypeSpinner();
         setUpButtonListeners();
+
+        checkForPrefillData();
     }
 
     // Initialize views (find by id)
@@ -98,6 +110,28 @@ public class NewRideUserFormFragment extends Fragment {
         btnLinkedPassengers = view.findViewById(R.id.btn_linked_passengers);
         btnSetTime = view.findViewById(R.id.btn_set_time);
         btnScheduleRide = view.findViewById(R.id.btn_schedule_ride);
+    }
+
+    private void checkForPrefillData() {
+        Bundle args = getArguments();
+        if (args == null) {
+            return;
+        }
+
+        if (args.containsKey("PREFILL_ORIGIN")) {
+            String origin = args.getString("PREFILL_ORIGIN");
+            String destination = args.getString("PREFILL_DESTINATION");
+
+            prefilledOriginLat = args.getDouble("PREFILL_ORIGIN_LAT", 0.0);
+            prefilledOriginLng = args.getDouble("PREFILL_ORIGIN_LNG", 0.0);
+            prefilledDestLat = args.getDouble("PREFILL_DEST_LAT", 0.0);
+            prefilledDestLng = args.getDouble("PREFILL_DEST_LNG", 0.0);
+
+            isFromFavorite = true;
+
+            etOrigin.setText(origin);
+            etDestination.setText(destination);
+        }
     }
 
     private void setUpVehicleTypeSpinner() {
@@ -260,12 +294,168 @@ public class NewRideUserFormFragment extends Fragment {
         if (!validateInput()) {
             return;
         }
+        btnScheduleRide.setEnabled(false);
+        btnScheduleRide.setText("Processing...");
 
-        // Build request
-        CreateRideRequest request = buildCreateRideRequest();
+        String origin = etOrigin.getText().toString().trim();
+        String destination = etDestination.getText().toString().trim();
 
-        // Send to backend
-        createRide(request);
+        // Route calculation service
+        routeCalculator.calculateRoute(origin,
+                destination,
+                additionalStops,
+                prefilledOriginLng,
+                prefilledOriginLat,
+                prefilledDestLng,
+                prefilledDestLat,
+                new RouteCalculator.RouteCalculationCallback() {
+                    @Override
+                    public void onSuccess(RouteCalculator.RouteCalculationResult result) {
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                createAndSendRide(result);
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
+                                resetScheduleButton();
+                            });
+                        }
+                    }
+                });
+    }
+
+    private void createAndSendRide(RouteCalculator.RouteCalculationResult routeResult) {
+        // Take data from form
+        int selectedVehicleTypeIndex = spinnerVehicleType.getSelectedItemPosition();
+        VehicleType vehicleType = VEHICLE_TYPES[selectedVehicleTypeIndex];
+        boolean babyFriendly = toggleBabyFriendly.isChecked();
+        boolean petFriendly = togglePetFriendly.isChecked();
+
+        LocationDTO originLocation = new LocationDTO(
+                routeResult.originLng,
+                routeResult.originLat,
+                routeResult.origin
+        );
+
+        LocationDTO destinationLocation = new LocationDTO(
+                routeResult.destLng,
+                routeResult.destLat,
+                routeResult.destination
+        );
+
+        // Convert Calendar to LocalDateTime
+        LocalDateTime scheduledTime = LocalDateTime.of(
+                selectedTime.get(Calendar.YEAR),
+                selectedTime.get(Calendar.MONTH) + 1,
+                selectedTime.get(Calendar.DAY_OF_MONTH),
+                selectedTime.get(Calendar.HOUR_OF_DAY),
+                selectedTime.get(Calendar.MINUTE)
+        );
+
+        Long passengerId = SessionManager.userId;
+
+        CreateRideRequest request = new CreateRideRequest(
+                passengerId,
+                originLocation,
+                destinationLocation,
+                routeResult.stopLocations,
+                linkedPassengers,
+                vehicleType,
+                scheduledTime,
+                babyFriendly,
+                petFriendly,
+                routeResult.durationMinutes,
+                routeResult.distanceKm
+        );
+
+        sendRideToBackend(request, routeResult);
+    }
+
+    private void sendRideToBackend(CreateRideRequest request, RouteCalculator.RouteCalculationResult routeResult) {
+        Call<RideResponse> call = ClientUtils.rideService.createRide(request);
+
+        call.enqueue(new Callback<RideResponse>() {
+            @Override
+            public void onResponse(Call<RideResponse> call, Response<RideResponse> response) {
+                resetScheduleButton();
+
+                if (response.isSuccessful() && response.body() != null) {
+                    handleRideResponse(response.body(), routeResult);
+                } else {
+                    Toast.makeText(getContext(), "Failed to create ride: " + response.code(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RideResponse> call, Throwable t) {
+                resetScheduleButton();
+                Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void handleRideResponse(RideResponse response, RouteCalculator.RouteCalculationResult routeResult) {
+
+        if (response.getStatus() == RideStatus.SCHEDULED) {
+            Toast.makeText(getContext(), "Ride scheduled", Toast.LENGTH_LONG).show();
+
+            // Create routedata with all inputs
+            RouteData routeData = createRouteData(routeResult);
+
+            // Navigate to map
+            navigateToMap(routeData);
+
+            clearForm();
+        } else if (response.getStatus() == RideStatus.FAILED) {
+            Toast.makeText(getContext(), "No available drivers at the moment", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(getContext(), "Ride status: " + response.getStatus(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private RouteData createRouteData(RouteCalculator.RouteCalculationResult result) {
+        RouteData routeData = new RouteData();
+        routeData.setOrigin(result.origin);
+        routeData.setDestination(result.destination);
+        routeData.setStops(result.stops);
+        routeData.setOriginLng(result.originLng);
+        routeData.setOriginLat(result.originLat);
+        routeData.setDestinationLng(result.destLng);
+        routeData.setDestinationLat(result.destLat);
+        routeData.setDistanceKm(result.distanceKm);
+        routeData.setDurationMinutes(result.durationMinutes);
+        routeData.setStopLocations(result.stopLocations);
+        routeData.setRouteCoordinates(result.routeCoordinates);
+        return routeData;
+    }
+
+    private void navigateToMap(RouteData routeData) {
+        HomeFragment homeFragment = new HomeFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("ROUTE_DATA", routeData);
+        homeFragment.setArguments(bundle);
+
+        if (getActivity() != null) {
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.flFragment, homeFragment)
+                    .addToBackStack(null)
+                    .commit();
+        }
+    }
+
+    private void resetScheduleButton() {
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                btnScheduleRide.setEnabled(true);
+                btnScheduleRide.setText("Schedule Ride");
+            });
+        }
     }
 
     // Validations
@@ -314,128 +504,6 @@ public class NewRideUserFormFragment extends Fragment {
         }
 
         return true;
-    }
-
-    // Creating ride ordering request
-    private CreateRideRequest buildCreateRideRequest() {
-        // Get data from the form
-        String origin = etOrigin.getText().toString().trim();
-        String destination = etDestination.getText().toString().trim();
-        int selectedVehicleTypeIndex = spinnerVehicleType.getSelectedItemPosition();
-        VehicleType vehicleType = VEHICLE_TYPES[selectedVehicleTypeIndex];
-        boolean babyFriendly = toggleBabyFriendly.isChecked();
-        boolean petFriendly = togglePetFriendly.isChecked();
-
-        // LocationDTOs
-        LocationDTO originLocation = new LocationDTO(
-                TEMP_LONGITUDE,
-                TEMP_LATITUDE,
-                origin
-        );
-
-        LocationDTO destinationLocation = new LocationDTO(
-                TEMP_LONGITUDE + 0.01,
-                TEMP_LATITUDE + 0.01,
-                destination
-        );
-
-        // Create LocationDTOs for additional stops
-        List<LocationDTO> stops = new ArrayList<>();
-        for (String stopAddress : additionalStops) {
-            LocationDTO stop = new LocationDTO(
-                    TEMP_LONGITUDE + 0.005,
-                    TEMP_LATITUDE + 0.005,
-                    stopAddress
-            );
-            stops.add(stop);
-        }
-
-        // Convert Calendar to LocalDateTime
-        LocalDateTime scheduledTime = LocalDateTime.of(
-                selectedTime.get(Calendar.YEAR),
-                selectedTime.get(Calendar.MONTH) + 1, // Calendar months are 0-indexed
-                selectedTime.get(Calendar.DAY_OF_MONTH),
-                selectedTime.get(Calendar.HOUR_OF_DAY),
-                selectedTime.get(Calendar.MINUTE)
-        );
-
-        // Use currently logged in users id
-        Long passengerId = SessionManager.userId;
-
-        // Build and return request
-        return new CreateRideRequest(
-                passengerId,
-                originLocation,
-                destinationLocation,
-                stops,
-                linkedPassengers,
-                vehicleType,
-                scheduledTime,
-                babyFriendly,
-                petFriendly,
-                TEMP_DURATION_MINUTES,
-                TEMP_DISTANCE_KM
-        );
-    }
-
-    private void createRide(CreateRideRequest request) {
-        Call<RideResponse> call = ClientUtils.rideService.createRide(request);
-
-        call.enqueue(new Callback<RideResponse>() {
-            @Override
-            public void onResponse(Call<RideResponse> call, Response<RideResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    RideResponse rideResponse = response.body();
-
-                    handleRideResponse(rideResponse);
-                } else {
-                    Toast.makeText(getContext(), "Failed to create ride", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<RideResponse> call, Throwable t) {
-                Toast.makeText(getContext(), "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    // Navigate to map and draw out the route
-    private void handleRideResponse(RideResponse response) {
-        if (response.getStatus() == RideStatus.SCHEDULED) { // Available driver found
-            String message = String.format("Ride scheduled! Price: %.2f RSD", response.getPrice());
-            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
-
-            RouteData routeData = new RouteData();
-            routeData.setOrigin(etOrigin.getText().toString().trim());
-            routeData.setDestination(etDestination.getText().toString().trim());
-            routeData.setStops(new ArrayList<>(additionalStops));
-
-            HomeFragment homeFragment = new HomeFragment();
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("ROUTE_DATA", routeData);
-            homeFragment.setArguments(bundle);
-
-            if (getActivity() != null) {
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.flFragment, homeFragment)
-                        .addToBackStack(null)
-                        .commit();
-            }
-
-            // Clear form
-            clearForm();
-        } else if (response.getStatus() == RideStatus.FAILED) {
-            // No available driver
-            Toast.makeText(getContext(),
-                    "No available driver at the moment. Please try again later.",
-                    Toast.LENGTH_LONG).show();
-        } else {
-            // Other status
-            Toast.makeText(getContext(),
-                    "Ride status: " + response.getStatus(),
-                    Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void clearForm() {

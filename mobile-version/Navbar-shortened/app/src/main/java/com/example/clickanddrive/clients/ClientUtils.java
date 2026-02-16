@@ -4,6 +4,7 @@ import com.example.clickanddrive.BuildConfig;
 import com.example.clickanddrive.SessionManager;
 import com.example.clickanddrive.clients.services.AdminService;
 import com.example.clickanddrive.clients.services.DriverService;
+import com.example.clickanddrive.clients.services.PassengerService;
 import com.example.clickanddrive.clients.services.RideService;
 import com.example.clickanddrive.clients.services.UserService;
 import com.example.clickanddrive.clients.services.GuestRideService;
@@ -73,4 +74,5 @@ public class ClientUtils {
     public static RideService rideService = retrofit.create(RideService.class);
     public static GuestRideService guestRideService = retrofit.create(GuestRideService.class);
     public static AdminService adminService = retrofit.create(AdminService.class);
+    public static PassengerService passengerService = retrofit.create(PassengerService.class);
 }
