@@ -1,0 +1,67 @@
+<div class="page-wrapper">
+    <div class="inner-container">
+        <div class="container">
+            <div class="title">
+                <p>Generate a Report</p>
+            </div>
+            <div class="card-container">
+                @if (userRole() === 'Passenger' || userRole() === 'Driver') {
+                    <div class="interactable">
+                        <span>
+                            <label for="date-from">Date from: </label>
+                            <input type="date" id="date-from" name="date-from">
+                        </span>
+
+                        <span>
+                            <label for="date-to">Date to: </label>
+                            <input type="date" id="date-to" name="date-to">
+                        </span>
+
+                        <button>Generate</button>
+                    </div>
+                    <div class="report-container">
+                        <div class="report">
+
+                        </div>
+                    </div>
+                } else {
+                    <div class="interactable">
+                        <div class="user-type-selector">
+                            <label>
+                                <input type="radio" name="userType" value="all-drivers" [(ngModel)]="selectedUserType">
+                                All Drivers
+                            </label>
+                            <label>
+                                <input type="radio" name="userType" value="all-passengers" [(ngModel)]="selectedUserType">
+                                All Passengers
+                            </label>
+                            <label>
+                                <input type="radio" name="userType" value="single" [(ngModel)]="selectedUserType">
+                                Single User
+                            </label>
+                        </div>
+                
+                        @if (selectedUserType === 'single') {
+                            <select [(ngModel)]="selectedUserId">
+                                <option value="">Select user...</option>
+                                @for (user of allUsers; track user.id) {
+                                    <option [value]="user.id">{{user.name}} ({{user.role}})</option>
+                                }
+                            </select>
+                        }
+                
+                        <span>
+                            <label for="date-from">Date from: </label>
+                            <input type="date" id="date-from" name="date-from" [(ngModel)]="dateFrom">
+                        </span>
+                        <span>
+                            <label for="date-to">Date to: </label>
+                            <input type="date" id="date-to" name="date-to" [(ngModel)]="dateTo">
+                        </span>
+                
+                        <button (click)="generateAdminReport()">Generate</button>
+                    </div>
+                }
+        </div>
+    </div>
+</div>

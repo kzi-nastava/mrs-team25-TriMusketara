@@ -19,7 +19,7 @@ export class DriverProfile {
     { label: 'Scheduled rides', route: 'scheduled-rides' },
     { label: 'Ride history', route: 'driver-history' },
     { label: 'Change information', route: 'change-information-page' },
-    { label: 'Reports', route: 'reports' },
+    { label: 'Reports', route: 'reports-page' },
     { label: 'Notes', route: 'driver-notes' },
     { label: 'Support', route: 'support' },
     { label: 'Log out', redText: true, logout: true }

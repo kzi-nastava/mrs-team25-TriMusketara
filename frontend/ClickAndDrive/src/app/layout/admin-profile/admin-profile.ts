@@ -22,7 +22,7 @@ export class AdminProfile {
     { label: 'Requests' },
     { label: 'Change information', route: 'change-information-page' },
     { label: 'Support' },
-    { label: 'Reports' },
+    { label: 'Reports' , route: 'reports-page'},
     { label: 'Notes' },
     { label: 'Block a user', route: 'block-a-user'},
     { label: 'Log out', redText: true, logout: true }

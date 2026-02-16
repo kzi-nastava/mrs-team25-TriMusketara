@@ -19,7 +19,7 @@ export class PassengerProfile {
     { label: 'Favorite routes', route: 'favorite-routes' },
     { label: 'Ride history' },
     { label: 'Change information', route: 'change-information-page' },
-    { label: 'Reports' },
+    { label: 'Reports', route: 'reports-page' },
     { label: 'Notes' },
     { label: 'Support' },
     { label: 'Log out', redText: true, logout: true }

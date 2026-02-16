@@ -699,5 +699,4 @@ public class RideServiceImpl implements RideService {
 
         return new PageImpl<>(pagedList, pageable, allRides.size());
     }
-
 }

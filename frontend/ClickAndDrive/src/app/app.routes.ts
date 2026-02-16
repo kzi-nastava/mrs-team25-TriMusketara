@@ -16,6 +16,7 @@ import { AuthGuard } from './services/auth.guard';
 import { PanicNotifications } from './layout/panic-notifications/panic-notifications';
 import { BlockPage } from './layout/block-page/block-page';
 import { DriverNotesPage } from './layout/driver-notes-page/driver-notes-page';
+import { ReportsPage } from './layout/reports-page/reports-page';
 
 
 export const routes: Routes = [
@@ -42,12 +43,16 @@ export const routes: Routes = [
   // SHARED ROUTES
   { path: 'change-information-page', component: ChangeInfoPage, canActivate: [AuthGuard], data: { roles: ['user', 'admin', 'driver'] } },
   { path: 'drive-in-progress', component: DriveInProgress, canActivate: [AuthGuard], data: { roles: ['user', 'driver'] } },
+  { path: 'reports-page', component: ReportsPage, canActivate: [AuthGuard], data: { roles: ['user', 'admin', 'driver'] } },
+
   
   // PUBLIC ROUTES
   { path: 'login', component: LoginPage },
   { path: 'register', component: RegistrationPage },
   { path: 'complete-registration', component: CompleteDriverRegistration },
   { path: 'activate-account', component: ActivateAccount },
+  { path: 'reports-page', component: ReportsPage },
+
   // CATCH ALL
   { path: '**', redirectTo: 'map' }
 ];
