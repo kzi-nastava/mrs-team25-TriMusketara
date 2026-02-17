@@ -2,11 +2,15 @@ import { Injectable, signal } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class AdminPopupService {
-  private isOpenSignal = signal(false);
+  private isPriceOpenSignal = signal(false);
+  private isChatOpenSignal = signal(false);
 
-  isOpen() { return this.isOpenSignal(); }
+  isPriceOpen() { return this.isPriceOpenSignal(); }
+  isChatOpen() { return this.isChatOpenSignal(); }
 
-  open() { this.isOpenSignal.set(true); }
+  openPrice() { this.isPriceOpenSignal.set(true); }
+  closePrice() { this.isPriceOpenSignal.set(false); }
 
-  close() { this.isOpenSignal.set(false); }
+  openChat() { this.isChatOpenSignal.set(true); }
+  closeChat() { this.isChatOpenSignal.set(false); }
 }

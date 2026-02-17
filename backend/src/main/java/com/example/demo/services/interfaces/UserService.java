@@ -7,6 +7,7 @@ import com.example.demo.dto.request.UserRegistrationRequestDTO;
 import com.example.demo.dto.response.LoginResponseDTO;
 import com.example.demo.dto.response.ProfileImageResponseDTO;
 import com.example.demo.dto.response.UserProfileResponseDTO;
+import com.example.demo.model.User;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
@@ -22,4 +23,7 @@ public interface UserService {
     UserProfileResponseDTO blockUser(Long id, String reason);
     UserProfileResponseDTO unblockUser(Long id);
     UserProfileResponseDTO setNote(Long id, String reason);
+
+
+    User findByEmail(String senderEmail);
 }

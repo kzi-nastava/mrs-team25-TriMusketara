@@ -6,6 +6,7 @@ import { UserProfileInformation } from '../../services/models/user-profile-infor
 import { CommonModule } from '@angular/common';
 import { fromReadableStreamLike } from 'rxjs/internal/observable/innerFrom';
 import { ToastrService } from 'ngx-toastr';
+import { AdminPopupService } from '../../services/admin-popup.service';
 
 @Component({
   selector: 'app-passenger-profile',
@@ -40,6 +41,7 @@ export class PassengerProfile {
     private authService: AuthService,
     private userService: UserService,
     private cdr: ChangeDetectorRef,
+    private adminPopupService: AdminPopupService,
     private toastr: ToastrService
   ) {}
 
@@ -78,6 +80,12 @@ export class PassengerProfile {
     if (button.logout) {
       this.authService.logout();
       return;
+    }
+
+    if (button.label === 'Support') {
+    this.adminPopupService.openChat();
+    //this.profileSidebar.close(); 
+    return;
     }
 
     if (button.route) {

@@ -137,11 +137,11 @@ export class NavbarComponent {
   });
 }
 
-  onTestRideClick() {
-    this.auth.setRideData('Bulevar Oslobođenja 45', 'Cara Dušana 12');
-    this.auth.setInDrive(true);
-    this.router.navigate(['drive-in-progress']);
-  }
+  // onTestRideClick() {
+  //   this.auth.setRideData('Bulevar Oslobođenja 45', 'Cara Dušana 12');
+  //   this.auth.setInDrive(true);
+  //   this.router.navigate(['drive-in-progress']);
+  // }
 
   // Navigate to admin panic notifications
   goToPanicNotifications() {

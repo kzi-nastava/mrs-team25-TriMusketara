@@ -9,7 +9,7 @@
 
 <router-outlet></router-outlet>
 
-<div class="overlay" [class.open]="ridePopup.isOpen() || adminPopup.isOpen()" (click)="onOverlayClick()"></div>
+<div class="overlay" [class.open]="ridePopup.isOpen() || adminPopup.isPriceOpen() || adminPopup.isChatOpen()" (click)="onOverlayClick()"></div>
 
 <!-- POPUP -->
 @if (ridePopup.isOpen()) {
@@ -50,6 +50,11 @@
 }
 
 <!-- ADMIN change prices popup -->
-@if (adminPopup.isOpen()) {
+@if (adminPopup.isPriceOpen()) {
     <app-change-price-popup></app-change-price-popup>
+}
+
+<!-- Admin/User Chat Popup -->
+@if (adminPopup.isChatOpen()) {
+  <app-chat-view></app-chat-view>
 }

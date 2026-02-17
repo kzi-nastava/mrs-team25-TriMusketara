@@ -1,0 +1,43 @@
+<div class="chat-section" (click)="$event.stopPropagation()">
+    <!-- Chat Navigation -->
+    <div class="chat-nav">
+        <div class="header">
+            <div class="avatar"></div>
+            <div class="title">
+                <span class="display-name">{{ selectedUserEmail || 'Support' }}</span>
+            </div>
+        </div>
+        <button class="close-x" (click)="close()">×</button>
+    </div>
+
+    <!-- Content Area -->
+    <div class="chat-content">
+        <!-- Admin see user list if no one selected -->
+        @if (auth.userType() === 'admin' && !selectedUserEmail) {
+            <div class="user-list">
+                <p style="color: white; padding: 10px;">Select a user to chat:</p>
+                @for (email of chatUsers; track email) {
+                    <div class="user-item" (click)="selectUser(email)">{{ email }}</div>
+                }
+            </div>
+        } @else {
+            <!-- Chat Messages -->
+            <div class="messages-container" #scrollMe>
+                @for (m of messages; track m.sentAt) {
+                    <div class="message-bubble" [class.mine]="m.senderEmail === auth.userName()">
+                        <div class="bubble-text">{{ m.message }}</div>
+                        <div class="timestamp">{{ m.sentAt | date:'HH:mm' }}</div>
+                    </div>
+                }
+            </div>
+
+            <!-- Compose Bar -->
+            <div class="compose-bar">
+                <div class="input-field">
+                    <input type="text" [(ngModel)]="newMessage" placeholder="Type a message..." (keyup.enter)="send()">
+                </div>
+                <button class="send-btn" (click)="send()">➤</button>
+            </div>
+        }
+    </div>
+</div>
