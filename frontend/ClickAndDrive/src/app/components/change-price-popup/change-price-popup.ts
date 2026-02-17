@@ -1,9 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AdminService } from '../services/admin.service';
-import { AdminPopupService } from '../services/admin-popup.service';
-import { VehiclePrice } from '../services/models/vehicle-price';
+import { AdminService } from '../../services/admin.service';
+import { AdminPopupService } from '../../services/admin-popup.service';
+import { VehiclePrice } from '../../services/models/vehicle-price';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -42,7 +42,7 @@ export class ChangePricePopup implements OnInit {
     this.adminService.updatePrices(this.prices).subscribe({
       next: () => {
         this.toastr.success("Prices updated successfully!");
-        this.popupService.close();
+        this.popupService.closePrice();
       },
       error: (err) => {
         this.toastr.error("Failed to update prices.");

@@ -94,8 +94,14 @@ export class AdminProfile {
     }
 
     if (button.label === 'Change prices') { // DODAJ OVU LOGIKU
-        this.adminPopupService.open();
+        this.adminPopupService.openPrice();
         return;
+    }
+
+    if (button.label === 'Support') {
+    this.adminPopupService.openChat();
+    //this.profileSidebar.close(); 
+    return;
     }
 
     if (button.route) {

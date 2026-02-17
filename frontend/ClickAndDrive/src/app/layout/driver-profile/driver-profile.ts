@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '../../services/user.service';
 import { UserProfileInformation } from '../../services/models/user-profile-information';
 import { ToastrService } from 'ngx-toastr';
+import { AdminPopupService } from '../../services/admin-popup.service';
 
 @Component({
   selector: 'app-driver-profile',
@@ -39,6 +40,7 @@ export class DriverProfile {
     private router: Router,
     private authService: AuthService,
     private userService: UserService,
+    private adminPopupService: AdminPopupService,
     private cdr: ChangeDetectorRef,
     private toastr: ToastrService
   ) {}
@@ -78,6 +80,10 @@ export class DriverProfile {
     if (button.logout) {
       this.authService.logout();
       return;
+    }
+
+    if(button.label === "Support") {
+      this.adminPopupService.openChat();
     }
 
     if (button.route) {
