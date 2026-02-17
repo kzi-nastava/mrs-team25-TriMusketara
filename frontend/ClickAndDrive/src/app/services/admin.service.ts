@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { NoteRequest, UserProfileInformation } from "./models/user-profile-information";
 import { Observable } from "rxjs";
 import { Injectable } from "@angular/core";
+import { VehiclePrice } from "./models/vehicle-price";
 
 @Injectable({
     providedIn: 'root'
@@ -36,5 +37,15 @@ export class AdminService {
     leaveNote(userId: number, note: string): Observable<UserProfileInformation> {
         const body: NoteRequest = {message: note}
         return this.http.put<UserProfileInformation>(`${this.apiUrl}/users/${userId}/note`, body);
+    }
+
+    // Get current prices
+    getPrices(): Observable<VehiclePrice> {
+        return this.http.get<VehiclePrice>(`${this.apiUrl}/prices`);
+    }
+
+    // Update prices
+    updatePrices(prices: VehiclePrice): Observable<any> {
+        return this.http.put<any>(`${this.apiUrl}/prices`, prices);
     }
 }

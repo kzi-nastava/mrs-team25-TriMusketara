@@ -9,17 +9,24 @@ import { Location } from '../services/models/location';
 import { SharedRideDataService } from '../services/shared-ride-data.service';
 import { HttpClient } from '@angular/common/http';
 import { GuestRideResponseDTO } from '../services/models/guest-ride-response-dto';
+import { ChangePricePopup } from '../change-price-popup/change-price-popup';
+import { AdminPopupService } from '../services/admin-popup.service';
 
 
 @Component({
   selector: 'app-main-page',
   standalone: true,
-  imports: [MapViewComponent, RouterOutlet, RideOrdering, FormsModule],
+  imports: [MapViewComponent, RouterOutlet, RideOrdering, FormsModule, ChangePricePopup],
   templateUrl: './main-page.html',
   styleUrls: ['./main-page.css']
 })
 export class MainPageComponent {
-  constructor(public ridePopup: RidePopup, public auth: AuthService, private http: HttpClient, private sharedRideDataService: SharedRideDataService, private cdr: ChangeDetectorRef) {}
+  constructor(public ridePopup: RidePopup, 
+    public auth: AuthService,  
+    private http: HttpClient, 
+    private sharedRideDataService: SharedRideDataService, 
+    private cdr: ChangeDetectorRef,
+    public adminPopup: AdminPopupService) {}
 
   @ViewChild('mapView') mapView!: MapViewComponent;
 
@@ -120,6 +127,7 @@ export class MainPageComponent {
 
   onOverlayClick() {
     this.ridePopup.close();
+    this.adminPopup.close();
   }
 
   // Converts text, example: Novi Sad, into map coordinates [lng, lat] using Mapbox Geocoding API
