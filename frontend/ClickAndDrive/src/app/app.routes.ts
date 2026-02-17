@@ -16,11 +16,12 @@ import { AuthGuard } from './services/auth.guard';
 import { PanicNotifications } from './layout/panic-notifications/panic-notifications';
 import { BlockPage } from './layout/block-page/block-page';
 import { DriverNotesPage } from './layout/driver-notes-page/driver-notes-page';
+import { ReportsPage } from './layout/reports-page/reports-page';
 import { PassengerHistory } from './layout/passenger-history/passenger-history';
 
 
 export const routes: Routes = [
-   { path: '', redirectTo: 'map', pathMatch: 'full' },
+  { path: '', redirectTo: 'map', pathMatch: 'full' },
   { path: 'map', component: MainPageComponent },
 
   // USER ROUTES
@@ -34,7 +35,6 @@ export const routes: Routes = [
   { path: 'driver-notes', component: DriverNotesPage, canActivate: [AuthGuard], data: {role: 'driver'} },
 
   // ADMIN ROUTES
-  { path: 'reports', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
   { path: 'notes', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
   { path: 'support', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
   { path: 'driver-registration', component: DriverRegistration, canActivate: [AuthGuard], data: { role: 'admin' } },
@@ -44,12 +44,14 @@ export const routes: Routes = [
   // SHARED ROUTES
   { path: 'change-information-page', component: ChangeInfoPage, canActivate: [AuthGuard], data: { roles: ['user', 'admin', 'driver'] } },
   { path: 'drive-in-progress', component: DriveInProgress, canActivate: [AuthGuard], data: { roles: ['user', 'driver'] } },
-  
+  { path: 'reports-page', component: ReportsPage, canActivate: [AuthGuard], data: { roles: ['user', 'admin', 'driver'] } },
+
   // PUBLIC ROUTES
   { path: 'login', component: LoginPage },
   { path: 'register', component: RegistrationPage },
   { path: 'complete-registration', component: CompleteDriverRegistration },
   { path: 'activate-account', component: ActivateAccount },
+
   // CATCH ALL
   { path: '**', redirectTo: 'map' }
 ];

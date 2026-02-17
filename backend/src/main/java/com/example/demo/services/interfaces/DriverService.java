@@ -6,8 +6,10 @@ import com.example.demo.dto.response.DriverRegistrationResponseDTO;
 import com.example.demo.dto.response.UserProfileResponseDTO;
 import com.example.demo.dto.response.VehicleResponseDTO;
 import com.example.demo.dto.response.DriverRideHistoryResponseDTO;
+import com.example.demo.model.Driver;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DriverService {
     DriverRegistrationResponseDTO registerDriver(DriverRegistrationRequestDTO request, String platform);
