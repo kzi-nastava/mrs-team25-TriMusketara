@@ -20,4 +20,6 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
 
     @Query("SELECT r FROM Ride r JOIN r.passengers p WHERE p.id = :passengerId")
     List<Ride> findAllByPassengerId(@Param("passengerId") Long passengerId);
+
+    List<Ride> findAllByStatus(RideStatus rideStatus);
 }

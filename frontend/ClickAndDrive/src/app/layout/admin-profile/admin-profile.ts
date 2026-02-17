@@ -5,6 +5,7 @@ import { UserService } from '../../services/user.service';
 import { UserProfileInformation } from '../../services/models/user-profile-information';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
+import { AdminPopupService } from '../../services/admin-popup.service';
 
 @Component({
   selector: 'app-admin-profile',
@@ -42,6 +43,7 @@ export class AdminProfile {
     private router: Router,
     private authService: AuthService,
     private userService: UserService,
+    private adminPopupService: AdminPopupService,
     private cdr: ChangeDetectorRef,
     private toastr: ToastrService
   ) {}
@@ -89,6 +91,11 @@ export class AdminProfile {
     if (button.logout) {
       this.authService.logout();
       return;
+    }
+
+    if (button.label === 'Change prices') { // DODAJ OVU LOGIKU
+        this.adminPopupService.open();
+        return;
     }
 
     if (button.route) {
