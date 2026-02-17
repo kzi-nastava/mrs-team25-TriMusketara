@@ -1,18 +1,22 @@
 package com.example.demo.services;
 
 import com.example.demo.dto.LocationDTO;
+import com.example.demo.dto.response.DriverRideHistoryResponseDTO;
+import com.example.demo.dto.response.PassengerRideHistoryResponseDTO;
 import com.example.demo.dto.response.RouteFromFavoritesResponseDTO;
 import com.example.demo.dto.response.UserProfileResponseDTO;
-import com.example.demo.model.Driver;
-import com.example.demo.model.Passenger;
-import com.example.demo.model.Route;
+import com.example.demo.model.*;
 import com.example.demo.repositories.PassengerRepository;
+import com.example.demo.repositories.RideRepository;
 import com.example.demo.repositories.RouteRepository;
 import com.example.demo.services.interfaces.PassengerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +26,7 @@ public class PassengerServiceImpl implements PassengerService {
 
     private final PassengerRepository passengerRepository;
     private final RouteRepository routeRepository;
+    private final RideRepository rideRepository;
 
     @Override
     public List<RouteFromFavoritesResponseDTO> getFavoriteRoutesForPassenger(Long passengerId) {
@@ -75,5 +80,57 @@ public class PassengerServiceImpl implements PassengerService {
                 passenger.isBlocked(),
                 passenger.getBlockReason()
         );
+    }
+
+    @Override
+    public List<PassengerRideHistoryResponseDTO> getPassengerRideHistory(Long passengerId) {
+
+        List<Ride> rides = rideRepository.findAllByPassengerId(passengerId);
+        List<PassengerRideHistoryResponseDTO> dtos = new ArrayList<>();
+
+        for (Ride ride : rides) {
+
+            if (ride.getStatus() != RideStatus.FINISHED
+                    && ride.getStatus() != RideStatus.STOPPED) continue;
+
+            PassengerRideHistoryResponseDTO dto = new PassengerRideHistoryResponseDTO();
+
+            dto.setId(ride.getId());
+            dto.setStartTime(ride.getStartTime());
+            dto.setEndTime(ride.getEndTime());
+            dto.setTotalPrice(ride.getPrice());
+
+            if (ride.getDriver() != null) {
+                dto.setDriverEmail(ride.getDriver().getEmail());
+            }
+
+            if (ride.getStatus() == RideStatus.FINISHED) {
+                dto.setStatus("Completed");
+            }
+            if (ride.getStatus() == RideStatus.STOPPED) {
+                dto.setStatus("Stopped");
+            }
+
+            if (ride.getRoute() != null) {
+                Location start = ride.getRoute().getOrigin();
+                Location end = ride.getRoute().getDestination();
+
+                dto.setOrigin(new LocationDTO(
+                        start.getLongitude(),
+                        start.getLatitude(),
+                        start.getAddress()
+                ));
+
+                dto.setDestination(new LocationDTO(
+                        end.getLongitude(),
+                        end.getLatitude(),
+                        end.getAddress()
+                ));
+            }
+
+            dtos.add(dto);
+        }
+
+        return dtos;
     }
 }

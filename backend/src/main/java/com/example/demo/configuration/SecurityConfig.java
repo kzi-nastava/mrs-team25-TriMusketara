@@ -63,6 +63,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // Driver endpoints
                         .requestMatchers("/api/drivers/**").hasAnyRole("DRIVER", "ADMIN")
+                        // Passenger endpoints
+                        .requestMatchers(("/api/passenger/**")).hasRole("USER")
                         // All other requests require authentication
                         .anyRequest().authenticated()
                 )

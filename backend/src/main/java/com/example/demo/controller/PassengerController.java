@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.dto.response.RouteFromFavoritesResponseDTO;
 import com.example.demo.services.PassengerServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -32,4 +33,9 @@ public class PassengerController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{id}/ride-history")
+    public ResponseEntity<?> getPassengerHistory(@PathVariable Long id) {
+
+        return ResponseEntity.ok(passengerService.getPassengerRideHistory(id));
+    }
 }

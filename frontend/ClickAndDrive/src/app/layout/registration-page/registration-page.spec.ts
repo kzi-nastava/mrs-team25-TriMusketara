@@ -142,9 +142,8 @@ describe('RegistrationPage', () => {
       
       const mockEvent = { target: mockForm } as any;
 
-      // Spy na http.post metodu direktno
       const postSpy = spyOn(component['http'], 'post').and.returnValue(
-        of({}) // Vraća Observable sa praznim objektom
+        of({})
       );
 
       component.register(mockEvent);
@@ -242,7 +241,7 @@ describe('RegistrationPage', () => {
       
       const form = document.createElement('form');
       const mockEvent = { target: form } as any;
-      // Ovo bi trebalo da bude FALSE jer su polja prazna!
+      
       spyOn(form, 'checkValidity').and.returnValue(false);
       spyOn(form, 'reportValidity');
 
