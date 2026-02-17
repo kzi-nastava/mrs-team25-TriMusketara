@@ -36,7 +36,7 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
         LEFT JOIN FETCH d.vehicle
         LEFT JOIN FETCH d.scheduledRides
         LEFT JOIN FETCH d.activeRide
-        WHERE d.status = 'ACTIVE' 
+        WHERE d.status = :status 
         AND d.vehicle.isBabyFriendly = :baby_bool
         AND d.vehicle.isPetFriendly = :pet_bool
         AND d.vehicle.type = :vehicleType
