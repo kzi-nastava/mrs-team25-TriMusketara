@@ -20,7 +20,7 @@ import { ReportsPage } from './layout/reports-page/reports-page';
 
 
 export const routes: Routes = [
-   { path: '', redirectTo: 'map', pathMatch: 'full' },
+  { path: '', redirectTo: 'map', pathMatch: 'full' },
   { path: 'map', component: MainPageComponent },
 
   // USER ROUTES
@@ -33,7 +33,6 @@ export const routes: Routes = [
   { path: 'driver-notes', component: DriverNotesPage, canActivate: [AuthGuard], data: {role: 'driver'} },
 
   // ADMIN ROUTES
-  { path: 'reports', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
   { path: 'notes', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
   { path: 'support', component: MapViewComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
   { path: 'driver-registration', component: DriverRegistration, canActivate: [AuthGuard], data: { role: 'admin' } },
@@ -45,13 +44,11 @@ export const routes: Routes = [
   { path: 'drive-in-progress', component: DriveInProgress, canActivate: [AuthGuard], data: { roles: ['user', 'driver'] } },
   { path: 'reports-page', component: ReportsPage, canActivate: [AuthGuard], data: { roles: ['user', 'admin', 'driver'] } },
 
-  
   // PUBLIC ROUTES
   { path: 'login', component: LoginPage },
   { path: 'register', component: RegistrationPage },
   { path: 'complete-registration', component: CompleteDriverRegistration },
   { path: 'activate-account', component: ActivateAccount },
-  { path: 'reports-page', component: ReportsPage },
 
   // CATCH ALL
   { path: '**', redirectTo: 'map' }

@@ -64,6 +64,7 @@ public class SecurityConfig {
                         // Driver endpoints
                         .requestMatchers("/api/drivers/**").hasAnyRole("DRIVER", "ADMIN")
                         // All other requests require authentication
+                        .requestMatchers("/api/reports/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

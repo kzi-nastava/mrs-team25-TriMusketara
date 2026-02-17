@@ -6,10 +6,12 @@ import { routes } from './app.routes';
 import { AuthInterceptor } from './infrastructure/interceptor';
 import { provideToastr } from 'ngx-toastr';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideCharts, withDefaultRegisterables} from 'ng2-charts';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideCharts(withDefaultRegisterables()),
     provideRouter(routes),
     importProvidersFrom(HttpClientModule, FormsModule),
     provideAnimationsAsync(), 

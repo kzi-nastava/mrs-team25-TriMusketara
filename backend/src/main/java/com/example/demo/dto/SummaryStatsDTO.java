@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class SummaryStatusDTO {
+public class SummaryStatsDTO {
     private int totalRides;
     private double totalKilometers;
     private double totalMoney;

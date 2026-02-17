@@ -4,52 +4,15 @@
             <div class="title">
                 <p>Generate a Report</p>
             </div>
+
+            @if (errorMessage) {
+                <div class="error-message">{{ errorMessage }}</div>
+            }
+
             <div class="card-container">
-                @if (userRole() === 'Passenger' || userRole() === 'Driver') {
-                    <div class="interactable">
-                        <span>
-                            <label for="date-from">Date from: </label>
-                            <input type="date" id="date-from" name="date-from">
-                        </span>
-
-                        <span>
-                            <label for="date-to">Date to: </label>
-                            <input type="date" id="date-to" name="date-to">
-                        </span>
-
-                        <button>Generate</button>
-                    </div>
-                    <div class="report-container">
-                        <div class="report">
-
-                        </div>
-                    </div>
-                } else {
-                    <div class="interactable">
-                        <div class="user-type-selector">
-                            <label>
-                                <input type="radio" name="userType" value="all-drivers" [(ngModel)]="selectedUserType">
-                                All Drivers
-                            </label>
-                            <label>
-                                <input type="radio" name="userType" value="all-passengers" [(ngModel)]="selectedUserType">
-                                All Passengers
-                            </label>
-                            <label>
-                                <input type="radio" name="userType" value="single" [(ngModel)]="selectedUserType">
-                                Single User
-                            </label>
-                        </div>
                 
-                        @if (selectedUserType === 'single') {
-                            <select [(ngModel)]="selectedUserId">
-                                <option value="">Select user...</option>
-                                @for (user of allUsers; track user.id) {
-                                    <option [value]="user.id">{{user.name}} ({{user.role}})</option>
-                                }
-                            </select>
-                        }
-                
+                @if (!isAdmin()) {
+                    <div class="interactable">
                         <span>
                             <label for="date-from">Date from: </label>
                             <input type="date" id="date-from" name="date-from" [(ngModel)]="dateFrom">
@@ -58,10 +21,107 @@
                             <label for="date-to">Date to: </label>
                             <input type="date" id="date-to" name="date-to" [(ngModel)]="dateTo">
                         </span>
+                        <button (click)="generateReport()" [disabled]="isLoading">
+                            {{ isLoading ? 'Generating...' : 'Generate' }}
+                        </button>
+                    </div>
+                } 
+                @else {
+                    <!-- ADMIN VIEW -->
+                    <div class="interactable">
+                        <div class="user-type-selector">
+                            <label>
+                                <input type="radio" name="userType" value="all-drivers" 
+                                       [(ngModel)]="selectedUserType" (change)="onUserTypeChange()">
+                                All Drivers
+                            </label>
+                            <label>
+                                <input type="radio" name="userType" value="all-passengers" 
+                                       [(ngModel)]="selectedUserType" (change)="onUserTypeChange()">
+                                All Passengers
+                            </label>
+                            <label>
+                                <input type="radio" name="userType" value="single-driver" 
+                                       [(ngModel)]="selectedUserType" (change)="onUserTypeChange()">
+                                Single Driver
+                            </label>
+                            <label>
+                                <input type="radio" name="userType" value="single-passenger" 
+                                       [(ngModel)]="selectedUserType" (change)="onUserTypeChange()">
+                                Single Passenger
+                            </label>
+                        </div>
                 
-                        <button (click)="generateAdminReport()">Generate</button>
+                        @if (selectedUserType === 'single-driver') {
+                            <select [(ngModel)]="selectedUserId">
+                                <option [value]="null">Select driver...</option>
+                                @for (driver of allDrivers; track driver.id) {
+                                    <option [value]="driver.id">{{ driver.name }} {{ driver.surname }}</option>
+                                }
+                            </select>
+                        }
+
+                        @if (selectedUserType === 'single-passenger') {
+                            <select [(ngModel)]="selectedUserId">
+                                <option [value]="null">Select passenger...</option>
+                                @for (passenger of allPassengers; track passenger.id) {
+                                    <option [value]="passenger.id">{{ passenger.name }} {{ passenger.surname }}</option>
+                                }
+                            </select>
+                        }
+                
+                        <span>
+                            <label for="admin-date-from">Date from: </label>
+                            <input type="date" id="admin-date-from" name="admin-date-from" [(ngModel)]="dateFrom">
+                        </span>
+                        <span>
+                            <label for="admin-date-to">Date to: </label>
+                            <input type="date" id="admin-date-to" name="admin-date-to" [(ngModel)]="dateTo">
+                        </span>
+                
+                        <button (click)="generateAdminReport()" [disabled]="isLoading">
+                            {{ isLoading ? 'Generating...' : 'Generate' }}
+                        </button>
                     </div>
                 }
+
+                @if (reportData) {
+                    <div class="report-container">
+                         <div class="summary-stats">
+                             <!-- ... -->
+                             <h3>Summary</h3>
+                              <div class="stats-grid">
+                                    <div class="stat-card">
+                                        <p class="stat-label">Total Rides</p>
+                                        <p class="stat-value">{{ reportData.summary.totalRides }}</p>
+                                    </div>
+                                    <div class="stat-card">
+                                        <p class="stat-label">Total Kilometers</p>
+                                        <p class="stat-value">{{ reportData.summary.totalKilometers | number:'1.1-1' }} km</p>
+                                    </div>
+                                    <div class="stat-card">
+                                        <p class="stat-label">Total Money</p>
+                                        <p class="stat-value">{{ reportData.summary.totalMoney | number:'1.0-0' }} RSD</p>
+                                    </div>
+                                </div>
+                         </div>
+                         <div class="charts-container">
+                             <!-- Chart 1 -->
+                             <div class="chart-wrapper">
+                                <canvas baseChart [data]="ridesChartData" [options]="chartOptions" [type]="lineChartType"></canvas>
+                             </div>
+                             <!-- Chart 2 -->
+                             <div class="chart-wrapper">
+                                <canvas baseChart [data]="kmChartData" [options]="chartOptions" [type]="lineChartType"></canvas>
+                             </div>
+                             <!-- Chart 3 -->
+                             <div class="chart-wrapper">
+                                <canvas baseChart [data]="moneyChartData" [options]="chartOptions" [type]="lineChartType"></canvas>
+                             </div>
+                         </div>
+                    </div>
+                }
+            </div>
         </div>
     </div>
 </div>
