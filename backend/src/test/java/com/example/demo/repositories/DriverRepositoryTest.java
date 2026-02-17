@@ -1,9 +1,6 @@
 package com.example.demo.repositories;
 
-import com.example.demo.model.Driver;
-import com.example.demo.model.DriverStatus;
-import com.example.demo.model.Vehicle;
-import com.example.demo.model.VehicleType;
+import com.example.demo.model.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -26,14 +23,25 @@ public class DriverRepositoryTest {
     private DriverRepository driverRepository;
 
     private Driver createDriver(DriverStatus status, boolean baby, boolean pet, VehicleType type) {
-        // Vehicle object
         Vehicle vehicle = new Vehicle();
-        vehicle.setIsPetFriendly(baby);
-        vehicle.setIsPetFriendly(pet);
+        vehicle.setModel("Toyota Prius");
         vehicle.setType(type);
+        vehicle.setRegistration("NS-" + System.nanoTime());
+        vehicle.setSeats(4);
+        vehicle.setIsBabyFriendly(baby);
+        vehicle.setIsPetFriendly(pet);
+        vehicle.setBusy(false);
         entityManager.persist(vehicle);
 
         Driver driver = new Driver();
+        driver.setEmail("driver" + System.nanoTime() + "@test.com");
+        driver.setPassword("password123");
+        driver.setName("Lazar");
+        driver.setSurname("Topic");
+        driver.setGender(Gender.MALE);
+        driver.setAddress("Nikole Tesle");
+        driver.setPhone("069669949");
+        driver.setBlocked(false);
         driver.setStatus(status);
         driver.setVehicle(vehicle);
         entityManager.persist(driver);
