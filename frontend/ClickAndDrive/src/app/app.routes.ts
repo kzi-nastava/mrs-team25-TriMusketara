@@ -16,6 +16,7 @@ import { AuthGuard } from './services/auth.guard';
 import { PanicNotifications } from './layout/panic-notifications/panic-notifications';
 import { BlockPage } from './layout/block-page/block-page';
 import { DriverNotesPage } from './layout/driver-notes-page/driver-notes-page';
+import { PassengerHistory } from './layout/passenger-history/passenger-history';
 
 
 export const routes: Routes = [
@@ -25,6 +26,7 @@ export const routes: Routes = [
   // USER ROUTES
   { path: 'favorite-routes', component: FavoriteRoutes, canActivate: [AuthGuard], data: { role: 'user' } },
   { path: 'rate-ride', component: RideRating, canActivate: [AuthGuard], data: { role: 'user' } },
+  { path: 'passenger-history', component: PassengerHistory, canActivate: [AuthGuard], data: { role: 'user' } },
 
   // DRIVER ROUTES
   { path: 'driver-history', component: DriverHistory, canActivate: [AuthGuard], data: { role: 'driver' } },

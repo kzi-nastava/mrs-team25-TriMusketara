@@ -17,7 +17,7 @@ export class PassengerProfile {
 
   passengerButtons = [
     { label: 'Favorite routes', route: 'favorite-routes' },
-    { label: 'Ride history' },
+    { label: 'Ride history', route: 'passenger-history' },
     { label: 'Change information', route: 'change-information-page' },
     { label: 'Reports' },
     { label: 'Notes' },
