@@ -1,0 +1,78 @@
+<div class="history-page">
+  <div class="content-wrapper">
+    
+    <div class="header-section">
+      <h1 class="all-drives-title">All Drives</h1>
+      
+      <div class="filters">
+        <!-- Date Pickers -->
+        <div class="date-filter-container">
+          <div class="input-group">
+            <label>From:</label>
+            <input type="date" [(ngModel)]="fromDate" class="figma-input">
+          </div>
+          <div class="input-group">
+            <label>To:</label>
+            <input type="date" [(ngModel)]="toDate" class="figma-input">
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="button-group">
+          <button (click)="searchByDate()" class="btn-search">Search</button>
+          <button (click)="clearFilter()" class="btn-clear">Clear</button>
+        </div>
+
+        <div class="sort-container">
+          <label>Sort by : </label>
+          <select class="figma-select">
+            <option>Newest</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+      <table class="figma-table">
+        <thead>
+          <tr>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Price (RSD)</th>
+            <th>Date of drive</th>
+            <th>Details</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ride of rides">
+            <td>{{ ride.origin?.address }}</td>
+            <td>{{ ride.destination?.address }}</td>
+            <td>{{ ride.totalPrice }}</td>
+            <td>{{ ride.startTime | date:'MM/dd/yyyy' }}</td>
+            <td><button class="btn-details">Details</button></td>
+            <td><span class="badge" [ngClass]="ride.status === 'Completed' ? 'badge-completed' : 'badge-stopped'">{{ ride.status }}</span></td>
+          </tr>
+          <tr *ngIf="rides.length === 0">
+            <td colspan="6" style="text-align: center;">No drives found for selected range.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-footer">
+      <!-- Dynamic display of how many drives are shown -->
+      <p class="data-info">Showing data {{ rides.length }} drives</p>
+      
+      <div class="pagination-controls">
+        <button class="page-arrow">&lt;</button>
+        <button class="page-num active">1</button>
+        <!-- Pagination logic would go here -->
+        <button class="page-arrow">&gt;</button>
+      </div>
+    </div>
+
+  </div>
+</div>

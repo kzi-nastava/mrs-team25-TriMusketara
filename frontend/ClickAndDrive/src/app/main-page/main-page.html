@@ -9,7 +9,7 @@
 
 <router-outlet></router-outlet>
 
-<div class="overlay" [class.open]="ridePopup.isOpen()" (click)="onOverlayClick()"></div>
+<div class="overlay" [class.open]="ridePopup.isOpen() || adminPopup.isOpen()" (click)="onOverlayClick()"></div>
 
 <!-- POPUP -->
 @if (ridePopup.isOpen()) {
@@ -47,4 +47,9 @@
     </app-ride-ordering>
   </div>
   }
+}
+
+<!-- ADMIN change prices popup -->
+@if (adminPopup.isOpen()) {
+    <app-change-price-popup></app-change-price-popup>
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { EmptyError, Observable } from 'rxjs';
 import { RouteFromFavorites } from './models/route-from-favorites';
+import { PassengerRideHistory } from './models/passenger-ride-history';
 
 @Injectable({
     providedIn: 'root'
@@ -21,5 +22,11 @@ export class PassengerService {
     // Remove a route from favorites
     removeFavoriteRoute(passengerId: number, routeId: number): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/${passengerId}/${routeId}/remove-route`);
+    }
+
+    getPassengerHistory(passengerId: number) {
+        return this.http.get<PassengerRideHistory[]>(
+            `http://localhost:8080/api/passenger/${passengerId}/ride-history`
+        );
     }
 }

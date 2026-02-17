@@ -41,4 +41,10 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "AND r.endTime BETWEEN :dateFrom AND :dateTo " +
             "ORDER BY r.endTime")
     List<Ride> findAllFinishedRidesAndDateRange(@Param("dateFrom") LocalDateTime dateFrom, @Param("dateTo") LocalDateTime dateTo);
+
+
+    @Query("SELECT r FROM Ride r JOIN r.passengers p WHERE p.id = :passengerId")
+    List<Ride> findAllByPassengerId(@Param("passengerId") Long passengerId);
+
+    List<Ride> findAllByStatus(RideStatus rideStatus);
 }

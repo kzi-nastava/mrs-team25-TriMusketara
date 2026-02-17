@@ -1,0 +1,59 @@
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.price-popup {
+  background: #242423;
+  width: 300px;
+  padding: 30px;
+  border-radius: 15px;
+  border: 1px solid #F5CB5C;
+  color: white;
+}
+
+.title {
+  text-align: center;
+  font-size: 24px;
+  font-style: italic;
+  color: #F5CB5C;
+  margin-bottom: 30px;
+}
+
+.input-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  font-size: 18px;
+}
+
+.input-group input {
+  width: 120px;
+  background: #A7A7A7;
+  border: none;
+  padding: 5px;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.save-btn {
+  width: 100%;
+  padding: 12px;
+  background: #F5CB5C;
+  border-radius: 30px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+}
