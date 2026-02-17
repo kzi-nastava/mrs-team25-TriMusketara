@@ -5,6 +5,9 @@ export interface DailyStats {
     numberOfRides: number;
     totalKilometers: number;
     totalMoney: number;
+    cumulativeRides: number;
+    cumulativeKilometers: number;
+    cumulativeMoney: number;
 }
 
 export interface SummaryStats {

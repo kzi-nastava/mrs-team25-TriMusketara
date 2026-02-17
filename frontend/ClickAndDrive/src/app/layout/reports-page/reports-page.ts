@@ -69,6 +69,21 @@ export class ReportsPage implements OnInit {
     labels: []
   }
 
+  public cumulativeRidesChartData: ChartConfiguration['data'] = {
+    datasets: [],
+    labels: []
+  }
+
+  public cumulativeKmChartData: ChartConfiguration['data'] = {
+    datasets: [],
+    labels: []
+  }
+
+  public cumulativeMoneyChartData: ChartConfiguration['data'] = {
+    datasets: [],
+    labels: []
+  }
+
   public chartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
@@ -263,6 +278,10 @@ export class ReportsPage implements OnInit {
     const kmData = this.reportData.dailyStats.map(stat => stat.totalKilometers);
     const moneyData = this.reportData.dailyStats.map(stat => stat.totalMoney);
 
+    const cumulativeRidesData = this.reportData.dailyStats.map(stat => stat.cumulativeRides);
+    const cumulativeKmData = this.reportData.dailyStats.map(stat => stat.cumulativeKilometers);
+    const cumulativeMoneyData = this.reportData.dailyStats.map(stat => stat.cumulativeMoney);
+
     // Rides chart
     this.ridesChartData = {
       labels: labels,
@@ -302,6 +321,49 @@ export class ReportsPage implements OnInit {
           label: this.getMoneyLabel(),
           borderColor: '#f59e0b',
           backgroundColor: 'rgba(245, 158, 11, 0.2)',
+          tension: 0.4,
+          fill: true
+        }
+      ]
+    };
+
+    // Cumulative charts
+    this.cumulativeRidesChartData = {
+      labels: labels,
+      datasets: [
+        {
+          data: cumulativeRidesData,
+          label: 'Cumulative Rides',
+          borderColor: '#8b5cf6',
+          backgroundColor: 'rgba(139, 92, 246, 0.2)',
+          tension: 0.4,
+          fill: true
+        }
+      ]
+    };
+  
+    this.cumulativeKmChartData = {
+      labels: labels,
+      datasets: [
+        {
+          data: cumulativeKmData,
+          label: 'Cumulative Kilometers',
+          borderColor: '#ec4899',
+          backgroundColor: 'rgba(236, 72, 153, 0.2)',
+          tension: 0.4,
+          fill: true
+        }
+      ]
+    };
+  
+    this.cumulativeMoneyChartData = {
+      labels: labels,
+      datasets: [
+        {
+          data: cumulativeMoneyData,
+          label: 'Cumulative ' + (this.isEarnings() ? 'Earnings' : 'Spending'),
+          borderColor: '#14b8a6',
+          backgroundColor: 'rgba(20, 184, 166, 0.2)',
           tension: 0.4,
           fill: true
         }

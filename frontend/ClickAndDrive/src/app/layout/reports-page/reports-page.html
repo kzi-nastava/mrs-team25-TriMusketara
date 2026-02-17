@@ -87,38 +87,61 @@
 
                 @if (reportData) {
                     <div class="report-container">
-                         <div class="summary-stats">
-                             <!-- ... -->
-                             <h3>Summary</h3>
-                              <div class="stats-grid">
-                                    <div class="stat-card">
-                                        <p class="stat-label">Total Rides</p>
-                                        <p class="stat-value">{{ reportData.summary.totalRides }}</p>
-                                    </div>
-                                    <div class="stat-card">
-                                        <p class="stat-label">Total Kilometers</p>
-                                        <p class="stat-value">{{ reportData.summary.totalKilometers | number:'1.1-1' }} km</p>
-                                    </div>
-                                    <div class="stat-card">
-                                        <p class="stat-label">Total Money</p>
-                                        <p class="stat-value">{{ reportData.summary.totalMoney | number:'1.0-0' }} RSD</p>
-                                    </div>
+                        <!-- Summary Stats -->
+                        <div class="summary-stats">
+                            <h3>Summary ({{ dateFrom }} to {{ dateTo }})</h3>
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <p class="stat-label">Total Rides</p>
+                                    <p class="stat-value">{{ reportData.summary.totalRides }}</p>
                                 </div>
-                         </div>
-                         <div class="charts-container">
-                             <!-- Chart 1 -->
-                             <div class="chart-wrapper">
+                                <div class="stat-card">
+                                    <p class="stat-label">Total Kilometers</p>
+                                    <p class="stat-value">{{ reportData.summary.totalKilometers | number:'1.1-1' }} km</p>
+                                    <p class="stat-avg">Avg: {{ reportData.summary.avgKilometersPerDay | number:'1.1-1' }} km/day</p>
+                                </div>
+                                <div class="stat-card">
+                                    <p class="stat-label">{{ getMoneyLabel() }}</p>
+                                    <p class="stat-value">{{ reportData.summary.totalMoney | number:'1.0-0' }} RSD</p>
+                                    <p class="stat-avg">Avg: {{ reportData.summary.avgMoneyPerDay | number:'1.0-0' }} RSD/day</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Daily Charts -->
+                        <div class="charts-container">
+                            <div class="chart-wrapper">
+                                <h4>Daily Rides</h4>
                                 <canvas baseChart [data]="ridesChartData" [options]="chartOptions" [type]="lineChartType"></canvas>
-                             </div>
-                             <!-- Chart 2 -->
-                             <div class="chart-wrapper">
+                            </div>
+                            <div class="chart-wrapper">
+                                <h4>Daily Kilometers</h4>
                                 <canvas baseChart [data]="kmChartData" [options]="chartOptions" [type]="lineChartType"></canvas>
-                             </div>
-                             <!-- Chart 3 -->
-                             <div class="chart-wrapper">
+                            </div>
+                            <div class="chart-wrapper">
+                                <h4>Daily Money {{ isEarnings() ? 'Earned' : 'Spent' }}</h4>
                                 <canvas baseChart [data]="moneyChartData" [options]="chartOptions" [type]="lineChartType"></canvas>
-                             </div>
-                         </div>
+                            </div>
+                        </div>
+
+                        <!-- Cumulative Charts -->
+                        <div class="cumulative-section">
+                            <h3>Cumulative Overview</h3>
+                            <div class="charts-container">
+                                <div class="chart-wrapper">
+                                    <h4>Cumulative Rides</h4>
+                                    <canvas baseChart [data]="cumulativeRidesChartData" [options]="chartOptions" [type]="lineChartType"></canvas>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <h4>Cumulative Kilometers</h4>
+                                    <canvas baseChart [data]="cumulativeKmChartData" [options]="chartOptions" [type]="lineChartType"></canvas>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <h4>Cumulative Money {{ isEarnings() ? 'Earned' : 'Spent' }}</h4>
+                                    <canvas baseChart [data]="cumulativeMoneyChartData" [options]="chartOptions" [type]="lineChartType"></canvas>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 }
             </div>

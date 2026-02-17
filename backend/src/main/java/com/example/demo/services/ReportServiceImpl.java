@@ -133,6 +133,11 @@ public class ReportServiceImpl {
         double totalMoney = 0;
         int totalRides = 0;
 
+        // Cumulative values
+        int cumulativeRides = 0;
+        double cumulativeKm = 0;
+        double cumulativeMoney = 0;
+
         for (LocalDate date = dateFrom.toLocalDate(); !date.isAfter(dateTo.toLocalDate()); date = date.plusDays(1)) {
             List<Ride> dayRides = ridesByDate.getOrDefault(date, Collections.emptyList());
 
@@ -146,7 +151,11 @@ public class ReportServiceImpl {
                 dayMoney = -dayMoney; // Passengers are spending money
             }
 
-            dailyStats.add(new DailyStatsDTO(date, numberOfRides, dayKm, dayMoney));
+            cumulativeRides += numberOfRides;
+            cumulativeKm += dayKm;
+            cumulativeMoney += dayMoney;
+
+            dailyStats.add(new DailyStatsDTO(date, numberOfRides, dayKm, dayMoney, cumulativeRides, cumulativeKm, cumulativeMoney));
 
             totalRides += numberOfRides;
             totalKm += dayKm;

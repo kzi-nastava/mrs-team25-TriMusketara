@@ -14,4 +14,8 @@ public class DailyStatsDTO {
     private int numberOfRides;
     private double totalKilometers;
     private double totalMoney;
+
+    private int cumulativeRides;
+    private double cumulativeKilometers;
+    private double cumulativeMoney;
 }
