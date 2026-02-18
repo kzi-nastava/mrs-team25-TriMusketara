@@ -19,6 +19,7 @@ import { DriverNotesPage } from './layout/driver-notes-page/driver-notes-page';
 import { ReportsPage } from './layout/reports-page/reports-page';
 import { PassengerHistory } from './layout/passenger-history/passenger-history';
 import { AdminHistory } from './layout/admin-history/admin-history';
+import { AdminActiveRides } from './layout/admin-active-rides/admin-active-rides';
 import { PassengerNotesPage } from './layout/passenger-notes-page/passenger-notes-page';
 
 
@@ -44,6 +45,7 @@ export const routes: Routes = [
   { path: 'panic-notifications',component: PanicNotifications, canActivate: [AuthGuard], data: { role: 'admin' } },
   { path: 'block-a-user', component: BlockPage, canActivate: [AuthGuard], data: { role: 'admin'}},
   { path: 'admin-history', component: AdminHistory, canActivate: [AuthGuard], data: { role: 'admin' } },
+  { path: 'active-rides-admin', component: AdminActiveRides, canActivate: [AuthGuard], data: { role: 'admin' } },
 
   // SHARED ROUTES
   { path: 'change-information-page', component: ChangeInfoPage, canActivate: [AuthGuard], data: { roles: ['user', 'admin', 'driver'] } },

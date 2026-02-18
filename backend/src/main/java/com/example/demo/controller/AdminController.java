@@ -6,7 +6,10 @@ import com.example.demo.dto.request.DriverRegistrationRequestDTO;
 import com.example.demo.dto.response.*;
 import com.example.demo.dto.VehiclePriceDTO;
 
+import com.example.demo.model.Ride;
+import com.example.demo.model.RideStatus;
 import com.example.demo.model.VehiclePrice;
+import com.example.demo.repositories.RideRepository;
 import com.example.demo.repositories.VehiclePriceRepository;
 import com.example.demo.services.interfaces.*;
 import jakarta.validation.Valid;
@@ -14,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -34,6 +38,7 @@ public class AdminController {
     private final UserService userService;
     private final PanicService panicService;
     private final VehiclePriceRepository priceRepository;
+    private final RideRepository rideRepository;
     private final VehiclePriceService priceService;
 
     @PostMapping("/drivers")
@@ -62,17 +67,62 @@ public class AdminController {
     public ResponseEntity<RideDetailsResponseDTO> getRideDetails(
             @PathVariable Long id
     ) {
-        return ResponseEntity.ok(new RideDetailsResponseDTO());
+        Ride ride = rideRepository.findById(id).orElseThrow();
+
+        RideDetailsResponseDTO dto = new RideDetailsResponseDTO();
+        dto.setRideId(ride.getId());
+
+        String start = (ride.getRoute() != null) ? ride.getRoute().getOrigin().getAddress() : "Bulevar oslobođenja 45";
+        String end = (ride.getRoute() != null) ? ride.getRoute().getDestination().getAddress() : "Cara Dušana 12";
+
+        dto.setStartAddress(start);
+        dto.setEndAddress(end);
+        dto.setDriverName(ride.getDriver().getName());
+        dto.setPrice(ride.getPrice());
+        dto.setStatus(ride.getStatus().toString());
+
+        return ResponseEntity.ok(dto);
     }
 
-    // 2.13: State of ride of any driver
-    @GetMapping("/rides/active/{driverId}")
-    public ResponseEntity<AdminRideStateResponseDTO> getActiveRideByDriver(@PathVariable Long driverId) {
-        AdminRideStateResponseDTO response = new AdminRideStateResponseDTO(
-                101L, "driver@uber.com", List.of("pass1@gmail.com"),
-                new LocationDTO( 45.25, 19.84, "Trg Slobode"),
-                LocalDateTime.now(), "STARTED"
-        );
+    @GetMapping("/rides/active")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<AdminRideStateResponseDTO>> getAllActiveRides() {
+        List<Ride> activeRides = rideRepository.findAllByStatus(RideStatus.STARTED);
+
+        List<AdminRideStateResponseDTO> response = activeRides.stream().map(ride -> {
+            // Safe check for location
+            LocationDTO currentLoc = null;
+            if (ride.getCurrentLocation() != null) {
+                currentLoc = new LocationDTO(
+                        ride.getCurrentLocation().getLatitude(),
+                        ride.getCurrentLocation().getLongitude(),
+                        ride.getCurrentLocation().getAddress()
+                );
+            } else {
+                // if null, then it's ended
+                currentLoc = new LocationDTO(ride.getRoute().getDestination().getLongitude(),
+                        ride.getRoute().getDestination().getLatitude(),
+                        ride.getRoute().getDestination().getAddress());
+            }
+
+            // Safe check for route
+            String origin = (ride.getRoute() != null && ride.getRoute().getOrigin() != null)
+                    ? ride.getRoute().getOrigin().getAddress() : "Rumenacka 100";
+            String dest = (ride.getRoute() != null && ride.getRoute().getDestination() != null)
+                    ? ride.getRoute().getDestination().getAddress() : "Rumenacka 140";
+
+            return new AdminRideStateResponseDTO(
+                    ride.getId(),
+                    ride.getDriver().getEmail(),
+                    ride.getPassengers().stream().map(p -> p.getEmail()).toList(),
+                    currentLoc,
+                    origin,
+                    dest,
+                    ride.getStartTime(),
+                    ride.getStatus().toString()
+            );
+        }).toList();
+
         return ResponseEntity.ok(response);
     }
 

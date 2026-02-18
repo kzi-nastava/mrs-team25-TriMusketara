@@ -16,6 +16,8 @@ public class AdminRideStateResponseDTO {
     private String driverEmail;
     private List<String> passengerEmails;
     private LocationDTO currentLocation;
+    private String originAddress;
+    private String destinationAddress;
     private LocalDateTime startTime;
     private String status;
 }

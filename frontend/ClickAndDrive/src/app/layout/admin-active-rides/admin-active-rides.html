@@ -1,0 +1,30 @@
+<div class="scheduled-rides">
+  <div class="content-wrapper">
+    <div class="header-section">
+      <h1 class="scheduled-rides-title">Choose drive to follow (admin)</h1>
+    </div>
+
+    <div class="table-container">
+      <table class="figma-table">
+        <thead>
+          <tr>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Driver</th>
+            <th>Follow</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ride of activeRides">
+            <td>{{ ride.originAddress }}</td>
+            <td>{{ ride.destinationAddress }}</td>
+            <td>{{ ride.driverEmail }}</td>
+            <td>
+              <button class="btn-follow" (click)="followRide(ride)">Follow</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

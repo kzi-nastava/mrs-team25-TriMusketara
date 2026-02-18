@@ -25,9 +25,6 @@ public class ChatController {
     public ResponseEntity<List<ChatMessageDTO>> getHistory(@PathVariable String userEmail, @PathVariable String adminEmail) {
         List<Message> messages = messageRepository.findAllChatMessagesByEmails(userEmail, adminEmail);
 
-        // Logika za SEEN: Sve poruke koje su poslate TRENUTNOM korisniku postaju viđene
-        // Ovde bi trebalo dodati logiku da onaj ko povlači history "vidi" poruke
-
         return ResponseEntity.ok(messages.stream().map(m -> new ChatMessageDTO(
                 m.getContent(), m.getFrom().getEmail(), m.getTo().getEmail(), m.getSentAt(), m.isSeen()
         )).toList());
@@ -59,7 +56,6 @@ public class ChatController {
         List<Message> messages = messageRepository.findAllChatMessagesByEmails(receiverEmail, senderEmail);
 
         for (Message m : messages) {
-            // Ako sam ja primalac (receiverEmail), a poruka je još uvek nepročitana
             if (m.getTo().getEmail().equals(receiverEmail) && !m.isSeen()) {
                 m.setSeen(true);
             }
