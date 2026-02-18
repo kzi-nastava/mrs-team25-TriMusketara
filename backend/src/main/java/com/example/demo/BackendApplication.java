@@ -188,6 +188,7 @@ public class BackendApplication {
 
 					// Passenger
 					ride.setPassengers(new ArrayList<>(List.of(passenger1)));
+					ride.setRideCreator(passenger1);
 					System.out.println(passenger1.getId());
 
 					rideRepository.save(ride);

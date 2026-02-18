@@ -182,8 +182,9 @@ public class RideController {
 
     // 2.8: Rating
     @PostMapping("/{id}/review")
-    public ResponseEntity<?> createReview(@Valid @RequestBody ReviewRequestDTO dto) {
-        // @Valid activates min, max, etc...
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> createReview(@PathVariable Long id, @Valid @RequestBody ReviewRequestDTO dto) {
+        dto.setRideId(id);
         reviewService.createReview(dto);
         return ResponseEntity.ok().build();
     }

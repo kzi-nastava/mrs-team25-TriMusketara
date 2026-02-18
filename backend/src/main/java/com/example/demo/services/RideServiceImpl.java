@@ -425,9 +425,14 @@ public class RideServiceImpl implements RideService {
         driver.setActiveRide(null);
         driverRepository.save(driver);
 
-        //update vehicle status
+        //update vehicle
         Vehicle vehicle = driver.getVehicle();
         vehicle.setBusy(false);
+        Location loc = new Location();
+        loc.setLatitude(dto.getStopLocation().getLatitude());
+        loc.setLongitude(dto.getStopLocation().getLongitude());
+        loc.setAddress(dto.getStopLocation().getAddress());
+        vehicle.setLocation(loc);
         vehicleRepository.save(vehicle);
     }
 
@@ -455,9 +460,14 @@ public class RideServiceImpl implements RideService {
         driver.setActiveRide(null);
         driverRepository.save(driver);
 
-        //update vehicle status
+        //update vehicle
         Vehicle vehicle = driver.getVehicle();
         vehicle.setBusy(false);
+        Location loc = new Location();
+        loc.setLatitude(dto.getStopLocation().getLatitude());
+        loc.setLongitude(dto.getStopLocation().getLongitude());
+        loc.setAddress(dto.getStopLocation().getAddress());
+        vehicle.setLocation(loc);
         vehicleRepository.save(vehicle);
     }
 
@@ -518,6 +528,7 @@ public class RideServiceImpl implements RideService {
         Vehicle vehicle = driver.getVehicle();
         driver.setActiveRide(null);
         vehicle.setBusy(false);
+        vehicle.setLocation(guestRide.getRoute().getDestination());
 
         double price = calculateRidePrice(distance, vehicle.getType());
         guestRide.setPrice(price);
@@ -536,6 +547,7 @@ public class RideServiceImpl implements RideService {
 
         Vehicle vehicle = driver.getVehicle();
         vehicle.setBusy(false);
+        vehicle.setLocation(route.getDestination());
         vehicleRepository.save(vehicle);
 
         extraLogic.accept(distance, vehicle.getType());
@@ -554,7 +566,7 @@ public class RideServiceImpl implements RideService {
             case VAN ->  price += vehiclePrice.getVan();
             default -> price += vehiclePrice.getStandard();
         }
-        System.out.println("DEBUG: Racunam cenu za distancu: " + distance);
+//        System.out.println("DEBUG: Racunam cenu za distancu: " + distance);
 
         price += distance * vehiclePrice.getPerKm();
         return (double) Math.round(price);
@@ -591,31 +603,6 @@ public class RideServiceImpl implements RideService {
         String creatorEmail = ride.getRideCreator().getEmail();
         System.out.println("Email sent to " + creatorEmail);
         sendEmail(creatorEmail, subject, finalBody);
-    }
-
-    // NOVA TESTNA METODA (Overload)
-    private void sendSummaryEmails(String testEmail) {
-        String subject = "TEST Ride Summary";
-        String finalBody = """
-            Dear User,
-            
-            THIS IS A TEST EMAIL (Fallback).
-            
-            Summary:
-            - Route: Test Start -> Test Destination
-            - Duration: 15 minutes
-            - Total Price: 500.00 RSD
-            
-            Thank you for testing ClickAndDrive!
-            """;
-
-        EmailDetails details = new EmailDetails();
-        details.setRecipient(testEmail);
-        details.setSubject(subject);
-        details.setMsgBody(finalBody);
-
-        emailService.sendsSimpleMail(details);
-        System.out.println("Test email sent to: " + testEmail);
     }
 
     private void sendEmail(String to, String subject, String body) {
