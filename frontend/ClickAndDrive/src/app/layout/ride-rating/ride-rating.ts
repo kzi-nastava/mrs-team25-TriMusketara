@@ -15,9 +15,8 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './ride-rating.css',
 })
 export class RideRating implements OnInit {
-  // Inputi koje treba da proslediš komponenti kada je pozivaš
+  // starting values
   @Input() rideId!: number; 
-  // PassengerId obično izvlačiš iz AuthService-a (tokena), ovde stavljamo placeholder
   passengerId: number = 1; 
 
   driverRating = signal(0);
@@ -27,7 +26,7 @@ export class RideRating implements OnInit {
   private router = inject(Router);
   private toastr = inject(ToastrService);
   private rideService = inject(RideOrderingService);
-  private authService = inject(AuthService); // Pretpostavka da imaš auth servis
+  private authService = inject(AuthService);
 
   stars = [1, 2, 3, 4, 5];
 
@@ -61,7 +60,7 @@ export class RideRating implements OnInit {
       comment: this.comment()
     };
 
-    // POZIV BACKEND-A
+    //backend
     this.rideService.rateRide(reviewData).subscribe({
       next: () => {
         this.toastr.success('Thank you for your feedback!');
