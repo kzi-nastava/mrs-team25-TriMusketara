@@ -30,11 +30,13 @@ export class App implements OnInit {
     if (userId && userId !== 0) {
       // User is logged in
       this.wsService.subscribeToPassengerNotes(userId);
+      this.wsService.subscribeToUserStatus(userId);
     }
 
     // If the user logs in during session
     this.authService.onLogin$.subscribe((userId: number) => {
       this.wsService.subscribeToPassengerNotes(userId);
+      this.wsService.subscribeToUserStatus(userId);
     });
   }
 }
