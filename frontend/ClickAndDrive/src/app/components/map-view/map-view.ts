@@ -1,7 +1,7 @@
 import { Component, AfterViewInit, Input, ElementRef, ViewChild, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import mapboxgl from 'mapbox-gl';
+import mapboxgl, { Marker } from 'mapbox-gl';
 import { VehicleService } from '../../services/vehicle.service';
 import { ActiveVehicleResponse } from '../../services/models/active-vehicle-response';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -29,6 +29,9 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
   private activeMarkers: mapboxgl.Marker[] = [];
   private vehicleSub?: Subscription;
   private panicMarker?: mapboxgl.Marker; // Marker za auto u panici
+
+  private simulationMarker: Marker | null = null;
+  private animationFrameId: number | null = null;
 
   constructor(
     private http: HttpClient, 
@@ -65,6 +68,7 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
 
   
   ngOnDestroy() {
+    //if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
     this.vehicleSub?.unsubscribe();
   }
 
@@ -199,7 +203,7 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
     }, (err) => console.error('Directions API error:', err));
   }
 
-  drawRouteWithStops(coordinates: [number, number][]) {
+  drawRouteWithStops(coordinates: [number, number][], shouldSimulate: boolean = false) {
     if (coordinates.length < 2) return;
 
     const coordsString = coordinates 
@@ -281,6 +285,82 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
         padding: 60,
         duration: 500
       });
+
+      if (shouldSimulate) {
+        // Begin vehicle moving sim
+        this.startSimulation(route.coordinates);
+      } else {
+        this.stopSimulation();
+      }
     });
   }
+
+  startSimulation(routeCoordinates: number[][]) {
+    // console.log('Begin sumulation');
+
+    if (!routeCoordinates || routeCoordinates.length < 2) {
+      // console.error('Not enough coords for simulation');
+      return;
+    }
+
+    // Clear previous simulation
+    if (this.simulationMarker) this.simulationMarker.remove();
+    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+
+    // Create marker
+    const el = document.createElement('div');
+    el.className = 'simulation-car';
+    el.style.backgroundImage = 'url(/taxi-icon.png)';
+    el.style.width = '40px';
+    el.style.height = '40px';
+    el.style.backgroundSize = 'cover';
+    // el.style.width = '30px';
+    // el.style.height = '30px';
+    // el.style.backgroundColor = 'red'; 
+    // el.style.borderRadius = '50%';
+    // el.style.border = '2px solid white';
+    // el.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+
+    const startPoint = routeCoordinates[0];
+    // console.log('Starting point:', startPoint);
+
+    this.simulationMarker = new Marker(el).setLngLat(startPoint as [number, number]).addTo(this.map);
+
+    let index = 0;
+    const speed = 0.18;
+
+    const animate = () => {
+      if (index >= routeCoordinates.length) {
+        // End ride
+        // console.log('Simulation ending - arrived at destination');
+        return;
+      }
+
+      const currentCoordIndex = Math.floor(index);
+      const currentCoord = routeCoordinates[currentCoordIndex];
+
+      if (currentCoord && currentCoord.length === 2) {
+        this.simulationMarker?.setLngLat(currentCoord as [number, number]);
+        // if (currentCoordIndex % 50 === 0 && Math.abs(index - currentCoordIndex) < speed) {
+        //   console.log(`Car at index: ${currentCoordIndex} / ${routeCoordinates.length}`);
+        // }
+      }
+      index += speed;
+      this.animationFrameId = requestAnimationFrame(animate);
+    };
+    // console.log('Begin loop...');
+    animate();
+  }
+
+  public stopSimulation() {
+    if (this.simulationMarker) {
+      this.simulationMarker.remove();
+      this.simulationMarker = null;
+    }
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+  }
+
 }

@@ -42,3 +42,8 @@
 .destination-marker svg {
   display: block;
 }
+
+.simulation-car {
+  transition: transform 0.1s linear; 
+  z-index: 10;
+}
