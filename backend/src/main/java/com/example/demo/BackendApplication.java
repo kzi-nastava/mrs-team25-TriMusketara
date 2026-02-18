@@ -197,14 +197,15 @@ public class BackendApplication {
 			}
 
 			// VEHICLE PRICES
-			VehiclePrice vehiclePrice = new VehiclePrice();
-			vehiclePrice.setPerKm(120.0);
-			vehiclePrice.setStandard(200.0);
-			vehiclePrice.setVan(400.0);
-			vehiclePrice.setLuxury(950.0);
+			if(vehiclePriceRepository.count() == 0) {
+				VehiclePrice vehiclePrice = new VehiclePrice();
+				vehiclePrice.setPerKm(120.0);
+				vehiclePrice.setStandard(200.0);
+				vehiclePrice.setVan(400.0);
+				vehiclePrice.setLuxury(950.0);
 
-			vehiclePriceRepository.save(vehiclePrice);
-
+				vehiclePriceRepository.save(vehiclePrice);
+			}
 		};
 	}
 }
