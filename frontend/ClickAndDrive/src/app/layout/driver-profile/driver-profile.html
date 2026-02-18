@@ -34,6 +34,10 @@
                     (click)="onButtonClick(btn)"
                 >
                     {{btn.label}}
+                    <span 
+                        *ngIf="btn.label === 'Notes' && isDriverBlocked"
+                        class="badge"
+                    >!</span>
                 </button>
             }
         </div>

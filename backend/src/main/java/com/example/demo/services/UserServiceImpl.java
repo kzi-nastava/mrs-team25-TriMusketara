@@ -17,7 +17,9 @@ import com.example.demo.services.interfaces.UserService;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +31,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -39,6 +42,9 @@ public class UserServiceImpl implements UserService {
     private final JwtUtil jwtUtil;
     private final EmailService emailService;
     private final VehicleRepository vehicleRepository;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     private final Path fileStorageLocation = Paths.get("uploads/profile-images");
 
@@ -353,6 +359,18 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
+        // Using websockets send a message
+        messagingTemplate.convertAndSend(
+                "/topic/user/" + id + "/status",
+                Map.of(
+                        "blocked", true,
+                        "reason", reason != null ? reason : "",
+                        "timestamp", LocalDateTime.now().toString()
+                )
+        );
+
+        System.out.println(reason);
+
         return new UserProfileResponseDTO(
                 user.getId(),
                 user.getEmail(),
@@ -375,6 +393,16 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
+        // Using websockets send a message
+        messagingTemplate.convertAndSend(
+                "/topic/user/" + id + "/status",
+                Map.of(
+                        "blocked", false,
+                        "reason", "",
+                        "timestamp", LocalDateTime.now().toString()
+                )
+        );
+
         return new UserProfileResponseDTO(
                 user.getId(),
                 user.getEmail(),
@@ -394,6 +422,16 @@ public class UserServiceImpl implements UserService {
 
         user.setBlockReason(reason);
         userRepository.save(user);
+
+        // Using websockets send updated message on why the user is blocked
+        messagingTemplate.convertAndSend(
+                "/topic/user/" + id + "/status",
+                Map.of(
+                        "blocked", user.isBlocked(),
+                        "reason", reason != null ? reason : "",
+                        "timestamp", LocalDateTime.now().toString()
+                )
+        );
 
         return new UserProfileResponseDTO(
                 user.getId(),

@@ -17,6 +17,6 @@ export class DriverNotesPage {
 
   blockReason = computed(() => {
     const r = this.authService.getBlockedReason();
-    return r?.trim() ? r : 'No reson provided.';
+    return r?.trim() ? r : 'No reason provided.';
   });
 }

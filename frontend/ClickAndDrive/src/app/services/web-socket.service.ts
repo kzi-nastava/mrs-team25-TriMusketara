@@ -3,6 +3,7 @@ import { Client, Message } from '@stomp/stompjs';
 import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
 
 import * as SockJS from 'sockjs-client';
+import { AuthService } from './auth.service';
 
 // Ova linija je ključna - ona govori TypeScript-u da "zaboravi" 
 // stroga pravila za ovu promenljivu
@@ -21,7 +22,10 @@ export class WebSocketService {
   public notificationReceived$ = new ReplaySubject<any>(50);
   private subscriptions: Map<string, any> = new Map();
 
-  constructor() {
+  // Keeping track of status, if a user is blocked/unblocked
+  public userStatusChanged$ = new BehaviorSubject<any>(null);
+
+  constructor(private authService: AuthService) {
     this.stompClient = new Client({
       webSocketFactory: () => new SockJsFunc('http://localhost:8080/ws'), // Backend URL
       debug: (msg) => console.log(msg),
@@ -83,6 +87,30 @@ export class WebSocketService {
 
       //console.log("Subscription created:", subscription);
       this.subscriptions.set(topic, subscription);
+    });
+  }
+
+  // Keeping track of users status
+  subscribeToUserStatus(userId: number) {
+    const topic = `/topic/user/${userId}/status`;
+
+    this.connected$.subscribe(() => {
+      // Do not subscribe more than once
+      if (this.subscriptions.has(topic)) return;
+
+      const subscription = this.stompClient.subscribe(topic, (message: Message) => {
+        try {
+          const data = JSON.parse(message.body);
+          console.log("Status change arrived: ", JSON.stringify(data));
+
+          // Immediately update AuthService signal for computed to work
+          this.authService.setBlockStatus(data.blocked, data.reason);
+          this.userStatusChanged$.next(data);
+        } catch (e) {
+          console.error("Error parsing message: ", e);
+        }
+      });
+        this.subscriptions.set(topic, subscription);
     });
   }
 }

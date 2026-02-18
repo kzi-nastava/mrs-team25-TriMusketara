@@ -6,6 +6,7 @@ import { UserService } from '../../services/user.service';
 import { UserProfileInformation } from '../../services/models/user-profile-information';
 import { ToastrService } from 'ngx-toastr';
 import { AdminPopupService } from '../../services/admin-popup.service';
+import { WebSocketService } from '../../services/web-socket.service';
 
 @Component({
   selector: 'app-driver-profile',
@@ -42,10 +43,20 @@ export class DriverProfile {
     private userService: UserService,
     private adminPopupService: AdminPopupService,
     private cdr: ChangeDetectorRef,
-    private toastr: ToastrService
-  ) {}
+    private toastr: ToastrService,
+    private wsService: WebSocketService
+  ) {
+    // When a status is changed, refresh
+    this.wsService.userStatusChanged$.subscribe(() => {
+        this.cdr.detectChanges();
+    });
+  }
 
-  
+  get isDriverBlocked(): boolean {
+    return this.authService.isUserBlocked();
+  }
+
+
   ngOnInit(): void {
     const idFromToken = this.authService.getUserIdFromToken();
 
