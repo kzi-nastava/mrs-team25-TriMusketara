@@ -54,11 +54,12 @@ public class SecurityConfig {
                                 "/api/rides/**",
                                 "/api/vehicles/active",                     //map view
                                 "/api/user/profile-images/**",
-                                "/api/activation/**").permitAll() // login, register...
+                                "/api/activation/**").permitAll()// login, register...
                         // PANIC endpoints - must be BEFORE anyRequest().authenticated()
                         .requestMatchers("/api/panic/**").permitAll()
                         //WebSocket endpoints
                         .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/v3/api-docs").permitAll()
                         // Admin endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // Driver endpoints
