@@ -4,6 +4,7 @@ import { Observable } from "rxjs";
 import { RideOrderCreate } from "./models/ride-order-create";
 import { RideOrderResponse } from "./models/ride-order-response";
 import { AdminRideStateDTO } from "./models/admin-ride-state";
+import { ReviewRequest } from "./models/review-request";
 
 export interface DriverRideDTO {
   id: number;
@@ -40,10 +41,14 @@ export class RideOrderingService {
     finishRide(rideId: number, distanceKm: number, isGuest: boolean): Observable<any> {
     const url = `${this.apiUrl}/${rideId}/finish?distanceKm=${distanceKm}&isGuest=${isGuest}`;
     
-    // PUT zahtev zahteva body, pa šaljemo prazan objekat {} kao drugi parametar
     return this.http.put(url, {}); 
-}
+    }
     
+    // rate ride function
+    rateRide(dto: ReviewRequest): Observable<any> {
+        return this.http.post(`${this.apiUrl}/${dto.rideId}/review`, dto);
+    }
+
     getScheduledRides(page: number, size: number): Observable<any> {
         return this.http.get(
           `${this.apiUrl}/driver/2?page=${page}&size=${size}`
