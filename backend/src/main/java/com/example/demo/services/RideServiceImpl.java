@@ -10,21 +10,20 @@ import com.example.demo.services.interfaces.EmailService;
 import com.example.demo.services.interfaces.RideService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +43,9 @@ public class RideServiceImpl implements RideService {
     //Service
     private final EmailService emailService;
     private final VehiclePriceRepository vehiclePriceRepository;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     // Ride creation
     @Override
@@ -136,6 +138,12 @@ public class RideServiceImpl implements RideService {
             ride.setDriver(driver);
             driver.getScheduledRides().add(ride);
             rideRepository.save(ride);
+
+            // Using websockets update drivers scheduled list
+            messagingTemplate.convertAndSend(
+                    "/topic/driver/" + driver.getId() + "/rides",
+                    Map.of("action", "NEW_RIDE", "timestamp", LocalDateTime.now().toString())
+            );
 
             // Send notifications and emails to linked passengers for this ride
             processNotifications(request.getPassengerEmails(), ride);

@@ -27,16 +27,34 @@ export class App implements OnInit {
 
   ngOnInit() {
     const userId = this.authService.getUserId();
+    const role = this.authService.getRoleFromToken();
     if (userId && userId !== 0) {
       // User is logged in
-      this.wsService.subscribeToPassengerNotes(userId);
       this.wsService.subscribeToUserStatus(userId);
+
+      // Check role
+      if (role === 'Passenger') {
+        this.wsService.subscribeToPassengerNotes(userId);
+      }
+
+      if (role === 'Driver') {
+        this.wsService.subscribeToDriverRides(userId);
+      }
     }
 
     // If the user logs in during session
     this.authService.onLogin$.subscribe((userId: number) => {
-      this.wsService.subscribeToPassengerNotes(userId);
+      const role = this.authService.getRoleFromToken();
       this.wsService.subscribeToUserStatus(userId);
+      
+      // Check role
+      if (role === 'Passenger') {
+        this.wsService.subscribeToPassengerNotes(userId);
+      }
+
+      if (role === 'Driver') {
+        this.wsService.subscribeToDriverRides(userId);
+      }
     });
   }
 }
