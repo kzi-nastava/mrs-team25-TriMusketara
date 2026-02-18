@@ -2,6 +2,8 @@ import { HttpClient } from "@angular/common/http";
 import { NoteRequest, UserProfileInformation } from "./models/user-profile-information";
 import { Observable } from "rxjs";
 import { Injectable } from "@angular/core";
+import { AdminRideHistory } from "./models/admin-ride-history";
+import { AdminUser } from "./models/admin-user";
 import { VehiclePrice } from "./models/vehicle-price";
 
 @Injectable({
@@ -39,6 +41,25 @@ export class AdminService {
         return this.http.put<UserProfileInformation>(`${this.apiUrl}/users/${userId}/note`, body);
     }
 
+    getRideHistory(id: number, role: string, from?: string, to?: string, sortBy?: string) {
+
+        let params: any = {
+            id: id,
+            role: role,
+            sortBy: sortBy || 'date'
+        };
+
+        if (from) params.from = from;
+        if (to) params.to = to;
+
+        return this.http.get<AdminRideHistory[]>(
+            'http://localhost:8080/api/admin/ride-history',
+            { params }
+        );
+    }
+
+    getAllUsers() {
+        return this.http.get<AdminUser[]>('http://localhost:8080/api/admin/users');
     // Get current prices
     getPrices(): Observable<VehiclePrice> {
         return this.http.get<VehiclePrice>(`${this.apiUrl}/prices`);

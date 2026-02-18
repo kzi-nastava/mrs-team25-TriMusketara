@@ -27,6 +27,7 @@ import java.util.List;
 public class AdminController {
 
     // Services
+    private final AdminService adminService;
     private final DriverService driverService;
     private final PassengerService passengerService;
     private final UserService userService;
@@ -124,4 +125,24 @@ public class AdminController {
         return ResponseEntity.ok(updatedUser);
     }
 
+    @GetMapping("/ride-history")
+    public ResponseEntity<?> getRideHistory(
+            @RequestParam Long id,
+            @RequestParam String role,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(defaultValue = "date") String sortBy) {
+
+        LocalDateTime fromDate = from != null ? LocalDateTime.parse(from) : null;
+        LocalDateTime toDate = to != null ? LocalDateTime.parse(to) : null;
+
+        return ResponseEntity.ok(
+                adminService.getRideHistory(id, role, fromDate, toDate, sortBy)
+        );
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<AdminUserResponseDTO>> getAllUsers() {
+        return ResponseEntity.ok(adminService.getAllNonAdminUsers());
+    }
 }

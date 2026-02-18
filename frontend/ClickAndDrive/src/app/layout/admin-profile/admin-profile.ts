@@ -19,7 +19,7 @@ export class AdminProfile {
     { label: 'Driver registration', route: 'driver-registration' },
     { label: 'Check current rides' },
     { label: 'Change prices' },
-    { label: 'Ride history' },
+    { label: 'Ride history', route: 'admin-history' },
     { label: 'Requests' },
     { label: 'Change information', route: 'change-information-page' },
     { label: 'Support' },
