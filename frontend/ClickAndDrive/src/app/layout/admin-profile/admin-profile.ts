@@ -17,7 +17,7 @@ export class AdminProfile {
 
   adminButtons = [
     { label: 'Driver registration', route: 'driver-registration' },
-    { label: 'Check current rides' },
+    { label: 'Check current rides', route: 'active-rides-admin' },
     { label: 'Change prices' },
     { label: 'Ride history', route: 'admin-history' },
     { label: 'Requests' },
@@ -93,14 +93,14 @@ export class AdminProfile {
       return;
     }
 
-    if (button.label === 'Change prices') { // DODAJ OVU LOGIKU
+    if (button.label === 'Change prices') { 
         this.adminPopupService.openPrice();
         return;
     }
 
     if (button.label === 'Support') {
     this.adminPopupService.openChat();
-    //this.profileSidebar.close(); 
+    //this.profileSidebar.close(); //can't do it like that
     return;
     }
 

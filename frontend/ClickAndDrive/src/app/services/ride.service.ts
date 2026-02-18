@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { RideOrderCreate } from "./models/ride-order-create";
 import { RideOrderResponse } from "./models/ride-order-response";
+import { AdminRideStateDTO } from "./models/admin-ride-state";
 
 export interface DriverRideDTO {
   id: number;
@@ -59,5 +60,15 @@ export class RideOrderingService {
 
     startRide(rideId: number, isGuest: boolean): Observable<void> {
         return this.http.post<void>(`${this.apiUrl}/${rideId}/start`, { isGuest });
+    }
+
+    private adminUrl = 'http://localhost:8080/api/admin';
+
+    getActiveRides(): Observable<AdminRideStateDTO[]> {
+        return this.http.get<AdminRideStateDTO[]>(`${this.adminUrl}/rides/active`);
+    }
+
+    getRideDetails(rideId: number): Observable<any> {
+        return this.http.get<any>(`${this.adminUrl}/rides/${rideId}`);
     }
 }

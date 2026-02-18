@@ -22,6 +22,7 @@ public class RideDetailsResponseDTO {
     private String canceledBy;
     private double price;
     private boolean panicTriggered;
+    private String status;
 
     // Driver - basic info
     private Long driverId;

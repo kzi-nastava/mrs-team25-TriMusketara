@@ -1,6 +1,6 @@
 import { Component, signal, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { MapViewComponent } from '../components/map-view/map-view';
-import { RouterOutlet } from '@angular/router';
+import { ActivatedRoute, RouterOutlet } from '@angular/router';
 import { RidePopup } from '../shared/ride-popup';
 import { RideOrdering } from '../layout/ride-ordering/ride-ordering';
 import { AuthService } from '../services/auth.service';
@@ -27,7 +27,8 @@ export class MainPageComponent {
     private http: HttpClient, 
     private sharedRideDataService: SharedRideDataService, 
     private cdr: ChangeDetectorRef,
-    public adminPopup: AdminPopupService) {}
+    public adminPopup: AdminPopupService,
+    private route: ActivatedRoute) {}
 
   @ViewChild('mapView') mapView!: MapViewComponent;
 
@@ -124,7 +125,42 @@ export class MainPageComponent {
         this.ridePopup.open();
       }
     });
+
+    this.route.queryParams.subscribe(params => {
+    const rideId = params['monitorRideId'];
+    if (rideId) {
+      this.loadRideForMonitoring(rideId);
+    }
+  });
   }
+
+  loadRideForMonitoring(rideId: number) {
+  this.http.get<any>(`http://localhost:8080/api/admin/rides/${rideId}`).subscribe({
+    next: async (ride) => {
+      // OBAVEZNO: Proveri nazive polja sa backenda (startAddress vs originAddress)
+      const start = ride.startAddress || "Bulevar oslobođenja 45";
+      const end = ride.endAddress || "Cara Dušana 12";
+
+      try {
+        const originCoords = await this.geocodeAddress(start);
+        const destCoords = await this.geocodeAddress(end);
+        
+        if (this.mapView) {
+          this.mapView.drawRouteAndCalculateETA(originCoords, destCoords);
+          this.showRideData.set(true);
+        }
+      } catch (err) {
+        console.error("Simulation mode: Geocoding failed, using defaults");
+        // FALLBACK: Ako pukne geocoding, nacrtaj bilo šta da asistent vidi da radi
+        if (this.mapView) {
+          this.mapView.drawRouteAndCalculateETA([19.8335, 45.2539], [19.8468, 45.2544]);
+          this.showRideData.set(true);
+        }
+      }
+    },
+    error: (err) => console.error("Could not fetch ride", err)
+  });
+}
 
   onOverlayClick() {
     this.ridePopup.close();
