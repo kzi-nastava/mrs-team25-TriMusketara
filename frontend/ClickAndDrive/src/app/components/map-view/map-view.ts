@@ -68,6 +68,7 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
 
   
   ngOnDestroy() {
+    //if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
     this.vehicleSub?.unsubscribe();
   }
 
@@ -78,9 +79,6 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
       },
       error: (err) => console.error('Greška pri učitavanju vozila:', err)
     });
-
-    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
-    this.vehicleSub?.unsubscribe();
   }
 
   private addTaxiMarkers(vehicles: ActiveVehicleResponse[]) {
@@ -329,7 +327,7 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
     this.simulationMarker = new Marker(el).setLngLat(startPoint as [number, number]).addTo(this.map);
 
     let index = 0;
-    const speed = 0.2;
+    const speed = 0.18;
 
     const animate = () => {
       if (index >= routeCoordinates.length) {
