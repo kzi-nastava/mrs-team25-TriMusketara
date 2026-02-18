@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import ch.qos.logback.core.CoreConstants;
 import com.example.demo.dto.LocationDTO;
 import com.example.demo.dto.request.*;
 import com.example.demo.dto.response.*;
@@ -562,6 +563,7 @@ public class RideServiceImpl implements RideService {
 
     private void sendSummaryEmails(Ride ride) {
         long minutes = Duration.between(ride.getStartTime(), ride.getEndTime()).toMinutes();
+
         String routeInfo = ride.getRoute().getOrigin().getAddress() + " -> " +
                 ride.getRoute().getDestination().getAddress();
 
@@ -582,8 +584,13 @@ public class RideServiceImpl implements RideService {
         String finalBody = String.format(bodyTemplate, routeInfo, minutes, ride.getPrice());
 
         for (Passenger passenger : ride.getPassengers()) {
+            System.out.println("Email sent to " + passenger.getEmail());
             sendEmail(passenger.getEmail(), subject, finalBody);
         }
+
+        String creatorEmail = ride.getRideCreator().getEmail();
+        System.out.println("Email sent to " + creatorEmail);
+        sendEmail(creatorEmail, subject, finalBody);
     }
 
     // NOVA TESTNA METODA (Overload)
