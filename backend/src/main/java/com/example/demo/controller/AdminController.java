@@ -11,6 +11,7 @@ import com.example.demo.repositories.VehiclePriceRepository;
 import com.example.demo.services.interfaces.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -126,19 +127,18 @@ public class AdminController {
     }
 
     @GetMapping("/ride-history")
-    public ResponseEntity<?> getRideHistory(
+    public ResponseEntity<List<AdminRideHistoryResponseDTO>> getRideHistory(
             @RequestParam Long id,
             @RequestParam String role,
-            @RequestParam(required = false) String from,
-            @RequestParam(required = false) String to,
             @RequestParam(defaultValue = "date") String sortBy) {
 
-        LocalDateTime fromDate = from != null ? LocalDateTime.parse(from) : null;
-        LocalDateTime toDate = to != null ? LocalDateTime.parse(to) : null;
+        // map "date" to startTime
+        if ("date".equalsIgnoreCase(sortBy)) {
+            sortBy = "startTime";
+        }
 
-        return ResponseEntity.ok(
-                adminService.getRideHistory(id, role, fromDate, toDate, sortBy)
-        );
+        List<AdminRideHistoryResponseDTO> rides = adminService.getRideHistory(id, role, sortBy);
+        return ResponseEntity.ok(rides);
     }
 
     @GetMapping("/users")

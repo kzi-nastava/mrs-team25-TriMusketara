@@ -8,10 +8,8 @@ import java.util.List;
 
 public interface AdminService {
     List<AdminRideHistoryResponseDTO> getRideHistory(
-            Long id,
-            String role,
-            LocalDateTime from,
-            LocalDateTime to,
+            Long driverId,
+            String userType,
             String sortBy
     );
     List<AdminUserResponseDTO> getAllNonAdminUsers();
