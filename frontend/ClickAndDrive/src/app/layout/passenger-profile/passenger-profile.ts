@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { fromReadableStreamLike } from 'rxjs/internal/observable/innerFrom';
 import { ToastrService } from 'ngx-toastr';
 import { AdminPopupService } from '../../services/admin-popup.service';
+import { WebSocketService } from '../../services/web-socket.service';
 
 @Component({
   selector: 'app-passenger-profile',
@@ -21,7 +22,7 @@ export class PassengerProfile {
     { label: 'Ride history', route: 'passenger-history' },
     { label: 'Change information', route: 'change-information-page' },
     { label: 'Reports', route: 'reports-page' },
-    { label: 'Notes' },
+    { label: 'Notes', route: 'passenger-notes-page' },
     { label: 'Support' },
     { label: 'Log out', redText: true, logout: true }
   ];
@@ -42,7 +43,8 @@ export class PassengerProfile {
     private userService: UserService,
     private cdr: ChangeDetectorRef,
     private adminPopupService: AdminPopupService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private wsService: WebSocketService
   ) {}
 
   
@@ -73,6 +75,10 @@ export class PassengerProfile {
         this.authService.logout();
         this.router.navigate(['/login']);
       }
+    });
+
+    this.wsService.unreadCount$.subscribe(() => {
+      this.cdr.detectChanges();
     });
   }
 
@@ -170,5 +176,9 @@ export class PassengerProfile {
     if (event.target.src !== this.defaultProfileImage) {
         event.target.src = this.defaultProfileImage;
     }
+  }
+
+  get unreadNotes(): number {
+    return this.wsService.unreadCount$.value;
   }
 }
