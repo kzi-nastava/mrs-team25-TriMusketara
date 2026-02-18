@@ -67,4 +67,21 @@ body {
     color: #333533;
 }
 
+button {
+    position: relative;
+}
 
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f55c5c;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    margin-left: 8px;
+    vertical-align: middle;
+  }

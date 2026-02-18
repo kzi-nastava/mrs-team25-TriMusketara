@@ -1,0 +1,34 @@
+<div class="notes-page">
+
+    <div class="notes-header">
+      <div class="header-left">
+        <div>
+          <h2>Notifications</h2>
+          <p class="subtitle">Ride reminders and updates</p>
+        </div>
+      </div>
+      <button *ngIf="notes.length > 0" class="clear-btn" (click)="clearNotes()">
+        Clear all
+      </button>
+    </div>
+  
+    <div class="notes-list" *ngIf="notes.length > 0; else empty">
+      @for (note of notes; track $index) {
+        <div class="note-card" [class.fresh]="$index === 0">
+          <div class="note-body">
+            <p class="note-content">{{ note.content }}</p>
+            <span class="note-time">{{ note.timestamp | date: 'HH:mm · dd MMM' }}</span>
+          </div>
+          <div class="note-dot" *ngIf="$index === 0"></div>
+        </div>
+      }
+    </div>
+  
+    <ng-template #empty>
+      <div class="empty-state">
+        <p class="empty-title">No notifications yet</p>
+        <p class="empty-sub">You'll be notified before your upcoming rides.</p>
+      </div>
+    </ng-template>
+  
+  </div>

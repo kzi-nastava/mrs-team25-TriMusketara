@@ -34,6 +34,11 @@
                     (click)="onButtonClick(btn)"
                 >
                     {{btn.label}}
+                    <span 
+                        *ngIf="btn.label === 'Notes' && unreadNotes > 0" 
+                        class="badge"
+                        >{{ unreadNotes }}
+                    </span>
                 </button>
             }
         </div>

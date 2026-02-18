@@ -46,6 +46,7 @@ export class LoginPage {
         }
 
         localStorage.setItem('token', res.token);
+        this.authService.onLogin$.next(this.authService.getUserId());
         // console.log(res.userId);
         this.authService.setUserType(res.role);
         this.authService.setUsername(res.email);
