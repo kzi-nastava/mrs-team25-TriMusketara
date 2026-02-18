@@ -143,7 +143,7 @@ public class BackendApplication {
 						{45.2390, 19.8310, 45.2460, 19.8510}
 				};
 
-				double[] prices = {750.0, 420.0, 1150.0};
+				double[] prices = {420.0, 740.0, 1150.0};
 
 				for (int i = 0; i < 3; i++) {
 					// origin - WITH SAVING

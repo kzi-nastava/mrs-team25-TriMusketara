@@ -17,6 +17,7 @@ import { PanicNotifications } from './layout/panic-notifications/panic-notificat
 import { BlockPage } from './layout/block-page/block-page';
 import { DriverNotesPage } from './layout/driver-notes-page/driver-notes-page';
 import { PassengerHistory } from './layout/passenger-history/passenger-history';
+import { AdminHistory } from './layout/admin-history/admin-history';
 
 
 export const routes: Routes = [
@@ -40,6 +41,7 @@ export const routes: Routes = [
   { path: 'driver-registration', component: DriverRegistration, canActivate: [AuthGuard], data: { role: 'admin' } },
   { path: 'panic-notifications',component: PanicNotifications, canActivate: [AuthGuard], data: { role: 'admin' } },
   { path: 'block-a-user', component: BlockPage, canActivate: [AuthGuard], data: { role: 'admin'}},
+  { path: 'admin-history', component: AdminHistory, canActivate: [AuthGuard], data: { role: 'admin' } },
 
   // SHARED ROUTES
   { path: 'change-information-page', component: ChangeInfoPage, canActivate: [AuthGuard], data: { roles: ['user', 'admin', 'driver'] } },

@@ -2,6 +2,8 @@ import { HttpClient } from "@angular/common/http";
 import { NoteRequest, UserProfileInformation } from "./models/user-profile-information";
 import { Observable } from "rxjs";
 import { Injectable } from "@angular/core";
+import { AdminRideHistory } from "./models/admin-ride-history";
+import { AdminUser } from "./models/admin-user";
 
 @Injectable({
     providedIn: 'root'
@@ -36,5 +38,26 @@ export class AdminService {
     leaveNote(userId: number, note: string): Observable<UserProfileInformation> {
         const body: NoteRequest = {message: note}
         return this.http.put<UserProfileInformation>(`${this.apiUrl}/users/${userId}/note`, body);
+    }
+
+    getRideHistory(id: number, role: string, from?: string, to?: string, sortBy?: string) {
+
+        let params: any = {
+            id: id,
+            role: role,
+            sortBy: sortBy || 'date'
+        };
+
+        if (from) params.from = from;
+        if (to) params.to = to;
+
+        return this.http.get<AdminRideHistory[]>(
+            'http://localhost:8080/api/admin/ride-history',
+            { params }
+        );
+    }
+
+    getAllUsers() {
+        return this.http.get<AdminUser[]>('http://localhost:8080/api/admin/users');
     }
 }

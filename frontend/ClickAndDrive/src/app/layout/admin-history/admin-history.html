@@ -1,0 +1,79 @@
+<div class="history-page">
+  <div class="content-wrapper">
+
+    <div class="header-section">
+      <h1 class="all-drives-title">Ride History</h1>
+
+      <div class="filters">
+
+        <div class="input-group">
+            <label>Select User:</label>
+            <select
+                [(ngModel)]="selectedUserId"
+                (change)="onUserChange()"
+                class="figma-select"
+            >
+                <option [ngValue]="null">-- Select user --</option>
+                <option *ngFor="let user of users" [ngValue]="user.id">
+                {{ user.username }} ({{ user.role }})
+                </option>
+            </select>
+        </div>
+
+        <button (click)="loadHistory()" class="btn-search">Load</button>
+
+        <div class="sort-container">
+          <label>Sort by:</label>
+          <select [(ngModel)]="sortField" (change)="sortBy()" class="figma-select">
+            <option value="startTime">Start Date</option>
+            <option value="endTime">End Date</option>
+            <option value="totalPrice">Price</option>
+            <option value="status">Status</option>
+          </select>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="figma-table">
+        <thead>
+          <tr>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Price</th>
+            <th>Cancelled By</th>
+            <th>Panic</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ride of rides">
+            <td>{{ ride.origin?.address }}</td>
+            <td>{{ ride.destination?.address }}</td>
+            <td>{{ ride.startTime | date:'MM/dd/yyyy HH:mm' }}</td>
+            <td>{{ ride.endTime | date:'MM/dd/yyyy HH:mm' }}</td>
+            <td>{{ ride.totalPrice }}</td>
+            <td>{{ ride.cancelledBy }}</td>
+            <td>
+              <span class="badge"
+                [ngClass]="ride.panicPressed ? 'badge-stopped' : 'badge-completed'">
+                {{ ride.panicPressed ? 'YES' : 'NO' }}
+              </span>
+            </td>
+            <td>{{ ride.status }}</td>
+          </tr>
+
+          <tr *ngIf="rides.length === 0">
+            <td colspan="8" style="text-align:center;">
+              No rides found.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>

@@ -16,8 +16,18 @@ import java.util.List;
 public interface RideRepository extends JpaRepository<Ride, Long> {
     List<Ride> findAllByDriverId(Long driverId);
     Page<Ride> findAllByDriverId(Long driverId, Pageable pageable);
-
+    List<Ride> findAllByStatus(RideStatus status);
 
     @Query("SELECT r FROM Ride r JOIN r.passengers p WHERE p.id = :passengerId")
     List<Ride> findAllByPassengerId(@Param("passengerId") Long passengerId);
+
+    List<Ride> findAllByDriverIdOrderByStartTimeDesc(Long driverId);
+
+    @Query("""
+SELECT DISTINCT r FROM Ride r
+JOIN r.passengers p
+WHERE p.id = :passengerId
+ORDER BY r.startTime DESC
+""")
+    List<Ride> findAllByPassengerIdOrdered(@Param("passengerId") Long passengerId);
 }

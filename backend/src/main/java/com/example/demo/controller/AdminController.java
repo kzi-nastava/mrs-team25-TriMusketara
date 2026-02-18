@@ -6,10 +6,7 @@ import com.example.demo.dto.request.DriverRegistrationRequestDTO;
 import com.example.demo.dto.response.*;
 import com.example.demo.dto.VehiclePriceDTO;
 
-import com.example.demo.services.interfaces.DriverService;
-import com.example.demo.services.interfaces.PanicService;
-import com.example.demo.services.interfaces.PassengerService;
-import com.example.demo.services.interfaces.UserService;
+import com.example.demo.services.interfaces.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,6 +25,7 @@ import java.util.List;
 public class AdminController {
 
     // Services
+    private final AdminService adminService;
     private final DriverService driverService;
     private final PassengerService passengerService;
     private final UserService userService;
@@ -124,4 +122,24 @@ public class AdminController {
         return ResponseEntity.ok(updatedUser);
     }
 
+    @GetMapping("/ride-history")
+    public ResponseEntity<?> getRideHistory(
+            @RequestParam Long id,
+            @RequestParam String role,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(defaultValue = "date") String sortBy) {
+
+        LocalDateTime fromDate = from != null ? LocalDateTime.parse(from) : null;
+        LocalDateTime toDate = to != null ? LocalDateTime.parse(to) : null;
+
+        return ResponseEntity.ok(
+                adminService.getRideHistory(id, role, fromDate, toDate, sortBy)
+        );
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<AdminUserResponseDTO>> getAllUsers() {
+        return ResponseEntity.ok(adminService.getAllNonAdminUsers());
+    }
 }
