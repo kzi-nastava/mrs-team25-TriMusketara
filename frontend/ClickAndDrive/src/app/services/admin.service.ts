@@ -46,7 +46,7 @@ export class AdminService {
         let params: any = {
             id: id,
             role: role,
-            sortBy: sortBy || 'date'
+            sortBy: sortBy || 'startTime'
         };
 
         if (from) params.from = from;

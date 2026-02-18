@@ -42,23 +42,26 @@ export class AdminHistory implements OnInit {
     if (!this.selectedUserId || !this.selectedRole) return;
 
     this.adminService
-      .getRideHistory(this.selectedUserId, this.selectedRole)
+      .getRideHistory(this.selectedUserId, this.selectedRole, this.fromDate, this.toDate, this.sortField)
       .subscribe(data => {
         this.allRides = data;
         this.rides = [...data];
-        this.sortBy();
+        this.sortBy(); // lokalno sortiranje ako želiš override
       });
   }
 
   sortBy() {
-    console.log(this.sortField);
-    console.log(this.rides[0]);
-    this.rides.sort((a: any, b: any) => {
-      if (a[this.sortField] < b[this.sortField]) return 1;
-      if (a[this.sortField] > b[this.sortField]) return -1;
-      return 0;
-    });
+      this.rides.sort((a: any, b: any) => {
+          switch(this.sortField) {
+              case 'startTime': return new Date(b.startTime).getTime() - new Date(a.startTime).getTime();
+              case 'endTime': return new Date(b.endTime).getTime() - new Date(a.endTime).getTime();
+              case 'price': return b.totalPrice - a.totalPrice;
+              case 'status': return b.status.localeCompare(a.status);
+              default: return 0;
+          }
+      });
   }
+
 
   onUserChange() {
     const user = this.users.find(u => u.id == this.selectedUserId);
