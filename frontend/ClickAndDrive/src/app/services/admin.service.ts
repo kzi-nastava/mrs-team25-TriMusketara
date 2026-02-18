@@ -60,6 +60,8 @@ export class AdminService {
 
     getAllUsers() {
         return this.http.get<AdminUser[]>('http://localhost:8080/api/admin/users');
+    }
+
     // Get current prices
     getPrices(): Observable<VehiclePrice> {
         return this.http.get<VehiclePrice>(`${this.apiUrl}/prices`);
