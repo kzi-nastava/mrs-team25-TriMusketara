@@ -1,7 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar';
 import { MainPageComponent } from './main-page/main-page';
+import { WebSocketService } from './services/web-socket.service';
+import { AuthService } from './services/auth.service';
 
 
 @Component({
@@ -12,14 +14,27 @@ import { MainPageComponent } from './main-page/main-page';
   styleUrl: './app.css'
 })
 
-export class App {
+export class App implements OnInit {
   protected readonly title = 'ClickAndDrive';
 
-  constructor(public router: Router) {}
+  constructor(public router: Router, private authService: AuthService, private wsService: WebSocketService) {}
 
   // Here im using .includes to remove navbar from password input when registering driver, remember this!
   showNavbar(): boolean {
     return this.router.url !== '/login' && this.router.url !== '/register'
           && this.router.url !== '/driver-registration' && !this.router.url.includes('/complete-registration');
+  }
+
+  ngOnInit() {
+    const userId = this.authService.getUserId();
+    if (userId && userId !== 0) {
+      // User is logged in
+      this.wsService.subscribeToPassengerNotes(userId);
+    }
+
+    // If the user logs in during session
+    this.authService.onLogin$.subscribe((userId: number) => {
+      this.wsService.subscribeToPassengerNotes(userId);
+    });
   }
 }

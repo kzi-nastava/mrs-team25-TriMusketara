@@ -2,6 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import {Map} from './map'
+import { Subject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
@@ -12,6 +13,8 @@ export class AuthService {
 
     // Username
     userName = signal('TriMusketara');
+
+    public onLogin$ = new Subject<number>();
 
     // In-drive status
     inDrive = signal(false);

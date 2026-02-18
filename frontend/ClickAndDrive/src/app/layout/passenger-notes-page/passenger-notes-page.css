@@ -1,0 +1,163 @@
+.notes-page {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+/* ── Header ── */
+.notes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.bell-icon {
+  font-size: 2rem;
+  background: #f0f4ff;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notes-header h2 {
+  font-size: 1.5rem;
+  margin: 0;
+  color: #1a1a2e;
+}
+
+.subtitle {
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+  color: #9098b1;
+}
+
+.clear-btn {
+  background: none;
+  border: 1.5px solid #e0e4f0;
+  border-radius: 10px;
+  padding: 7px 16px;
+  font-size: 0.82rem;
+  color: #9098b1;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clear-btn:hover {
+  border-color: #f55c5c;
+  color: #f55c5c;
+}
+
+/* ── Cards ── */
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.note-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #232324;
+  border: 1.5px solid #edf0f7;
+  border-radius: 16px;
+  padding: 16px 18px;
+  position: relative;
+  transition: box-shadow 0.2s, transform 0.2s;
+  animation: slideIn 0.3s ease;
+}
+
+.note-card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+  transform: translateY(-1px);
+}
+
+/* Newest card gets a subtle blue tint */
+.note-card.fresh {
+  border-color: #c7d7ff;
+  background: #232324;
+}
+
+.note-icon {
+  font-size: 1.3rem;
+  background: #f0f4ff;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.note-body {
+  flex: 1;
+}
+
+.note-content {
+  margin: 0 0 5px;
+  font-size: 0.95rem;
+  color: white;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.note-time {
+  font-size: 0.78rem;
+  color: #b0b8cc;
+}
+
+/* Blue dot for newest unread */
+.note-dot {
+  width: 8px;
+  height: 8px;
+  background: #F5CB5C;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #b0b8cc;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.empty-title {
+  font-size: 1.1rem;
+  color: #6b7280;
+  margin: 0 0 6px;
+}
+
+.empty-sub {
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* ── Animation ── */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

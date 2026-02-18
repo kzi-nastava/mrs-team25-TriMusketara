@@ -20,6 +20,7 @@ import { ReportsPage } from './layout/reports-page/reports-page';
 import { PassengerHistory } from './layout/passenger-history/passenger-history';
 import { AdminHistory } from './layout/admin-history/admin-history';
 import { AdminActiveRides } from './layout/admin-active-rides/admin-active-rides';
+import { PassengerNotesPage } from './layout/passenger-notes-page/passenger-notes-page';
 
 
 export const routes: Routes = [
@@ -30,6 +31,7 @@ export const routes: Routes = [
   { path: 'favorite-routes', component: FavoriteRoutes, canActivate: [AuthGuard], data: { role: 'user' } },
   { path: 'rate-ride', component: RideRating, canActivate: [AuthGuard], data: { role: 'user' } },
   { path: 'passenger-history', component: PassengerHistory, canActivate: [AuthGuard], data: { role: 'user' } },
+  { path: 'passenger-notes-page', component: PassengerNotesPage, canActivate: [AuthGuard], data: { role: 'user' } },
 
   // DRIVER ROUTES
   { path: 'driver-history', component: DriverHistory, canActivate: [AuthGuard], data: { role: 'driver' } },
