@@ -47,15 +47,55 @@ export class DriveInProgress implements AfterViewInit {
     this.listenForFinish();
   }
 
+  // private async drawRouteOnLoad() {
+  //   try {
+  //     console.log('Drawing route for:', this.auth.origin(), this.auth.destination());
+  //     const originCoords = await this.mapService.geocodeAddress(this.auth.origin());
+  //     const destCoords = await this.mapService.geocodeAddress(this.auth.destination());
+
+  //     setTimeout(() => {
+  //       if (this.mapView && this.mapView.map) {
+  //         this.mapView.drawRouteAndCalculateETA(originCoords, destCoords);
+  //       }
+  //     }, 200);
+  //   } catch (err) {
+  //     console.error('Failed to draw route on load:', err);
+  //   }
+  // }
+
   private async drawRouteOnLoad() {
     try {
-      console.log('Drawing route for:', this.auth.origin(), this.auth.destination());
-      const originCoords = await this.mapService.geocodeAddress(this.auth.origin());
-      const destCoords = await this.mapService.geocodeAddress(this.auth.destination());
+      if (!this.activeRide) return;
 
+      // List of all addresses
+      const locations: string[] = [];
+      locations.push(this.activeRide.origin);
+
+      if (this.activeRide.stops && Array.isArray(this.activeRide.stops)) {
+        this.activeRide.stops.forEach((stop: any) => {
+          locations.push(typeof stop === 'string' ? stop : stop.address);
+        });
+      }
+
+      locations.push(this.activeRide.destination);
+
+      console.log('Route path', locations);
+
+      // Geocode all addresses to coordinates
+      const coordsPromises = locations.map(loc => this.mapService.geocodeAddress(loc));
+      const allCords = await Promise.all(coordsPromises);
+
+      const validCoords = allCords.filter(c => c!== null) as [number, number][];
+
+      if (validCoords.length < 2) {
+        console.error('Not enough coordinates for a route');
+        return;
+      }
+
+      // Call map, draw route and begin simulation
       setTimeout(() => {
         if (this.mapView && this.mapView.map) {
-          this.mapView.drawRouteAndCalculateETA(originCoords, destCoords);
+          this.mapView.drawRouteWithStops(validCoords, true);
         }
       }, 200);
     } catch (err) {
