@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { FavoriteToggle } from '../../components/favorite-toggle/favorite-toggle';
 import { RouteFromFavorites } from '../../services/models/route-from-favorites';
 import { PassengerService } from '../../services/passenger.service';
@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { SharedRideDataService } from '../../services/shared-ride-data.service';
+import { BlockReasonAlert } from '../../components/block-reason-alert/block-reason-alert';
 
 /* RouteDTO for dummy data - for now */
 interface RouteDTO {
@@ -20,13 +21,24 @@ interface RouteDTO {
 
 @Component({
   selector: 'app-favorite-routes',
-  imports: [FavoriteToggle],
+  imports: [FavoriteToggle, BlockReasonAlert],
   templateUrl: './favorite-routes.html',
   styleUrl: './favorite-routes.css',
 })
 export class FavoriteRoutes {
 
   favoriteRoutes: RouteFromFavorites[] = [];
+  
+  private _blockedAlert: BlockReasonAlert | undefined;
+
+  @ViewChild(BlockReasonAlert)
+  set blockedAlert(value: BlockReasonAlert) {
+    this._blockedAlert = value;
+  }
+
+  get blockedAlert(): BlockReasonAlert {
+    return this._blockedAlert!;
+  }
 
   constructor(private passengerService: PassengerService, private cdr: ChangeDetectorRef, private authService: AuthService, private toastr: ToastrService, private router: Router, private sharedRideDataService: SharedRideDataService) {}
 
@@ -85,6 +97,14 @@ export class FavoriteRoutes {
 
   // Order favorite route
   onOrderClick(route: RouteFromFavorites) {
+
+    // Check users status - if blocked he can not order new rides
+    if (this.authService.isUserBlocked()) {
+      const reason = this.authService.getBlockedReason();
+      this.blockedAlert.open(reason || 'No specific reason provided');
+      return;
+    } 
+
     // Send origin and destination to ride ordering form
     this.sharedRideDataService.setPrefilledData({
       origin: route.origin.address,
