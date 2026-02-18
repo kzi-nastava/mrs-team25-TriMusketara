@@ -22,6 +22,22 @@
 
         <button (click)="loadHistory()" class="btn-search">Load</button>
 
+        <div class="date-filter-container">
+          <div class="input-group">
+            <label>From:</label>
+            <input type="date" [(ngModel)]="fromDate" class="figma-input">
+          </div>
+          <div class="input-group">
+            <label>To:</label>
+            <input type="date" [(ngModel)]="toDate" class="figma-input">
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button (click)="searchByDate()" class="btn-search">Search</button>
+          <button (click)="clearFilter()" class="btn-clear">Clear</button>
+        </div>
+
         <div class="sort-container">
           <label>Sort by:</label>
           <select [(ngModel)]="sortField" (change)="sortBy()" class="figma-select">
@@ -55,7 +71,7 @@
             <td>{{ ride.destination?.address }}</td>
             <td>{{ ride.startTime | date:'MM/dd/yyyy HH:mm' }}</td>
             <td>{{ ride.endTime | date:'MM/dd/yyyy HH:mm' }}</td>
-            <td>{{ ride.totalPrice }}</td>
+            <td class="ride-price">{{ ride.totalPrice }}</td>
             <td>{{ ride.cancelledBy }}</td>
             <td>
               <span class="badge"

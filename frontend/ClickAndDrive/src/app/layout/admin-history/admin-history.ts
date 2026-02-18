@@ -38,6 +38,28 @@ export class AdminHistory implements OnInit {
     });
   }
 
+  searchByDate() {
+
+    const start = this.fromDate ? new Date(this.fromDate).getTime() : -Infinity;
+    const end = this.toDate
+      ? new Date(this.toDate).setHours(23, 59, 59, 999)
+      : Infinity;
+
+    this.rides = this.allRides.filter(ride => {
+      const rideDate = new Date(ride.startTime).getTime();
+      return rideDate >= start && rideDate <= end;
+    });
+
+    this.sortBy();
+  }
+
+  clearFilter() {
+    this.fromDate = '';
+    this.toDate = '';
+    this.rides = [...this.allRides];
+    this.sortBy();
+  }
+
   loadHistory() {
     if (!this.selectedUserId || !this.selectedRole) return;
 
@@ -55,7 +77,7 @@ export class AdminHistory implements OnInit {
           switch(this.sortField) {
               case 'startTime': return new Date(b.startTime).getTime() - new Date(a.startTime).getTime();
               case 'endTime': return new Date(b.endTime).getTime() - new Date(a.endTime).getTime();
-              case 'price': return b.totalPrice - a.totalPrice;
+              case 'totalPrice': return b.totalPrice - a.totalPrice;
               case 'status': return b.status.localeCompare(a.status);
               default: return 0;
           }
