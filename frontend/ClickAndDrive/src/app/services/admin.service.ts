@@ -4,6 +4,7 @@ import { Observable } from "rxjs";
 import { Injectable } from "@angular/core";
 import { AdminRideHistory } from "./models/admin-ride-history";
 import { AdminUser } from "./models/admin-user";
+import { VehiclePrice } from "./models/vehicle-price";
 
 @Injectable({
     providedIn: 'root'
@@ -59,5 +60,13 @@ export class AdminService {
 
     getAllUsers() {
         return this.http.get<AdminUser[]>('http://localhost:8080/api/admin/users');
+    // Get current prices
+    getPrices(): Observable<VehiclePrice> {
+        return this.http.get<VehiclePrice>(`${this.apiUrl}/prices`);
+    }
+
+    // Update prices
+    updatePrices(prices: VehiclePrice): Observable<any> {
+        return this.http.put<any>(`${this.apiUrl}/prices`, prices);
     }
 }

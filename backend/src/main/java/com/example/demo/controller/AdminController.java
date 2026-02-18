@@ -6,6 +6,8 @@ import com.example.demo.dto.request.DriverRegistrationRequestDTO;
 import com.example.demo.dto.response.*;
 import com.example.demo.dto.VehiclePriceDTO;
 
+import com.example.demo.model.VehiclePrice;
+import com.example.demo.repositories.VehiclePriceRepository;
 import com.example.demo.services.interfaces.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,8 @@ public class AdminController {
     private final PassengerService passengerService;
     private final UserService userService;
     private final PanicService panicService;
+    private final VehiclePriceRepository priceRepository;
+    private final VehiclePriceService priceService;
 
     @PostMapping("/drivers")
     public ResponseEntity<DriverRegistrationResponseDTO> registerDriver(
@@ -74,15 +78,14 @@ public class AdminController {
     // 2.14: GET prices
     @GetMapping("/prices")
     public ResponseEntity<VehiclePriceDTO> getVehiclePrices() {
-        return ResponseEntity.ok(new VehiclePriceDTO(200.0, 500.0, 300.0, 120.0));
+        return ResponseEntity.ok(priceService.getPrices());
     }
 
     // 2.14: UPDATE prices
     @PutMapping("/prices")
     public ResponseEntity<VehiclePriceDTO> updateVehiclePrices(@RequestBody VehiclePriceDTO request) {
-        return ResponseEntity.ok(new VehiclePriceDTO(
-                request.getStandardBasePrice(), request.getLuxuryBasePrice(),
-                request.getVanBasePrice(), request.getPricePerKm()));
+        VehiclePriceDTO updated = priceService.updatePrices(request);
+        return ResponseEntity.ok(updated);
     }
 
     // GET all drivers

@@ -1,0 +1,32 @@
+<div class="popup-overlay" (click)="popupService.closePrice()">
+  <div class="price-popup" (click)="$event.stopPropagation()">
+    <p class="title">Change prices</p>
+
+    @if (prices.standardBasePrice !== 0) {
+    <div class="input-group">
+        <label>Standard:</label>
+        <input type="number" [(ngModel)]="prices.standardBasePrice">
+    </div>
+    <div class="input-group">
+      <label>Luxury:</label>
+      <input type="number" [(ngModel)]="prices.luxuryBasePrice">
+    </div>
+
+    <div class="input-group">
+      <label>Van:</label>
+      <input type="number" [(ngModel)]="prices.vanBasePrice">
+    </div>
+
+    <div class="input-group">
+      <label>Price per km:</label>
+      <input type="number" [(ngModel)]="prices.pricePerKm">
+    </div>
+
+    <button class="save-btn" (click)="save()">Update prices</button>
+    }@else {
+      <p style="text-align: center;">Loading prices...</p>
+    }
+
+    
+  </div>
+</div>

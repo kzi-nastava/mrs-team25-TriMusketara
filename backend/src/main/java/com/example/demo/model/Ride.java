@@ -23,6 +23,14 @@ public class Ride {
     @JoinColumn(name = "creator_id")
     private Passenger rideCreator;
 
+    private LocalDateTime createdAt;
+
+    // When saving an object into database, remember when created
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
     @ManyToOne(cascade = CascadeType.PERSIST)
     private Location currentLocation;
 

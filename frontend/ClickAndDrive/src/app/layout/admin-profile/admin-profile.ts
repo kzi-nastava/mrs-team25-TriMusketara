@@ -5,6 +5,7 @@ import { UserService } from '../../services/user.service';
 import { UserProfileInformation } from '../../services/models/user-profile-information';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
+import { AdminPopupService } from '../../services/admin-popup.service';
 
 @Component({
   selector: 'app-admin-profile',
@@ -22,7 +23,7 @@ export class AdminProfile {
     { label: 'Requests' },
     { label: 'Change information', route: 'change-information-page' },
     { label: 'Support' },
-    { label: 'Reports' },
+    { label: 'Reports' , route: 'reports-page'},
     { label: 'Notes' },
     { label: 'Block a user', route: 'block-a-user'},
     { label: 'Log out', redText: true, logout: true }
@@ -42,6 +43,7 @@ export class AdminProfile {
     private router: Router,
     private authService: AuthService,
     private userService: UserService,
+    private adminPopupService: AdminPopupService,
     private cdr: ChangeDetectorRef,
     private toastr: ToastrService
   ) {}
@@ -89,6 +91,17 @@ export class AdminProfile {
     if (button.logout) {
       this.authService.logout();
       return;
+    }
+
+    if (button.label === 'Change prices') { // DODAJ OVU LOGIKU
+        this.adminPopupService.openPrice();
+        return;
+    }
+
+    if (button.label === 'Support') {
+    this.adminPopupService.openChat();
+    //this.profileSidebar.close(); 
+    return;
     }
 
     if (button.route) {

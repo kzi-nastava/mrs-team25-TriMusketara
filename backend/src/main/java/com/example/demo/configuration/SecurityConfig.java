@@ -66,6 +66,7 @@ public class SecurityConfig {
                         // Passenger endpoints
                         .requestMatchers(("/api/passenger/**")).hasRole("USER")
                         // All other requests require authentication
+                        .requestMatchers("/api/reports/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

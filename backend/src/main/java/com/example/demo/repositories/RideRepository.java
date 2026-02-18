@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -30,4 +31,5 @@ WHERE p.id = :passengerId
 ORDER BY r.startTime DESC
 """)
     List<Ride> findAllByPassengerIdOrdered(@Param("passengerId") Long passengerId);
+    List<Ride> findAllByStatus(RideStatus rideStatus);
 }
