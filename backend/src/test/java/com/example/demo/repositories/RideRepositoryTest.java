@@ -1,5 +1,7 @@
 package com.example.demo.repositories;
 
+import com.example.demo.model.Driver;
+import com.example.demo.model.Passenger;
 import com.example.demo.model.Ride;
 import com.example.demo.model.RideStatus;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,9 @@ public class RideRepositoryTest {
     @Autowired
     private RideRepository rideRepository;
 
+    /*
+    * List<Ride> findAllByPassengerIdOrdered(@Param("passengerId") Long passengerId);*/
+
     @Test
     void findAllByStatus_shouldReturnRides() {
 
@@ -29,6 +34,36 @@ public class RideRepositoryTest {
         rideRepository.save(ride);
 
         List<Ride> rides = rideRepository.findAllByStatus(RideStatus.STARTED);
+
+        assertFalse(rides.isEmpty());
+    }
+
+    @Test
+    void findAllByDriverId_shouldReturnRides() {
+
+        Driver driver = new Driver();
+
+        Ride ride = new Ride();
+        ride.setDriver(driver);
+
+        rideRepository.save(ride);
+
+        List<Ride> rides = rideRepository.findAllByDriverId(driver.getId());
+
+        assertFalse(rides.isEmpty());
+    }
+
+    @Test
+    void findAllByPassengerId_shouldReturnRides() {
+
+        Passenger creator = new Passenger();
+        Ride ride = new Ride();
+
+        ride.setRideCreator(creator);
+
+        rideRepository.save(ride);
+
+        List<Ride> rides = rideRepository.findAllByPassengerId(creator.getId());
 
         assertFalse(rides.isEmpty());
     }

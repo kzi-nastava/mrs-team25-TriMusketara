@@ -59,6 +59,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/panic/**").permitAll()
                         //WebSocket endpoints
                         .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/api/passenger/rides/**").hasAnyRole("ADMIN", "USER")
                         // Admin endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // Driver endpoints

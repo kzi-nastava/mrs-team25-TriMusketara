@@ -29,4 +29,8 @@ export class PassengerService {
             `http://localhost:8080/api/passenger/${passengerId}/ride-history`
         );
     }
+
+    getRideDetails(rideId: number) {
+        return this.http.get<any>(`http://localhost:8080/api/passenger/rides/${rideId}/details`);
+    }
 }

@@ -706,4 +706,56 @@ public class RideServiceImpl implements RideService {
 
         return new PageImpl<>(pagedList, pageable, allRides.size());
     }
+
+    @Override
+    public PassengerRideDetailsResponseDTO getRideDetails(Long rideId) {
+
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() -> new RuntimeException("Ride not found"));
+
+        PassengerRideDetailsResponseDTO dto = new PassengerRideDetailsResponseDTO();
+
+        dto.setDriverEmail(ride.getDriver().getEmail());
+        dto.setStartTime(ride.getStartTime());
+        dto.setEndTime(ride.getEndTime());
+        dto.setTotalPrice(ride.getPrice());
+
+        dto.setStatus(ride.getStatus().name());
+
+        if (ride.getDriver() != null) {
+            dto.setDriverEmail(ride.getDriver().getEmail());
+            dto.setDriverName(ride.getDriver().getName() + " " + ride.getDriver().getSurname());
+        }
+
+        if (ride.getRoute() != null) {
+            Location start = ride.getRoute().getOrigin();
+            Location end = ride.getRoute().getDestination();
+
+            dto.setOrigin(new LocationDTO(
+                    start.getLongitude(),
+                    start.getLatitude(),
+                    start.getAddress()
+            ));
+
+            dto.setDestination(new LocationDTO(
+                    end.getLongitude(),
+                    end.getLatitude(),
+                    end.getAddress()
+            ));
+        }
+
+        if (ride.getInconsistencyReports() != null) {
+            dto.setInconsistencyReports(
+                    ride.getInconsistencyReports()
+                            .stream()
+                            .map(r -> r.getNote())
+                            .toList()
+            );
+        }
+
+        dto.setPetFriendly(ride.isPetFriendly());
+        dto.setBabyFriendly(ride.isBabyFriendly());
+
+        return dto;
+    }
 }

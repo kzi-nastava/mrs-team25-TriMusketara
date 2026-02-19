@@ -25,8 +25,11 @@
 
         <div class="sort-container">
           <label>Sort by : </label>
-          <select class="figma-select">
-            <option>Newest</option>
+          <select [(ngModel)]="sortField" (change)="sortBy()" class="figma-select">
+            <option value="startTime">Start Date</option>
+            <option value="endTime">End Date</option>
+            <option value="totalPrice">Price</option>
+            <option value="status">Status</option>
           </select>
         </div>
       </div>
@@ -51,7 +54,7 @@
             <td>{{ ride.destination?.address }}</td>
             <td>{{ ride.totalPrice }}</td>
             <td>{{ ride.startTime | date:'MM/dd/yyyy' }}</td>
-            <td><button class="btn-details">Details</button></td>
+            <td><button class="btn-details" (click)="openDetails(ride.id)">Details</button></td>
             <td><span class="badge" [ngClass]="ride.status === 'Completed' ? 'badge-completed' : 'badge-stopped'">{{ ride.status }}</span></td>
           </tr>
           <tr *ngIf="rides.length === 0">
@@ -74,5 +77,57 @@
       </div>
     </div>
 
-  </div>
+    <div 
+    class="overlay" 
+    *ngIf="showDetails" 
+    (click)="closeDetails()">
+    </div>
+
+    @if (showDetails) {
+    <div class="details-popup">
+  
+        <div class="map-mini">
+            <app-map-view 
+                size="small"
+                [readonlyMode]="true">
+            </app-map-view>
+        </div>
+
+        <div class="details">
+            <p><strong>Origin:</strong> {{ selectedRide.origin.address }}</p>
+            <p><strong>Destination:</strong> {{ selectedRide.destination.address }}</p>
+            <p><strong>Driver:</strong> {{ selectedRide.driverEmail }}</p>
+            <p><strong>Price:</strong> {{ selectedRide.totalPrice }}</p>
+            <p><strong>Status:</strong> {{ selectedRide.status }}</p>
+            <div class="stars">
+                <strong>Driver rating:</strong>
+                @for (star of getStarsArray(); track star) {
+                <span 
+                    class="star"
+                    [class.filled]="star <= getDriverRating()">
+                    ★
+                </span>
+                }
+            </div>
+
+            <div class="stars">
+                <strong>Vehicle rating:</strong>
+                @for (star of getStarsArray(); track star) {
+                <span 
+                    class="star"
+                    [class.filled]="star <= getVehicleRating()">
+                    ★
+                </span>
+                }
+            </div>
+
+
+            <div class="buttons">
+                <button (click)="closeDetails()">Close</button>
+                <button class="btn-reorder" (click)="reorderNow(selectedRide)">Reorder</button>
+            </div>
+
+        </div>
+    </div>
+    }
 </div>

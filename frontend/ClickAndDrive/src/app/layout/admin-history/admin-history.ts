@@ -1,17 +1,20 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../services/admin.service';
 import { AdminRideHistory } from '../../services/models/admin-ride-history';
+import { PassengerService } from '../../services/passenger.service';
+import { MapViewComponent } from '../../components/map-view/map-view';
 
 @Component({
   selector: 'app-admin-history',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MapViewComponent],
   templateUrl: './admin-history.html',
   styleUrl: './admin-history.css',
 })
 export class AdminHistory implements OnInit {
+  @ViewChild(MapViewComponent) mapComponent!: MapViewComponent;
 
   allRides: AdminRideHistory[] = [];
   rides: AdminRideHistory[] = [];
@@ -25,9 +28,13 @@ export class AdminHistory implements OnInit {
 
   sortField: string = 'startTime';
 
+  selectedRide: any = null;
+  showDetails: boolean = false;
+
   constructor(
     private adminService: AdminService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private passengerService: PassengerService
   ) {}
 
   ngOnInit() {
@@ -88,5 +95,47 @@ export class AdminHistory implements OnInit {
   onUserChange() {
     const user = this.users.find(u => u.id == this.selectedUserId);
     this.selectedRole = user ? user.role : '';
+  }
+
+  openDetails(rideId: number) {
+    this.passengerService.getRideDetails(rideId).subscribe({
+      next: (data) => {
+        this.selectedRide = data;
+        this.showDetails = true;
+        console.log(data)
+
+        setTimeout(() => {
+          if (this.mapComponent) {
+            this.mapComponent.drawRouteAndCalculateETA(
+              [
+                this.selectedRide.origin.longitude,
+                this.selectedRide.origin.latitude
+              ],
+              [
+                this.selectedRide.destination.longitude,
+                this.selectedRide.destination.latitude
+              ]
+            );
+          }
+        }, 200);
+      }
+    });
+  }
+
+
+  closeDetails() {
+    this.showDetails = false;
+  }
+
+  getDriverRating(): number {
+    return this.selectedRide?.review?.driverRating ?? 0;
+  }
+
+  getVehicleRating(): number {
+    return this.selectedRide?.review?.vehicleRating ?? 0;
+  }
+
+  getStarsArray(): number[] {
+    return [1, 2, 3, 4, 5];
   }
 }

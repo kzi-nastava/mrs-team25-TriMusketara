@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.response.RouteFromFavoritesResponseDTO;
 import com.example.demo.services.PassengerServiceImpl;
+import com.example.demo.services.RideServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.List;
 public class PassengerController {
 
     private final PassengerServiceImpl passengerService;
+    private final RideServiceImpl rideService;
 
     // Getting passengers list of favorite routes to display
     @GetMapping("/{passengerId}/favorite-routes")
@@ -37,5 +39,10 @@ public class PassengerController {
     public ResponseEntity<?> getPassengerHistory(@PathVariable Long id) {
 
         return ResponseEntity.ok(passengerService.getPassengerRideHistory(id));
+    }
+
+    @GetMapping("/rides/{rideId}/details")
+    public ResponseEntity<?> getRideDetails(@PathVariable Long rideId) {
+        return ResponseEntity.ok(rideService.getRideDetails(rideId));
     }
 }
