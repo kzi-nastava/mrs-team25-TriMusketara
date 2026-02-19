@@ -10,21 +10,20 @@ import com.example.demo.services.interfaces.EmailService;
 import com.example.demo.services.interfaces.RideService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +43,9 @@ public class RideServiceImpl implements RideService {
     //Service
     private final EmailService emailService;
     private final VehiclePriceRepository vehiclePriceRepository;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     // Ride creation
     @Override
@@ -136,6 +138,12 @@ public class RideServiceImpl implements RideService {
             ride.setDriver(driver);
             driver.getScheduledRides().add(ride);
             rideRepository.save(ride);
+
+            // Using websockets update drivers scheduled list
+            messagingTemplate.convertAndSend(
+                    "/topic/driver/" + driver.getId() + "/rides",
+                    Map.of("action", "NEW_RIDE", "timestamp", LocalDateTime.now().toString())
+            );
 
             // Send notifications and emails to linked passengers for this ride
             processNotifications(request.getPassengerEmails(), ride);
@@ -425,9 +433,14 @@ public class RideServiceImpl implements RideService {
         driver.setActiveRide(null);
         driverRepository.save(driver);
 
-        //update vehicle status
+        //update vehicle
         Vehicle vehicle = driver.getVehicle();
         vehicle.setBusy(false);
+        Location loc = new Location();
+        loc.setLatitude(dto.getStopLocation().getLatitude());
+        loc.setLongitude(dto.getStopLocation().getLongitude());
+        loc.setAddress(dto.getStopLocation().getAddress());
+        vehicle.setLocation(loc);
         vehicleRepository.save(vehicle);
     }
 
@@ -455,9 +468,14 @@ public class RideServiceImpl implements RideService {
         driver.setActiveRide(null);
         driverRepository.save(driver);
 
-        //update vehicle status
+        //update vehicle
         Vehicle vehicle = driver.getVehicle();
         vehicle.setBusy(false);
+        Location loc = new Location();
+        loc.setLatitude(dto.getStopLocation().getLatitude());
+        loc.setLongitude(dto.getStopLocation().getLongitude());
+        loc.setAddress(dto.getStopLocation().getAddress());
+        vehicle.setLocation(loc);
         vehicleRepository.save(vehicle);
     }
 
@@ -518,6 +536,7 @@ public class RideServiceImpl implements RideService {
         Vehicle vehicle = driver.getVehicle();
         driver.setActiveRide(null);
         vehicle.setBusy(false);
+        vehicle.setLocation(guestRide.getRoute().getDestination());
 
         double price = calculateRidePrice(distance, vehicle.getType());
         guestRide.setPrice(price);
@@ -536,6 +555,7 @@ public class RideServiceImpl implements RideService {
 
         Vehicle vehicle = driver.getVehicle();
         vehicle.setBusy(false);
+        vehicle.setLocation(route.getDestination());
         vehicleRepository.save(vehicle);
 
         extraLogic.accept(distance, vehicle.getType());
@@ -554,7 +574,7 @@ public class RideServiceImpl implements RideService {
             case VAN ->  price += vehiclePrice.getVan();
             default -> price += vehiclePrice.getStandard();
         }
-        System.out.println("DEBUG: Racunam cenu za distancu: " + distance);
+//        System.out.println("DEBUG: Racunam cenu za distancu: " + distance);
 
         price += distance * vehiclePrice.getPerKm();
         return (double) Math.round(price);
@@ -591,31 +611,6 @@ public class RideServiceImpl implements RideService {
         String creatorEmail = ride.getRideCreator().getEmail();
         System.out.println("Email sent to " + creatorEmail);
         sendEmail(creatorEmail, subject, finalBody);
-    }
-
-    // NOVA TESTNA METODA (Overload)
-    private void sendSummaryEmails(String testEmail) {
-        String subject = "TEST Ride Summary";
-        String finalBody = """
-            Dear User,
-            
-            THIS IS A TEST EMAIL (Fallback).
-            
-            Summary:
-            - Route: Test Start -> Test Destination
-            - Duration: 15 minutes
-            - Total Price: 500.00 RSD
-            
-            Thank you for testing ClickAndDrive!
-            """;
-
-        EmailDetails details = new EmailDetails();
-        details.setRecipient(testEmail);
-        details.setSubject(subject);
-        details.setMsgBody(finalBody);
-
-        emailService.sendsSimpleMail(details);
-        System.out.println("Test email sent to: " + testEmail);
     }
 
     private void sendEmail(String to, String subject, String body) {

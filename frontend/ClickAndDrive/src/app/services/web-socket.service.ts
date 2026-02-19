@@ -25,6 +25,9 @@ export class WebSocketService {
   // Keeping track of status, if a user is blocked/unblocked
   public userStatusChanged$ = new BehaviorSubject<any>(null);
 
+  // Emitting subject for when a new ride is assigned to a driver
+  public driverRidesUpdated$ = new Subject<any>();
+
   constructor(private authService: AuthService) {
     this.stompClient = new Client({
       webSocketFactory: () => new SockJsFunc('http://localhost:8080/ws'), // Backend URL
@@ -111,6 +114,25 @@ export class WebSocketService {
         }
       });
         this.subscriptions.set(topic, subscription);
+    });
+  }
+
+  subscribeToDriverRides(driverId: number) {
+    const topic = `/topic/driver/${driverId}/rides`;
+
+    this.connected$.subscribe(() => {
+      if (this.subscriptions.has(topic)) return;
+
+      const subscription = this.stompClient.subscribe(topic, (message: Message) => {
+          try {
+            const data = JSON.parse(message.body);
+            console.log("New ride for driver:", data);
+            this.driverRidesUpdated$.next(data);
+          } catch (e) {
+            console.error("Error:", e);
+          }
+      });
+      this.subscriptions.set(topic, subscription);
     });
   }
 }

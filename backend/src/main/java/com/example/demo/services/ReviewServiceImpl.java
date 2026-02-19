@@ -9,6 +9,7 @@ import com.example.demo.repositories.ReviewRepository;
 import com.example.demo.repositories.RideRepository;
 import com.example.demo.services.interfaces.ReviewService;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
 
-    private RideRepository rideRepository;
-    private ReviewRepository reviewRepository;
-    private PassengerRepository passengerRepository;
+    private final RideRepository rideRepository;
+    private final ReviewRepository reviewRepository;
+    private final PassengerRepository passengerRepository;
 
     @Override
     public List<ReviewRequestDTO> getAll(long rideId) {
@@ -55,7 +57,9 @@ public class ReviewServiceImpl implements ReviewService {
         // Check if passenger participated
         boolean participated = ride.getPassengers().stream()
                 .anyMatch(p -> p.getId().equals(dto.getPassengerId()));
-
+        if(!participated){
+            participated = ride.getRideCreator().getId().equals(dto.getPassengerId());
+        }
         if (!participated) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You did not participate in this ride.");
         }

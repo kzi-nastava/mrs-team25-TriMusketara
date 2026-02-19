@@ -25,8 +25,9 @@ export class DriverHistory implements OnInit {
               private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
-    const driverId = this.authService.getIdFromToken();
-    let driverIdNum = 2; 
+    const driverId = this.authService.getUserId();
+    let driverIdNum = 2;
+    console.log(driverId); 
     if (driverId !== null) driverIdNum = Number(driverId);
 
     this.driverService.getDriverHistory(driverIdNum).subscribe({

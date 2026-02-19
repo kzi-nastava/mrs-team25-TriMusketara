@@ -128,6 +128,7 @@ export class DriveInProgress implements AfterViewInit {
   // Method to return to home/order screen
   resetToOrder() {
     this.showFinishNotification.set(false);
+    localStorage.removeItem('activeRideData');
     this.router.navigate(['/map']);
   }
 
@@ -235,7 +236,7 @@ export class DriveInProgress implements AfterViewInit {
   private completeRideFlow(isGuest: boolean = false) {
     this.auth.setInDrive(false);
     this.showFinishNotification.set(true); 
-    localStorage.removeItem('activeRideData');
+    
 
     if (!isGuest) {
       this.toastr.success("Ride finished! Summary sent via email.", "Success");

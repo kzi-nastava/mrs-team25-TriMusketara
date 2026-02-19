@@ -114,6 +114,8 @@ export class AuthService {
         localStorage.removeItem('user');
         localStorage.removeItem('isBlocked');
         localStorage.removeItem('blockReason');
+        this.setInDrive(false);
+        this.router.navigate(['/map']);
         window.location.reload();
     }
 

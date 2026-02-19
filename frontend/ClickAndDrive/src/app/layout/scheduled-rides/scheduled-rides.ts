@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { RideOrderingService, DriverRideDTO } from '../../services/ride.service';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { WebSocketService } from '../../services/web-socket.service';
 
 export interface ScheduledRide {
   id: number;
@@ -37,11 +38,18 @@ export class ScheduledRides implements OnInit {
     public auth: AuthService,
     public ridePopup: RidePopup,
     private rideService: RideOrderingService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private wsService: WebSocketService
   ) {}
 
   ngOnInit(): void {
     this.loadRides();
+
+    // Listen to channel, and when new ride comes refresh
+    this.wsService.driverRidesUpdated$.subscribe(() => {
+      console.log("New ride!");
+      this.loadRides();
+    });
   }
 
   loadRides() {
