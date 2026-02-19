@@ -50,6 +50,10 @@ export class FavoriteRoutes {
 
   userId!: number;
 
+  currentPage = 0;
+  pageSize = 3;
+  totalPages = 0;
+
   ngOnInit(): void {
     const userIdFromToken = this.authService.getUserIdFromToken();
     if (userIdFromToken) {
@@ -60,22 +64,7 @@ export class FavoriteRoutes {
       return;
     }
 
-    this.passengerService.getFavoriteRoutes(this.userId).subscribe({
-      next: (routes) => {
-        this.favoriteRoutes = routes.map(r => ({ ...r, favorite: true }));
-        if (this.favoriteRoutes.length === 0) {
-          this.toastr.info('Add some routes to favorite', 'Info');
-        }
-        else {
-          this.toastr.success('Favorite routes loaded', 'Success');
-        }
-        this.cdr.detectChanges();
-        this.cdr.markForCheck(); 
-      },
-      error: (err) => {
-        this.toastr.error(err, 'Error');
-      }
-    })
+    this.loadRoutes();
   }
 
   // Click on the heart button (remove from favorites)
@@ -92,6 +81,17 @@ export class FavoriteRoutes {
           route.favorite = !active;
           this.toastr.error(err, "Error");
         }
+    });
+  }
+
+  loadRoutes(): void {
+    this.passengerService.getFavoriteRoutes(this.userId, this.currentPage, this.pageSize).subscribe({
+      next: (response) => {
+        this.favoriteRoutes = response.content.map((r: any) => ({ ...r, favorite: true }));
+        this.totalPages = response.totalPages;
+        this.cdr.detectChanges();
+      },
+      error: (err) => { this.toastr.error(err, 'Error'); }
     });
   }
 
@@ -114,5 +114,19 @@ export class FavoriteRoutes {
     // Navigate to main page
     this.router.navigate(['/']);
   }
-}
 
+  // Navigating through pages
+  nextPage(): void {
+    if (this.currentPage < this.totalPages - 1) {
+      this.currentPage++;
+      this.loadRoutes();
+    }
+  }
+  
+  prevPage(): void {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+      this.loadRoutes();
+    }
+  }
+}

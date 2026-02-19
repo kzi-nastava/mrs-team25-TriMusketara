@@ -3,6 +3,8 @@ package com.example.demo.controller;
 import com.example.demo.dto.response.RouteFromFavoritesResponseDTO;
 import com.example.demo.services.PassengerServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,8 +22,8 @@ public class PassengerController {
     // Getting passengers list of favorite routes to display
     @GetMapping("/{passengerId}/favorite-routes")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<RouteFromFavoritesResponseDTO>> getFavoriteRoutes(@PathVariable Long passengerId) {
-        List<RouteFromFavoritesResponseDTO> favoriteRoutes = passengerService.getFavoriteRoutesForPassenger(passengerId);
+    public ResponseEntity<Page<RouteFromFavoritesResponseDTO>> getFavoriteRoutes(@PathVariable Long passengerId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "3") int size) {
+        Page<RouteFromFavoritesResponseDTO> favoriteRoutes = passengerService.getFavoriteRoutesForPassenger(passengerId, PageRequest.of(page, size));
         return ResponseEntity.ok(favoriteRoutes);
     }
 

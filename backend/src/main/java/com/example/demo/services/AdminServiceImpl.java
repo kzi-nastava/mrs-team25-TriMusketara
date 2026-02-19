@@ -3,18 +3,18 @@ package com.example.demo.services;
 import com.example.demo.dto.LocationDTO;
 import com.example.demo.dto.response.AdminRideHistoryResponseDTO;
 import com.example.demo.dto.response.AdminUserResponseDTO;
+import com.example.demo.dto.response.UserProfileResponseDTO;
 import com.example.demo.model.*;
-import com.example.demo.repositories.GuestRideRepository;
-import com.example.demo.repositories.RideRepository;
-import com.example.demo.repositories.UserRepository;
+import com.example.demo.repositories.*;
 import com.example.demo.services.interfaces.AdminService;
-import com.example.demo.services.interfaces.DriverService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +24,8 @@ public class AdminServiceImpl implements AdminService {
     private final RideRepository rideRepository;
     private final UserRepository userRepository;
     private final GuestRideRepository guestRideRepository;
+    private final DriverRepository driverRepository;
+    private final PassengerRepository passengerRepository;
 
     @Override
     public List<AdminRideHistoryResponseDTO> getRideHistory(Long userId, String userType, String sortBy) {
@@ -144,5 +146,45 @@ public class AdminServiceImpl implements AdminService {
                 .toList();
     }
 
+    @Override
+    public Page<UserProfileResponseDTO> getAllDriversPaged(Pageable pageable) {
+        return driverRepository.findAll(pageable)
+                .map(this::mapDriverToDTO);
+    }
 
+    @Override
+    public Page<UserProfileResponseDTO> getAllPassengersPaged(Pageable pageable) {
+        return passengerRepository.findAll(pageable)
+                .map(this::mapPassengerToDTO);
+    }
+
+    // Helper
+    private UserProfileResponseDTO mapDriverToDTO(Driver driver) {
+        return new UserProfileResponseDTO(
+                driver.getId(),
+                driver.getEmail(),
+                driver.getName(),
+                driver.getSurname(),
+                driver.getAddress(),
+                driver.getPhone(),
+                driver.getProfileImageUrl(),
+                driver.isBlocked(),
+                driver.getBlockReason()
+        );
+    }
+
+    // Helper
+    private UserProfileResponseDTO mapPassengerToDTO(Passenger passenger) {
+        return new UserProfileResponseDTO(
+                passenger.getId(),
+                passenger.getEmail(),
+                passenger.getName(),
+                passenger.getSurname(),
+                passenger.getAddress(),
+                passenger.getPhone(),
+                passenger.getProfileImageUrl(),
+                passenger.isBlocked(),
+                passenger.getBlockReason()
+        );
+    }
 }

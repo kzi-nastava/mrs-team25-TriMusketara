@@ -15,6 +15,8 @@ import com.example.demo.services.interfaces.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.bind.DefaultValue;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -151,6 +153,20 @@ public class AdminController {
     public ResponseEntity<List<UserProfileResponseDTO>> getAllPassengers() {
         List<UserProfileResponseDTO> passengers = passengerService.getAllPassengers();
         return ResponseEntity.ok(passengers);
+    }
+
+    @GetMapping("/drivers/all/paged")
+    public ResponseEntity<Page<UserProfileResponseDTO>> getAllDriversPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "3") int size) {
+        return ResponseEntity.ok(adminService.getAllDriversPaged(PageRequest.of(page, size)));
+    }
+
+    @GetMapping("/passengers/all/paged")
+    public ResponseEntity<Page<UserProfileResponseDTO>> getAllPassengersPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "3") int size) {
+        return ResponseEntity.ok(adminService.getAllPassengersPaged(PageRequest.of(page, size)));
     }
 
     // Block a user (driver or passenger)
