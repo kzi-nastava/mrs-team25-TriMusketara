@@ -5,6 +5,7 @@ import { Injectable } from "@angular/core";
 import { AdminRideHistory } from "./models/admin-ride-history";
 import { AdminUser } from "./models/admin-user";
 import { VehiclePrice } from "./models/vehicle-price";
+import { PageResponse } from "./models/page-response";
 
 @Injectable({
     providedIn: 'root'
@@ -22,6 +23,14 @@ export class AdminService {
     // GET all passengers
     getAllPassengers(): Observable<UserProfileInformation[]> {
         return this.http.get<UserProfileInformation[]>(`${this.apiUrl}/passengers/all`);
+    }
+
+    getAllDriversPaged(page: number, size: number): Observable<PageResponse<UserProfileInformation>> {
+        return this.http.get<PageResponse<UserProfileInformation>>(`${this.apiUrl}/drivers/all/paged?page=${page}&size=${size}`);
+    }
+    
+    getAllPassengersPaged(page: number, size: number): Observable<PageResponse<UserProfileInformation>> {
+        return this.http.get<PageResponse<UserProfileInformation>>(`${this.apiUrl}/passengers/all/paged?page=${page}&size=${size}`);
     }
 
     // Block a user

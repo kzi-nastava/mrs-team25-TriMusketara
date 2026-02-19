@@ -15,6 +15,10 @@ export class BlockPage implements OnInit {
   // List that is displayed
   users: UserProfileInformation[] = [];
 
+  currentPage = 0;
+  pageSize = 3;
+  totalPages = 0;
+
   currentView: 'drivers' | 'passengers' = 'drivers';
 
   @ViewChild(BlockReasonInput) noteInput!: BlockReasonInput;
@@ -29,32 +33,36 @@ export class BlockPage implements OnInit {
   // Show drivers
   showDrivers() {
     this.currentView = 'drivers';
+    this.currentPage = 0;
     this.loadDrivers();
   }
 
   // Show passengers
   showPassengers() {
     this.currentView = 'passengers';
+    this.currentPage = 0;
     this.loadPassengers();
   }
 
   loadDrivers() {
-    this.adminService.getAllDrivers().subscribe({
-      next: (data) => {
-        this.users = data,
-        this.cdr.detectChanges();
-      },
-      error: (err) => console.error(err)
+    this.adminService.getAllDriversPaged(this.currentPage, this.pageSize).subscribe({
+        next: (data) => {
+            this.users = data.content;
+            this.totalPages = data.totalPages;
+            this.cdr.detectChanges();
+        },
+        error: (err) => console.error(err)
     });
   }
 
   loadPassengers() {
-    this.adminService.getAllPassengers().subscribe({
-      next: (data) => {
-        this.users = data,
-        this.cdr.detectChanges();
-      },
-      error: (err) => console.log(err)
+    this.adminService.getAllPassengersPaged(this.currentPage, this.pageSize).subscribe({
+        next: (data) => {
+            this.users = data.content;
+            this.totalPages = data.totalPages;
+            this.cdr.detectChanges();
+        },
+        error: (err) => console.log(err)
     });
   }
 
@@ -100,4 +108,18 @@ export class BlockPage implements OnInit {
           this.cdr.detectChanges();
       }
   }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages - 1) {
+        this.currentPage++;
+        this.currentView === 'drivers' ? this.loadDrivers() : this.loadPassengers();
+    }
+  }
+
+  prevPage() {
+      if (this.currentPage > 0) {
+          this.currentPage--;
+          this.currentView === 'drivers' ? this.loadDrivers() : this.loadPassengers();
+      }
+    }
 }

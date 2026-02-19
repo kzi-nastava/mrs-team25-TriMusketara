@@ -12,6 +12,9 @@ import com.example.demo.repositories.RouteRepository;
 import com.example.demo.services.interfaces.PassengerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,15 +32,19 @@ public class PassengerServiceImpl implements PassengerService {
     private final RideRepository rideRepository;
 
     @Override
-    public List<RouteFromFavoritesResponseDTO> getFavoriteRoutesForPassenger(Long passengerId) {
+    public Page<RouteFromFavoritesResponseDTO> getFavoriteRoutesForPassenger(Long passengerId, Pageable pageable) {
         // Find the passenger by id
         Passenger passenger = passengerRepository.findById(passengerId).orElseThrow(() -> new RuntimeException("Passenger not found"));
 
         // Get his favorite routes, if he has any
         List<Route> favoriteRoutes = passenger.getFavoriteRoutes();
 
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), favoriteRoutes.size());
+        List<Route> pageContent = favoriteRoutes.subList(start, end);
+
         // Map models to ResponseDTO and send to frontend
-        return favoriteRoutes.stream()
+        List<RouteFromFavoritesResponseDTO> dtos = pageContent.stream()
                 .map(route -> new RouteFromFavoritesResponseDTO(
                         route.getId(),
                         new LocationDTO(route.getOrigin().getLongitude(), route.getOrigin().getLatitude(), route.getOrigin().getAddress()),
@@ -46,6 +53,8 @@ public class PassengerServiceImpl implements PassengerService {
                         route.getDuration(),
                         route.getTimesUsed()
                 )).toList();
+
+        return new PageImpl<>(dtos, pageable, favoriteRoutes.size());
     }
 
     @Override
