@@ -1,24 +1,36 @@
 <div class="scheduled-rides">
   <div class="content-wrapper">
     <div class="header-section">
-      <h1 class="scheduled-rides-title">Choose drive to follow (admin)</h1>
+      <h1 class="scheduled-rides-title">
+        {{ isMonitoring ? 'Monitoring Ride #' + selectedRide?.rideId : 'Choose drive to follow (admin)' }}
+      </h1>
+      <button *ngIf="isMonitoring" class="btn-cancel" (click)="backToTable()" style="margin-bottom: 12px;">
+        Back to List
+      </button>
     </div>
 
-    <div class="table-container">
+    <!-- TABELA (vidi se samo kad NIJE monitoring) -->
+    <div class="table-container" *ngIf="!isMonitoring">
       <table class="figma-table">
         <thead>
           <tr>
             <th>Origin</th>
+            <th></th>
             <th>Destination</th>
+            <th></th>
             <th>Driver</th>
+            <th></th>
             <th>Follow</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let ride of activeRides">
             <td>{{ ride.originAddress }}</td>
+            <td></td>
             <td>{{ ride.destinationAddress }}</td>
+            <td></td>
             <td>{{ ride.driverEmail }}</td>
+            <td></td>
             <td>
               <button class="btn-follow" (click)="followRide(ride)">Follow</button>
             </td>
@@ -26,5 +38,10 @@
         </tbody>
       </table>
     </div>
+
+    <div class="map-container-admin" *ngIf="isMonitoring">
+    <app-map-view></app-map-view>
+    </div>
+
   </div>
 </div>
