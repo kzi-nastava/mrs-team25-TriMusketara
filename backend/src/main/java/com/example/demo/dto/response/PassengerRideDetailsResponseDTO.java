@@ -29,7 +29,8 @@ public class PassengerRideDetailsResponseDTO {
     private LocationDTO origin;
     private LocationDTO destination;
 
-    private Review review;
+    private int driverRating;
+    private int vehicleRating;
     private List<String> inconsistencyReports;
 
     private boolean petFriendly;

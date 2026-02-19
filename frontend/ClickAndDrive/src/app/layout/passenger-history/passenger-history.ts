@@ -126,11 +126,11 @@ export class PassengerHistory implements OnInit {
   }
 
   getDriverRating(): number {
-    return this.selectedRide?.review?.driverRating ?? 0;
+    return this.selectedRide?.driverRating ?? 0;
   }
 
   getVehicleRating(): number {
-    return this.selectedRide?.review?.vehicleRating ?? 0;
+    return this.selectedRide?.vehicleRating ?? 0;
   }
 
   getStarsArray(): number[] {
