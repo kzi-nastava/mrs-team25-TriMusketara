@@ -22,6 +22,9 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
 
   @Input() size: 'large' | 'small' = 'large';
   @Output() routeCalculated = new EventEmitter<{durationMinutes: number, distanceKm: number}>();
+  @Input() origin?: [number, number];
+  @Input() destination?: [number, number];
+  @Input() readonlyMode: boolean = false;
 
   @ViewChild('mapContainer', { static: true }) mapContainer!: ElementRef<HTMLDivElement>;
 
@@ -49,8 +52,16 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
     });
 
     this.map.on('load', () => {
-      this.startVehiclePolling();
+
+      if (!this.readonlyMode) {
+        this.startVehiclePolling();
+      }
+
+      if (this.origin && this.destination) {
+        this.drawRouteAndCalculateETA(this.origin, this.destination);
+      }
     });
+
   }
 
    // Function that fetches new data every 5 seconds

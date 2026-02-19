@@ -60,7 +60,7 @@
             <th>Start</th>
             <th>End</th>
             <th>Price</th>
-            <th>Cancelled By</th>
+            <th>Details</th>
             <th>Panic</th>
             <th>Status</th>
           </tr>
@@ -72,7 +72,7 @@
             <td>{{ ride.startTime | date:'MM/dd/yyyy HH:mm' }}</td>
             <td>{{ ride.endTime | date:'MM/dd/yyyy HH:mm' }}</td>
             <td class="ride-price">{{ ride.totalPrice }}</td>
-            <td>{{ ride.cancelledBy }}</td>
+            <td><button class="btn-details" (click)="openDetails(ride.id)">Details</button></td>
             <td>
               <span class="badge"
                 [ngClass]="ride.panicPressed ? 'badge-stopped' : 'badge-completed'">
@@ -90,6 +90,59 @@
         </tbody>
       </table>
     </div>
+
+    <div 
+    class="overlay" 
+    *ngIf="showDetails" 
+    (click)="closeDetails()">
+    </div>
+
+    @if (showDetails) {
+    <div class="details-popup">
+  
+        <div class="map-mini">
+            <app-map-view 
+                size="small"
+                [readonlyMode]="true">
+            </app-map-view>
+        </div>
+
+        <div class="details">
+            <p><strong>Origin:</strong> {{ selectedRide.origin.address }}</p>
+            <p><strong>Destination:</strong> {{ selectedRide.destination.address }}</p>
+            <p><strong>Driver:</strong> {{ selectedRide.driverEmail }}</p>
+            <p><strong>Price:</strong> {{ selectedRide.totalPrice }}</p>
+            <p><strong>Status:</strong> {{ selectedRide.status }}</p>
+            <div class="stars">
+                <strong>Driver rating:</strong>
+                @for (star of getStarsArray(); track star) {
+                <span 
+                    class="star"
+                    [class.filled]="star <= getDriverRating()">
+                    ★
+                </span>
+                }
+            </div>
+
+            <div class="stars">
+                <strong>Vehicle rating:</strong>
+                @for (star of getStarsArray(); track star) {
+                <span 
+                    class="star"
+                    [class.filled]="star <= getVehicleRating()">
+                    ★
+                </span>
+                }
+            </div>
+
+
+            <div class="buttons">
+                <button (click)="closeDetails()">Close</button>
+            </div>
+
+        </div>
+    </div>
+    }
 
   </div>
 </div>

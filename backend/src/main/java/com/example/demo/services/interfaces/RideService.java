@@ -22,5 +22,6 @@ public interface RideService {
                                                        String name);
     Page<ScheduledRideResponseDTO> getDriverScheduledRides(Long driverId, int page, int size);
     void cancelAnyRide(Long rideId, RideCancellationRequestDTO request);
+    PassengerRideDetailsResponseDTO getRideDetails(Long rideId);
 
 }

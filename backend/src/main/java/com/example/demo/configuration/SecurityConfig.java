@@ -59,6 +59,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/panic/**").permitAll()
                         //WebSocket endpoints
                         .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/api/passenger/rides/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/v3/api-docs").permitAll()
                         // Admin endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

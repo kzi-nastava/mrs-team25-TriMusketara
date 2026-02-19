@@ -42,7 +42,12 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             "ORDER BY r.endTime")
     List<Ride> findAllFinishedRidesAndDateRange(@Param("dateFrom") LocalDateTime dateFrom, @Param("dateTo") LocalDateTime dateTo);
 
-    @Query("SELECT r FROM Ride r JOIN r.passengers p WHERE p.id = :passengerId")
+    @Query("""
+SELECT DISTINCT r FROM Ride r
+LEFT JOIN r.passengers p
+WHERE p.id = :passengerId
+   OR r.rideCreator.id = :passengerId
+""")
     List<Ride> findAllByPassengerId(@Param("passengerId") Long passengerId);
 
     List<Ride> findAllByDriverIdOrderByStartTimeDesc(Long driverId);
