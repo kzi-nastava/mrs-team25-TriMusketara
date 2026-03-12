@@ -358,7 +358,7 @@ public class ProfileFragment extends Fragment {
         switch(userType) {
             case SessionManager.USER:
                 addButton("Favorite routes", R.drawable.heart ,() -> openFavoriteRoutesFragment());
-                addButton("Ride history", R.drawable.history  ,() -> {});
+                addButton("Ride history", R.drawable.history, this::openUserHistoryFragment);
                 addButton("Reports", R.drawable.report,  () -> {});
                 addButton("Notes", R.drawable.notes, () -> {});
                 addButton("Support", R.drawable.support, () -> {});
@@ -451,6 +451,14 @@ public class ProfileFragment extends Fragment {
         requireActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.flFragment, historyFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    private void openUserHistoryFragment() {
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.flFragment, new UserHistoryFragment())
                 .addToBackStack(null)
                 .commit();
     }

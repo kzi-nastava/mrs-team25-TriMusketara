@@ -751,8 +751,14 @@ public class RideServiceImpl implements RideService {
         dto.setPetFriendly(ride.isPetFriendly());
         dto.setBabyFriendly(ride.isBabyFriendly());
 
-        dto.setDriverRating(ride.getReviews().get(0).getDriverRating());
-        dto.setVehicleRating(ride.getReviews().get(0).getVehicleRating());
+        if (ride.getReviews() != null && !ride.getReviews().isEmpty()) {
+            Review review = ride.getReviews().get(0);
+            dto.setDriverRating(review.getDriverRating());
+            dto.setVehicleRating(review.getVehicleRating());
+        } else {
+            dto.setDriverRating(0);
+            dto.setVehicleRating(0);
+        }
 
         return dto;
     }
