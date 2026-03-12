@@ -1,6 +1,8 @@
 package com.example.clickanddrive.clients.services;
 
 import com.example.clickanddrive.dtosample.responses.RouteFromFavoritesResponse;
+import com.example.clickanddrive.dtosample.responses.PassengerRideDetailsResponse;
+import com.example.clickanddrive.dtosample.responses.PassengerRideHistoryResponse;
 
 import java.util.List;
 
@@ -19,4 +21,9 @@ public interface PassengerService {
     @DELETE("passenger/{passengerId}/{routeId}/remove-route")
     Call<Void> removeFromFavorites(@Path("passengerId") Long passengerId, @Path("routeId") Long routeId);
 
+    @GET("passenger/{id}/ride-history")
+    Call<List<PassengerRideHistoryResponse>> getPassengerRideHistory(@Path("id") Long id);
+
+    @GET("passenger/rides/{rideId}/details")
+    Call<PassengerRideDetailsResponse> getRideDetails(@Path("rideId") Long rideId);
 }
