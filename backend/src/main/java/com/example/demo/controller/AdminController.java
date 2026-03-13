@@ -6,6 +6,7 @@ import com.example.demo.dto.request.DriverRegistrationRequestDTO;
 import com.example.demo.dto.response.*;
 import com.example.demo.dto.VehiclePriceDTO;
 
+import com.example.demo.model.Review;
 import com.example.demo.model.Ride;
 import com.example.demo.model.RideStatus;
 import com.example.demo.model.VehiclePrice;
@@ -66,22 +67,67 @@ public class AdminController {
     }
 
     @GetMapping("/rides/{id}")
-    public ResponseEntity<RideDetailsResponseDTO> getRideDetails(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<RideDetailsResponseDTO> getRideDetails(@PathVariable Long id) {
         Ride ride = rideRepository.findById(id).orElseThrow();
 
         RideDetailsResponseDTO dto = new RideDetailsResponseDTO();
         dto.setRideId(ride.getId());
 
-        String start = (ride.getRoute() != null) ? ride.getRoute().getOrigin().getAddress() : "Bulevar oslobođenja 45";
-        String end = (ride.getRoute() != null) ? ride.getRoute().getDestination().getAddress() : "Cara Dušana 12";
+        if (ride.getRoute() != null) {
+            if (ride.getRoute().getOrigin() != null) {
+                dto.setStartAddress(ride.getRoute().getOrigin().getAddress());
+                dto.setOrigin(new LocationDTO(
+                        ride.getRoute().getOrigin().getLongitude(),
+                        ride.getRoute().getOrigin().getLatitude(),
+                        ride.getRoute().getOrigin().getAddress()
+                ));
+            }
 
-        dto.setStartAddress(start);
-        dto.setEndAddress(end);
-        dto.setDriverName(ride.getDriver().getName());
+            if (ride.getRoute().getDestination() != null) {
+                dto.setEndAddress(ride.getRoute().getDestination().getAddress());
+                dto.setDestination(new LocationDTO(
+                        ride.getRoute().getDestination().getLongitude(),
+                        ride.getRoute().getDestination().getLatitude(),
+                        ride.getRoute().getDestination().getAddress()
+                ));
+            }
+        }
+
+        dto.setStartTime(ride.getStartTime());
+        dto.setEndTime(ride.getEndTime());
+        dto.setCanceled(ride.getCancelledBy() != null);
+        dto.setCanceledBy(ride.getCancelledBy() != null ? ride.getCancelledBy().getEmail() : null);
         dto.setPrice(ride.getPrice());
-        dto.setStatus(ride.getStatus().toString());
+        dto.setPanicTriggered(ride.isPanicPressed());
+        dto.setStatus(ride.getStatus() != null ? ride.getStatus().toString() : null);
+
+        if (ride.getDriver() != null) {
+            dto.setDriverId(ride.getDriver().getId());
+            dto.setDriverName(ride.getDriver().getName() + " " + ride.getDriver().getSurname());
+        }
+
+        if (ride.getPassengers() != null) {
+            List<UserProfileResponseDTO> passengerDtos = ride.getPassengers().stream()
+                    .map(p -> new UserProfileResponseDTO(
+                            p.getId(),
+                            p.getEmail(),
+                            p.getName(),
+                            p.getSurname(),
+                            p.getAddress(),
+                            p.getPhone(),
+                            p.getProfileImageUrl(),
+                            p.isBlocked(),
+                            p.getBlockReason()
+                    ))
+                    .toList();
+            dto.setPassengers(passengerDtos);
+        }
+
+        if (ride.getReviews() != null && !ride.getReviews().isEmpty()) {
+            Review review = ride.getReviews().get(0);
+            dto.setRating(review.getDriverRating());
+            dto.setComment(review.getComment());
+        }
 
         return ResponseEntity.ok(dto);
     }

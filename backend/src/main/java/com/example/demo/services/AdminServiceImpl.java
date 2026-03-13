@@ -97,6 +97,9 @@ public class AdminServiceImpl implements AdminService {
                 .toList();
         dto.setPassengerEmails(passengerEmails);
 
+        dto.setDriverEmail(ride.getDriver() != null ? ride.getDriver().getEmail() : null);
+        dto.setCancelled(ride.getCancelledBy() != null);
+
         return dto;
     }
 
@@ -115,6 +118,9 @@ public class AdminServiceImpl implements AdminService {
             dto.setOrigin(new LocationDTO(guestRide.getRoute().getOrigin().getLongitude(), guestRide.getRoute().getOrigin().getLatitude(), guestRide.getRoute().getOrigin().getAddress()));
             dto.setDestination(new LocationDTO(guestRide.getRoute().getDestination().getLongitude(), guestRide.getRoute().getDestination().getLatitude(), guestRide.getRoute().getDestination().getAddress()));
         }
+
+        dto.setDriverEmail(guestRide.getDriver() != null ? guestRide.getDriver().getEmail() : null);
+        dto.setCancelled(false);
 
         return dto;
     }

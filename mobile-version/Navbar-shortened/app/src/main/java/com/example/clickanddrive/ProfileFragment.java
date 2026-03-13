@@ -385,7 +385,7 @@ public class ProfileFragment extends Fragment {
                 addButton("Register new driver", 0, () -> openDriverRegistrationFragment());
                 addButton("Check current rides", 0, () -> {});
                 addButton("Change prices", R.drawable.price, () -> {});
-                addButton("Ride history", R.drawable.history, () -> {});
+                addButton("Ride history", R.drawable.history, this::openAdminHistoryFragment);
                 addButton("Requests", 0,  () -> {});
                 addButton("Reports", R.drawable.report,  () -> {});
                 addButton("Block a user", R.drawable.block_icon,  () -> openBlockAUserFragment());
@@ -459,6 +459,14 @@ public class ProfileFragment extends Fragment {
         requireActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.flFragment, new UserHistoryFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+
+    private void openAdminHistoryFragment() {
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.flFragment, new AdminHistoryFragment())
                 .addToBackStack(null)
                 .commit();
     }

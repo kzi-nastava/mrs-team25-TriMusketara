@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/profile_bg"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Admin Ride History"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:layout_marginBottom="12dp" />
+
+    <Spinner
+        android:id="@+id/spRole"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp" />
+
+    <Spinner
+        android:id="@+id/spUser"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp" />
+
+    <Spinner
+        android:id="@+id/spSort"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp"
+        android:weightSum="3.6">
+
+        <EditText
+            android:id="@+id/etFromDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.2"
+            android:hint="From: YYYY-MM-DD"
+            android:focusable="false"
+            android:clickable="true"
+            android:textColor="@android:color/white"
+            android:textColorHint="#888888"/>
+
+        <EditText
+            android:id="@+id/etToDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.2"
+            android:hint="To: YYYY-MM-DD"
+            android:focusable="false"
+            android:clickable="true"
+            android:textColor="@android:color/white"
+            android:textColorHint="#888888"/>
+
+        <ImageButton
+            android:id="@+id/btnSearch"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.6"
+            android:src="@android:drawable/ic_menu_search"
+            android:backgroundTint="@color/nav_bg"/>
+
+        <ImageButton
+            android:id="@+id/btnClearFilters"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.6"
+            android:src="@android:drawable/ic_menu_revert"
+            android:backgroundTint="@color/nav_bg"
+            android:layout_marginStart="4dp"/>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvHistory"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

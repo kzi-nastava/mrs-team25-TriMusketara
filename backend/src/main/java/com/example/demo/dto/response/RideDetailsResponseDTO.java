@@ -1,5 +1,6 @@
 package com.example.demo.dto.response;
 
+import com.example.demo.dto.LocationDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,10 @@ public class RideDetailsResponseDTO {
     private Long rideId;
     private String startAddress;
     private String endAddress;
+
+    private LocationDTO origin;
+    private LocationDTO destination;
+
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private boolean canceled;
@@ -24,14 +29,11 @@ public class RideDetailsResponseDTO {
     private boolean panicTriggered;
     private String status;
 
-    // Driver - basic info
     private Long driverId;
     private String driverName;
 
-    // Passengers
     private List<UserProfileResponseDTO> passengers;
 
-    // Review info
     private Integer rating;
     private String comment;
 }
