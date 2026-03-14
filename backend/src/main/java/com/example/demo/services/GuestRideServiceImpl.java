@@ -92,7 +92,23 @@ public class GuestRideServiceImpl implements GuestRideService {
     }
 
     private double calculateDistance(Location origin, Location destination) {
-        return 10.0; // km
+        final double R = 6371.0; // Earth radius in km
+
+        double lat1 = Math.toRadians(origin.getLatitude());
+        double lon1 = Math.toRadians(origin.getLongitude());
+        double lat2 = Math.toRadians(destination.getLatitude());
+        double lon2 = Math.toRadians(destination.getLongitude());
+
+        double dLat = lat2 - lat1;
+        double dLon = lon2 - lon1;
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(lat1) * Math.cos(lat2)
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c;
     }
 
     private int estimateTime(double distanceKm) {

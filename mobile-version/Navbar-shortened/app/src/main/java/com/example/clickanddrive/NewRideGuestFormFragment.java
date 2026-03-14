@@ -16,6 +16,7 @@ import com.example.clickanddrive.clients.ClientUtils;
 import com.example.clickanddrive.dtosample.LocationDTO;
 import com.example.clickanddrive.dtosample.requests.CreateGuestRideRequest;
 import com.example.clickanddrive.dtosample.responses.GuestRideResponseDTO;
+import com.example.clickanddrive.map.MapboxGeocoder;
 import com.example.clickanddrive.models.RouteData;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -30,10 +31,6 @@ public class NewRideGuestFormFragment extends Fragment {
     private TextInputEditText etOrigin;
     private TextInputEditText etDestination;
     private Button btnShowRoute;
-
-    // privremene koordinate dok se ne poveže unos sa realnim map klikom / geolokacijom
-    private static final double TEMP_LONGITUDE = 20.44897;
-    private static final double TEMP_LATITUDE = 44.7866;
 
     @Nullable
     @Override
@@ -61,8 +58,53 @@ public class NewRideGuestFormFragment extends Fragment {
 
         if (!validateInput(originText, destinationText)) return;
 
-        CreateGuestRideRequest request = buildRequest(originText, destinationText);
-        createGuestRide(request, originText, destinationText);
+        btnShowRoute.setEnabled(false);
+
+        MapboxGeocoder geocoder = new MapboxGeocoder();
+
+        geocoder.geocode(originText, new MapboxGeocoder.GeocodeCallback() {
+            @Override
+            public void onSuccess(double originLng, double originLat) {
+                geocoder.geocode(destinationText, new MapboxGeocoder.GeocodeCallback() {
+                    @Override
+                    public void onSuccess(double destLng, double destLat) {
+                        if (!isAdded()) return;
+
+                        CreateGuestRideRequest request = new CreateGuestRideRequest(
+                                new LocationDTO(originLng, originLat, originText),
+                                new LocationDTO(destLng, destLat, destinationText)
+                        );
+
+                        requireActivity().runOnUiThread(() ->
+                                createGuestRide(request, originText, destinationText));
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        if (!isAdded()) return;
+
+                        requireActivity().runOnUiThread(() -> {
+                            btnShowRoute.setEnabled(true);
+                            Toast.makeText(getContext(),
+                                    "Destination geocoding failed",
+                                    Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String error) {
+                if (!isAdded()) return;
+
+                requireActivity().runOnUiThread(() -> {
+                    btnShowRoute.setEnabled(true);
+                    Toast.makeText(getContext(),
+                            "Origin geocoding failed",
+                            Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
     }
 
     private boolean validateInput(String origin, String destination) {
@@ -86,22 +128,6 @@ public class NewRideGuestFormFragment extends Fragment {
         return true;
     }
 
-    private CreateGuestRideRequest buildRequest(String originText, String destinationText) {
-        LocationDTO origin = new LocationDTO(
-                TEMP_LONGITUDE,
-                TEMP_LATITUDE,
-                originText
-        );
-
-        LocationDTO destination = new LocationDTO(
-                TEMP_LONGITUDE + 0.01,
-                TEMP_LATITUDE + 0.01,
-                destinationText
-        );
-
-        return new CreateGuestRideRequest(origin, destination);
-    }
-
     private void createGuestRide(CreateGuestRideRequest request, String originText, String destinationText) {
         Call<GuestRideResponseDTO> call = ClientUtils.guestRideService.createGuestRide(request);
 
@@ -111,6 +137,8 @@ public class NewRideGuestFormFragment extends Fragment {
                                    Response<GuestRideResponseDTO> response) {
 
                 if (!isAdded()) return;
+
+                btnShowRoute.setEnabled(true);
 
                 if (response.isSuccessful() && response.body() != null) {
                     GuestRideResponseDTO rideResponse = response.body();
@@ -135,6 +163,8 @@ public class NewRideGuestFormFragment extends Fragment {
             @Override
             public void onFailure(Call<GuestRideResponseDTO> call, Throwable t) {
                 if (!isAdded()) return;
+
+                btnShowRoute.setEnabled(true);
 
                 Toast.makeText(getContext(),
                         "Network error: " + t.getMessage(),

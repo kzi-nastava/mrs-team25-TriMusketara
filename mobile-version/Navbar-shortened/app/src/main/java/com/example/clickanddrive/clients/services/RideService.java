@@ -2,6 +2,7 @@ package com.example.clickanddrive.clients.services;
 
 import com.example.clickanddrive.dtosample.requests.CreateRideRequest;
 import com.example.clickanddrive.dtosample.requests.RideCancellationRequest;
+import com.example.clickanddrive.dtosample.requests.RideStopRequest;
 import com.example.clickanddrive.dtosample.responses.RideResponse;
 import com.example.clickanddrive.dtosample.responses.ScheduledRideResponse;
 
@@ -40,4 +41,7 @@ public interface RideService {
             return totalPages;
         }
     }
+
+    @POST("rides/{id}/stop")
+    Call<Void> stopRide(@Path("id") Long rideId, @Body RideStopRequest request);
 }

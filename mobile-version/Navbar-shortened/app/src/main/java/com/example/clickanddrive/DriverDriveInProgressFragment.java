@@ -12,6 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.clickanddrive.clients.ClientUtils;
+import com.example.clickanddrive.dtosample.requests.RideStopRequest;
+import com.example.clickanddrive.dtosample.LocationDTO;
 import com.example.clickanddrive.dtosample.responses.ScheduledRideResponse;
 import com.example.clickanddrive.map.MapHelper;
 import com.example.clickanddrive.map.MapboxDirections;
@@ -23,6 +26,10 @@ import com.mapbox.maps.Style;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DriverDriveInProgressFragment extends Fragment {
 
@@ -74,10 +81,7 @@ public class DriverDriveInProgressFragment extends Fragment {
         tvDestination.setText("Destination: " + ride.getDestination());
         tvScheduledTime.setText("Scheduled: " + ride.getFormattedScheduledTime());
 
-        btnStopRide.setOnClickListener(v ->
-                Toast.makeText(getContext(),
-                        "Stop ride UI is ready, functionality can be connected later",
-                        Toast.LENGTH_SHORT).show());
+        btnStopRide.setOnClickListener(v -> onStopRide());
 
         btnFinishRide.setOnClickListener(v ->
                 Toast.makeText(getContext(),
@@ -97,6 +101,53 @@ public class DriverDriveInProgressFragment extends Fragment {
 
         mapView.getMapboxMap().setCamera(cameraOptions);
         mapView.getMapboxMap().loadStyleUri(Style.DARK, style -> drawRoute());
+    }
+
+    private void onStopRide() {
+        if (ride == null) {
+            Toast.makeText(getContext(), "No ride selected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Point center = mapView.getMapboxMap().getCameraState().getCenter();
+
+        LocationDTO stopLocation = new LocationDTO(
+                center.longitude(),
+                center.latitude(),
+                "Stopped at current location"
+        );
+
+        RideStopRequest request = new RideStopRequest(ride.isGuest(), stopLocation);
+
+        btnStopRide.setEnabled(false);
+
+        ClientUtils.rideService.stopRide(ride.getId(), request).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (!isAdded()) return;
+
+                btnStopRide.setEnabled(true);
+
+                if (response.isSuccessful()) {
+                    Toast.makeText(getContext(), "Ride stopped successfully", Toast.LENGTH_SHORT).show();
+
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.flFragment, new HomeFragment())
+                            .commit();
+                } else {
+                    Toast.makeText(getContext(), "Failed to stop ride", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                if (!isAdded()) return;
+
+                btnStopRide.setEnabled(true);
+                Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void drawRoute() {
