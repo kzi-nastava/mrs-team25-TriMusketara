@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         Fragment homeFragment = new HomeFragment();
         Fragment profileFragment = new ProfileFragment();
         Fragment newRideFragment = new NewRideFragment();
+        Fragment scheduledRidesFragment = new ScheduledRidesFragment();
         // add more based on role ...
 
         Uri data = getIntent().getData();
@@ -77,6 +78,9 @@ public class MainActivity extends AppCompatActivity {
                     setCurrentFragment(newRideFragment);
                     return true;
                 }
+            }else if (id == R.id.scheduled_rides) {
+                setCurrentFragment(scheduledRidesFragment);
+                return true;
             }
             // ...
             // will add other cases when other role fragments are created

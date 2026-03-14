@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     android:background="@color/home_bg"
     tools:context=".HomeFragment">
 
-
-    <!-- Mapbox -->
     <com.mapbox.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         mapbox:mapbox_cameraTargetLat="45.2543"
-        mapbox:mapbox_cameraTargetLng="19.8423"/>
-
+        mapbox:mapbox_cameraTargetLng="19.8423" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -34,7 +31,7 @@
             android:layout_height="40dp"
             android:src="@drawable/ic_app_icon"
             android:layout_marginEnd="12dp"
-            android:contentDescription="App Logo"/>
+            android:contentDescription="App Logo" />
 
         <TextView
             android:layout_width="0dp"
@@ -44,13 +41,61 @@
             android:textSize="20sp"
             android:layout_marginLeft="4dp"
             android:textColor="@color/nav_bg"
-            android:textStyle="italic"/>
-
+            android:textStyle="italic" />
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="4dp"
-        android:background="@drawable/top_bar_shadow"/>
+        android:background="@drawable/top_bar_shadow" />
+
+    <LinearLayout
+        android:id="@+id/guestRidePanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:background="#E6222830"
+        android:padding="16dp"
+        android:visibility="gone"
+        android:elevation="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Guest ride"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="ETA"
+            android:textColor="#CFCFCF"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvEtaValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="24sp"
+            android:layout_marginTop="4dp" />
+
+        <Button
+            android:id="@+id/btnCancelGuestRide"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Cancel ride"
+            android:textAllCaps="false"
+            android:backgroundTint="@android:color/holo_red_dark"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
 
 </FrameLayout>
