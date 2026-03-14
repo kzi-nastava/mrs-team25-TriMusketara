@@ -89,6 +89,19 @@
                     android:textStyle="bold"
                     android:backgroundTint="@color/profile_bg"
                     android:textColor="@color/nav_bg"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_cancel_guest_ride"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="12dp"
+                    android:text="Cancel ride"
+                    android:visibility="gone"
+                    app:cornerRadius="8dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:backgroundTint="@android:color/holo_red_dark"
+                    android:textColor="@android:color/white"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

@@ -5,18 +5,32 @@ import java.io.Serializable;
 public class GuestRideResponseDTO implements Serializable {
     private Long id;
     private String status;
-    private int estimatedTime;
-    private double distance;
+    private int estimatedTimeMinutes;
+    private double distanceKm;
 
-    public GuestRideResponseDTO(Long id, String status, int estimatedTime, double distance) {
-        this.id = id;
-        this.status = status;
-        this.estimatedTime = estimatedTime;
-        this.distance = distance;
+    public GuestRideResponseDTO() {
     }
 
-    public Long getId() { return id; }
-    public String getStatus() { return status; }
-    public int getEstimatedTime() { return estimatedTime; }
-    public double getDistance() { return distance; }
+    public GuestRideResponseDTO(Long id, String status, int estimatedTimeMinutes, double distanceKm) {
+        this.id = id;
+        this.status = status;
+        this.estimatedTimeMinutes = estimatedTimeMinutes;
+        this.distanceKm = distanceKm;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public int getEstimatedTimeMinutes() {
+        return estimatedTimeMinutes;
+    }
+
+    public double getDistanceKm() {
+        return distanceKm;
+    }
 }
