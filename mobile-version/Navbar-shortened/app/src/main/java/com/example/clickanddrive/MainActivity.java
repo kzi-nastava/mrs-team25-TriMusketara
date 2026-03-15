@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         Fragment profileFragment = new ProfileFragment();
         Fragment newRideFragment = new NewRideFragment();
         Fragment scheduledRidesFragment = new ScheduledRidesFragment();
+        Fragment panicNotificationsFragment = new PanicNotificationsFragment();
         // add more based on role ...
 
         Uri data = getIntent().getData();
@@ -80,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }else if (id == R.id.scheduled_rides) {
                 setCurrentFragment(scheduledRidesFragment);
+                return true;
+            } else if (id == R.id.support) {
+                setCurrentFragment(panicNotificationsFragment);
                 return true;
             }
             // ...

@@ -7,11 +7,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.app.AlertDialog;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.clickanddrive.dtosample.requests.PanicRequest;
+import com.example.clickanddrive.dtosample.responses.PanicResponse;
 import com.example.clickanddrive.clients.ClientUtils;
 import com.example.clickanddrive.dtosample.requests.RideStopRequest;
 import com.example.clickanddrive.dtosample.LocationDTO;
@@ -88,11 +91,7 @@ public class DriverDriveInProgressFragment extends Fragment {
                         "Finish ride UI is ready, functionality can be connected later",
                         Toast.LENGTH_SHORT).show());
 
-        btnPanic.setOnClickListener(v ->
-                Toast.makeText(getContext(),
-                        "Panic button pressed (functionality will be implemented later)",
-                        Toast.LENGTH_LONG).show()
-        );
+        btnPanic.setOnClickListener(v -> onPanic());
 
         CameraOptions cameraOptions = new CameraOptions.Builder()
                 .center(Point.fromLngLat(19.8423, 45.2543))
@@ -145,6 +144,64 @@ public class DriverDriveInProgressFragment extends Fragment {
                 if (!isAdded()) return;
 
                 btnStopRide.setEnabled(true);
+                Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void onPanic() {
+        if (ride == null) {
+            Toast.makeText(getContext(), "No active ride found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (SessionManager.userId == null) {
+            Toast.makeText(getContext(), "User not found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Trigger PANIC")
+                .setMessage("Are you sure you want to trigger PANIC?\n\nThis will notify administrators about a serious problem with the ride.")
+                .setPositiveButton("Yes", (dialog, which) -> sendPanicRequest())
+                .setNegativeButton("No", null)
+                .show();
+    }
+
+    private void sendPanicRequest() {
+        PanicRequest request = new PanicRequest(
+                ride.getId(),
+                ride.isGuest(),
+                SessionManager.userId
+        );
+
+        btnPanic.setEnabled(false);
+
+        ClientUtils.panicService.triggerPanic(request).enqueue(new Callback<PanicResponse>() {
+            @Override
+            public void onResponse(Call<PanicResponse> call, Response<PanicResponse> response) {
+                if (!isAdded()) return;
+
+                if (response.isSuccessful() && response.body() != null) {
+                    btnPanic.setText("PANIC SENT");
+                    btnPanic.setEnabled(false);
+
+                    Toast.makeText(
+                            getContext(),
+                            "PANIC triggered successfully. Administrators have been notified.",
+                            Toast.LENGTH_LONG
+                    ).show();
+                } else {
+                    btnPanic.setEnabled(true);
+                    Toast.makeText(getContext(), "Failed to trigger PANIC", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PanicResponse> call, Throwable t) {
+                if (!isAdded()) return;
+
+                btnPanic.setEnabled(true);
                 Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
             }
         });
