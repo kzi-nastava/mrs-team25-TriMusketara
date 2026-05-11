@@ -23,14 +23,17 @@ public class VehicleServiceImpl implements VehicleService {
     public List<ActiveVehicleResponseDTO> getAllActiveVehicles() {
         List<Vehicle> vehicles = vehicleRepository.findAll();
 
-        return vehicles.stream().map(v -> new ActiveVehicleResponseDTO(
-                v.getId(),
-                new LocationDTO(
-                        v.getLocation().getLatitude(),
-                        v.getLocation().getLongitude(),
-                        v.getLocation().getAddress()
-                ),
-                v.getBusy()
-        )).collect(Collectors.toList());
+        return vehicles.stream()
+                .filter(v -> v.getLocation() != null)
+                .map(v -> new ActiveVehicleResponseDTO(
+                        v.getId(),
+                        new LocationDTO(
+                                v.getLocation().getLatitude(),
+                                v.getLocation().getLongitude(),
+                                v.getLocation().getAddress()
+                        ),
+                        Boolean.TRUE.equals(v.getBusy())
+                ))
+                .collect(Collectors.toList());
     }
 }
