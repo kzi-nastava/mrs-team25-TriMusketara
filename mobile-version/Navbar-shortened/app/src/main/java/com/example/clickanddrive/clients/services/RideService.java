@@ -13,7 +13,9 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface RideService {
 
@@ -29,6 +31,16 @@ public interface RideService {
     @POST("rides/cancel/{id}")
     Call<Void> cancelRide(@Path("id") Long rideId, @Body RideCancellationRequest request);
 
+    @POST("rides/{id}/stop")
+    Call<Void> stopRide(@Path("id") Long rideId, @Body RideStopRequest request);
+
+    @PUT("rides/{id}/finish")
+    Call<Void> finishRide(
+            @Path("id") Long rideId,
+            @Query("distanceKm") double distanceKm,
+            @Query("isGuest") boolean isGuest
+    );
+
     class PageResponse<T> {
         private List<T> content;
         private int totalPages;
@@ -41,7 +53,4 @@ public interface RideService {
             return totalPages;
         }
     }
-
-    @POST("rides/{id}/stop")
-    Call<Void> stopRide(@Path("id") Long rideId, @Body RideStopRequest request);
 }
