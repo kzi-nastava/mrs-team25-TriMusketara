@@ -9,6 +9,7 @@ import com.example.clickanddrive.clients.services.PassengerService;
 import com.example.clickanddrive.clients.services.RideService;
 import com.example.clickanddrive.clients.services.UserService;
 import com.example.clickanddrive.clients.services.GuestRideService;
+import com.example.clickanddrive.clients.services.VehicleService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonPrimitive;
@@ -77,4 +78,6 @@ public class ClientUtils {
     public static AdminService adminService = retrofit.create(AdminService.class);
     public static PassengerService passengerService = retrofit.create(PassengerService.class);
     public static PanicService panicService = retrofit.create(PanicService.class);
+
+    public static VehicleService vehicleService = retrofit.create(VehicleService.class);
 }

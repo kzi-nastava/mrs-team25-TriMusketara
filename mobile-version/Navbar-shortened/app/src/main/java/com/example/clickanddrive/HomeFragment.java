@@ -1,6 +1,12 @@
 package com.example.clickanddrive;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +16,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.clickanddrive.clients.ClientUtils;
 import com.example.clickanddrive.dtosample.LocationDTO;
+import com.example.clickanddrive.dtosample.responses.ActiveVehicleResponse;
 import com.example.clickanddrive.map.MapHelper;
 import com.example.clickanddrive.map.MapboxDirections;
 import com.example.clickanddrive.map.MapboxGeocoder;
@@ -22,6 +30,12 @@ import com.mapbox.geojson.Point;
 import com.mapbox.maps.CameraOptions;
 import com.mapbox.maps.MapView;
 import com.mapbox.maps.Style;
+import com.mapbox.maps.plugin.annotation.AnnotationConfig;
+import com.mapbox.maps.plugin.annotation.AnnotationPlugin;
+import com.mapbox.maps.plugin.annotation.AnnotationPluginImplKt;
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager;
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManagerKt;
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +46,25 @@ import retrofit2.Response;
 
 public class HomeFragment extends Fragment {
 
+    private static final String TAG = "HomeFragment";
+
+    private static final long VEHICLE_REFRESH_INTERVAL_MS = 10_000L;
+
     private MapView mapView;
+
+    private PointAnnotationManager vehicleMarkerManager;
+    private Bitmap availableVehicleIcon;
+    private Bitmap busyVehicleIcon;
+
+    private final Handler vehicleRefreshHandler = new Handler(Looper.getMainLooper());
+
+    private final Runnable vehicleRefreshRunnable = new Runnable() {
+        @Override
+        public void run() {
+            loadActiveVehicles();
+            vehicleRefreshHandler.postDelayed(this, VEHICLE_REFRESH_INTERVAL_MS);
+        }
+    };
 
     private View guestRidePanel;
     private TextView tvEtaValue;
@@ -65,7 +97,12 @@ public class HomeFragment extends Fragment {
 
         mapView.getMapboxMap().setCamera(cameraOptions);
 
-        mapView.getMapboxMap().loadStyleUri(Style.DARK, style -> checkAndDrawIncomingRoute());
+        mapView.getMapboxMap().loadStyleUri(Style.DARK, style -> {
+            initializeVehicleMarkerManager();
+            checkAndDrawIncomingRoute();
+            loadActiveVehicles();
+            startVehicleRefresh();
+        });
 
         btnCancelGuestRide.setOnClickListener(v -> cancelGuestRide());
 
@@ -172,19 +209,28 @@ public class HomeFragment extends Fragment {
                 if (!isAdded()) return;
 
                 requireActivity().runOnUiThread(() ->
-                        Toast.makeText(getContext(),
+                        Toast.makeText(
+                                getContext(),
                                 "Geocoding failed for: " + address,
-                                Toast.LENGTH_SHORT).show());
+                                Toast.LENGTH_SHORT
+                        ).show()
+                );
             }
         });
     }
 
-    private void requestDirections(List<String> addresses, List<MapboxDirections.Coordinate> waypoints) {
+    private void requestDirections(List<String> addresses,
+                                   List<MapboxDirections.Coordinate> waypoints) {
         if (waypoints.size() < 2) {
             if (!isAdded()) return;
 
             requireActivity().runOnUiThread(() ->
-                    Toast.makeText(getContext(), "Unable to calculate route", Toast.LENGTH_SHORT).show());
+                    Toast.makeText(
+                            getContext(),
+                            "Unable to calculate route",
+                            Toast.LENGTH_SHORT
+                    ).show()
+            );
             return;
         }
 
@@ -199,6 +245,7 @@ public class HomeFragment extends Fragment {
 
                     if (routeData.getDurationMinutes() <= 0) {
                         routeData.setDurationMinutes(result.durationMinutes);
+
                         if (isGuestRide) {
                             tvEtaValue.setText(result.durationMinutes + " min");
                         }
@@ -211,6 +258,7 @@ public class HomeFragment extends Fragment {
                     routeData.setDestinationLat(waypoints.get(waypoints.size() - 1).lat);
 
                     List<LocationDTO> stopLocations = new ArrayList<>();
+
                     if (waypoints.size() > 2) {
                         for (int i = 1; i < waypoints.size() - 1; i++) {
                             stopLocations.add(new LocationDTO(
@@ -220,6 +268,7 @@ public class HomeFragment extends Fragment {
                             ));
                         }
                     }
+
                     routeData.setStopLocations(stopLocations);
 
                     MapHelper mapHelper = new MapHelper(mapView);
@@ -239,11 +288,107 @@ public class HomeFragment extends Fragment {
                 if (!isAdded()) return;
 
                 requireActivity().runOnUiThread(() ->
-                        Toast.makeText(getContext(),
+                        Toast.makeText(
+                                getContext(),
                                 "Failed to draw route",
-                                Toast.LENGTH_SHORT).show());
+                                Toast.LENGTH_SHORT
+                        ).show()
+                );
             }
         });
+    }
+
+    private void initializeVehicleMarkerManager() {
+        AnnotationPlugin annotationPlugin = AnnotationPluginImplKt.getAnnotations(mapView);
+
+        vehicleMarkerManager = PointAnnotationManagerKt.createPointAnnotationManager(
+                annotationPlugin,
+                new AnnotationConfig()
+        );
+
+        availableVehicleIcon = bitmapFromVector(R.drawable.ic_vehicle_available);
+        busyVehicleIcon = bitmapFromVector(R.drawable.ic_vehicle_busy);
+    }
+
+    private Bitmap bitmapFromVector(int drawableId) {
+        Drawable drawable = ContextCompat.getDrawable(requireContext(), drawableId);
+
+        if (drawable == null) {
+            return null;
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(
+                drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight(),
+                Bitmap.Config.ARGB_8888
+        );
+
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
+    }
+
+    private void startVehicleRefresh() {
+        vehicleRefreshHandler.removeCallbacks(vehicleRefreshRunnable);
+        vehicleRefreshHandler.postDelayed(vehicleRefreshRunnable, VEHICLE_REFRESH_INTERVAL_MS);
+    }
+
+    private void loadActiveVehicles() {
+        ClientUtils.vehicleService.getActiveVehicles().enqueue(new Callback<List<ActiveVehicleResponse>>() {
+            @Override
+            public void onResponse(Call<List<ActiveVehicleResponse>> call,
+                                   Response<List<ActiveVehicleResponse>> response) {
+                if (!isAdded()) return;
+
+                if (response.isSuccessful() && response.body() != null) {
+                    drawVehicleMarkers(response.body());
+                } else {
+                    Log.e(TAG, "Failed to load active vehicles. Code: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<ActiveVehicleResponse>> call, Throwable t) {
+                if (!isAdded()) return;
+
+                Log.e(TAG, "Network error while loading active vehicles", t);
+            }
+        });
+    }
+
+    private void drawVehicleMarkers(List<ActiveVehicleResponse> vehicles) {
+        if (vehicleMarkerManager == null || vehicles == null) return;
+
+        vehicleMarkerManager.deleteAll();
+
+        for (ActiveVehicleResponse vehicle : vehicles) {
+            if (vehicle == null || vehicle.getCurrentLocation() == null) continue;
+
+            LocationDTO location = vehicle.getCurrentLocation();
+
+            /*
+             * Backend currently returns swapped coordinates in LocationDTO.
+             * Web frontend already compensates for this by using latitude as longitude.
+             * Keep the same logic here until backend/frontend coordinate contract is fixed globally.
+             */
+            double longitude = location.getLatitude();
+            double latitude = location.getLongitude();
+
+            if (longitude == 0.0 && latitude == 0.0) continue;
+
+            Bitmap vehicleIcon = vehicle.isBusy() ? busyVehicleIcon : availableVehicleIcon;
+
+            if (vehicleIcon == null) continue;
+
+            PointAnnotationOptions markerOptions = new PointAnnotationOptions()
+                    .withPoint(Point.fromLngLat(longitude, latitude))
+                    .withIconImage(vehicleIcon)
+                    .withIconSize(0.7);
+
+            vehicleMarkerManager.create(markerOptions);
+        }
     }
 
     private void cancelGuestRide() {
@@ -286,24 +431,45 @@ public class HomeFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        if (mapView != null) mapView.onStart();
+
+        if (mapView != null) {
+            mapView.onStart();
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (mapView != null) mapView.onStop();
+
+        vehicleRefreshHandler.removeCallbacks(vehicleRefreshRunnable);
+
+        if (mapView != null) {
+            mapView.onStop();
+        }
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        if (mapView != null) mapView.onLowMemory();
+
+        if (mapView != null) {
+            mapView.onLowMemory();
+        }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (mapView != null) mapView.onDestroy();
+
+        vehicleRefreshHandler.removeCallbacks(vehicleRefreshRunnable);
+
+        if (vehicleMarkerManager != null) {
+            vehicleMarkerManager.deleteAll();
+            vehicleMarkerManager = null;
+        }
+
+        if (mapView != null) {
+            mapView.onDestroy();
+        }
     }
 }
