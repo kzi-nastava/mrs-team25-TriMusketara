@@ -1,5 +1,6 @@
 package com.example.clickanddrive;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,17 +8,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.app.AlertDialog;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.clickanddrive.dtosample.requests.PanicRequest;
-import com.example.clickanddrive.dtosample.responses.PanicResponse;
 import com.example.clickanddrive.clients.ClientUtils;
-import com.example.clickanddrive.dtosample.requests.RideStopRequest;
 import com.example.clickanddrive.dtosample.LocationDTO;
+import com.example.clickanddrive.dtosample.requests.PanicRequest;
+import com.example.clickanddrive.dtosample.requests.RideStopRequest;
+import com.example.clickanddrive.dtosample.responses.PanicResponse;
 import com.example.clickanddrive.dtosample.responses.ScheduledRideResponse;
 import com.example.clickanddrive.map.MapHelper;
 import com.example.clickanddrive.map.MapboxDirections;
@@ -40,9 +40,16 @@ public class DriverDriveInProgressFragment extends Fragment {
 
     private ScheduledRideResponse ride;
     private MapView mapView;
-    private TextView tvOrigin, tvDestination, tvScheduledTime;
-    private Button btnStopRide, btnFinishRide;
+
+    private TextView tvOrigin;
+    private TextView tvDestination;
+    private TextView tvScheduledTime;
+
+    private Button btnStopRide;
+    private Button btnFinishRide;
     private Button btnPanic;
+
+    private double routeDistanceKm = 0.0;
 
     public static DriverDriveInProgressFragment newInstance(ScheduledRideResponse ride) {
         DriverDriveInProgressFragment fragment = new DriverDriveInProgressFragment();
@@ -64,7 +71,9 @@ public class DriverDriveInProgressFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ride = (ScheduledRideResponse) getArguments().getSerializable(ARG_RIDE);
+        if (getArguments() != null) {
+            ride = (ScheduledRideResponse) getArguments().getSerializable(ARG_RIDE);
+        }
 
         mapView = view.findViewById(R.id.mapView);
         tvOrigin = view.findViewById(R.id.tvOrigin);
@@ -85,12 +94,7 @@ public class DriverDriveInProgressFragment extends Fragment {
         tvScheduledTime.setText("Scheduled: " + ride.getFormattedScheduledTime());
 
         btnStopRide.setOnClickListener(v -> onStopRide());
-
-        btnFinishRide.setOnClickListener(v ->
-                Toast.makeText(getContext(),
-                        "Finish ride UI is ready, functionality can be connected later",
-                        Toast.LENGTH_SHORT).show());
-
+        btnFinishRide.setOnClickListener(v -> confirmFinishRide());
         btnPanic.setOnClickListener(v -> onPanic());
 
         CameraOptions cameraOptions = new CameraOptions.Builder()
@@ -100,6 +104,75 @@ public class DriverDriveInProgressFragment extends Fragment {
 
         mapView.getMapboxMap().setCamera(cameraOptions);
         mapView.getMapboxMap().loadStyleUri(Style.DARK, style -> drawRoute());
+    }
+
+    private void confirmFinishRide() {
+        if (ride == null) {
+            Toast.makeText(getContext(), "No active ride selected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Finish ride")
+                .setMessage("Confirm that the ride is completed and paid in the vehicle?")
+                .setPositiveButton("Finish", (dialog, which) -> finishRide())
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void finishRide() {
+        if (ride == null) {
+            Toast.makeText(getContext(), "No active ride selected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        btnFinishRide.setEnabled(false);
+        btnStopRide.setEnabled(false);
+
+        ClientUtils.rideService
+                .finishRide(ride.getId(), routeDistanceKm, ride.isGuest())
+                .enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        if (!isAdded()) return;
+
+                        btnFinishRide.setEnabled(true);
+                        btnStopRide.setEnabled(true);
+
+                        if (response.isSuccessful()) {
+                            Toast.makeText(
+                                    getContext(),
+                                    "Ride finished successfully",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+
+                            requireActivity().getSupportFragmentManager()
+                                    .beginTransaction()
+                                    .replace(R.id.flFragment, new ScheduledRidesFragment())
+                                    .commit();
+                        } else {
+                            Toast.makeText(
+                                    getContext(),
+                                    "Failed to finish ride",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        if (!isAdded()) return;
+
+                        btnFinishRide.setEnabled(true);
+                        btnStopRide.setEnabled(true);
+
+                        Toast.makeText(
+                                getContext(),
+                                "Network error",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                });
     }
 
     private void onStopRide() {
@@ -226,6 +299,8 @@ public class DriverDriveInProgressFragment extends Fragment {
                             public void onSuccess(MapboxDirections.RouteResult result) {
                                 if (!isAdded()) return;
 
+                                routeDistanceKm = result.distanceKm;
+
                                 requireActivity().runOnUiThread(() -> {
                                     MapHelper helper = new MapHelper(mapView);
                                     helper.drawPreCalculatedRoute(
@@ -244,9 +319,12 @@ public class DriverDriveInProgressFragment extends Fragment {
                                 if (!isAdded()) return;
 
                                 requireActivity().runOnUiThread(() ->
-                                        Toast.makeText(getContext(),
+                                        Toast.makeText(
+                                                getContext(),
                                                 "Failed to draw route",
-                                                Toast.LENGTH_SHORT).show());
+                                                Toast.LENGTH_SHORT
+                                        ).show()
+                                );
                             }
                         });
                     }
@@ -256,9 +334,12 @@ public class DriverDriveInProgressFragment extends Fragment {
                         if (!isAdded()) return;
 
                         requireActivity().runOnUiThread(() ->
-                                Toast.makeText(getContext(),
+                                Toast.makeText(
+                                        getContext(),
                                         "Destination geocoding failed",
-                                        Toast.LENGTH_SHORT).show());
+                                        Toast.LENGTH_SHORT
+                                ).show()
+                        );
                     }
                 });
             }
@@ -268,9 +349,12 @@ public class DriverDriveInProgressFragment extends Fragment {
                 if (!isAdded()) return;
 
                 requireActivity().runOnUiThread(() ->
-                        Toast.makeText(getContext(),
+                        Toast.makeText(
+                                getContext(),
                                 "Origin geocoding failed",
-                                Toast.LENGTH_SHORT).show());
+                                Toast.LENGTH_SHORT
+                        ).show()
+                );
             }
         });
     }
@@ -278,24 +362,36 @@ public class DriverDriveInProgressFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        if (mapView != null) mapView.onStart();
+
+        if (mapView != null) {
+            mapView.onStart();
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (mapView != null) mapView.onStop();
+
+        if (mapView != null) {
+            mapView.onStop();
+        }
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        if (mapView != null) mapView.onLowMemory();
+
+        if (mapView != null) {
+            mapView.onLowMemory();
+        }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (mapView != null) mapView.onDestroy();
+
+        if (mapView != null) {
+            mapView.onDestroy();
+        }
     }
 }
