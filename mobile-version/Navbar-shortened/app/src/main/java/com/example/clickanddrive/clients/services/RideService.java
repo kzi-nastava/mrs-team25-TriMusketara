@@ -1,6 +1,7 @@
 package com.example.clickanddrive.clients.services;
 
 import com.example.clickanddrive.dtosample.requests.CreateRideRequest;
+import com.example.clickanddrive.dtosample.requests.ReviewRequest;
 import com.example.clickanddrive.dtosample.requests.RideCancellationRequest;
 import com.example.clickanddrive.dtosample.requests.RideStopRequest;
 import com.example.clickanddrive.dtosample.responses.RideResponse;
@@ -39,6 +40,12 @@ public interface RideService {
             @Path("id") Long rideId,
             @Query("distanceKm") double distanceKm,
             @Query("isGuest") boolean isGuest
+    );
+
+    @POST("rides/{id}/review")
+    Call<Void> rateRide(
+            @Path("id") Long rideId,
+            @Body ReviewRequest request
     );
 
     class PageResponse<T> {
