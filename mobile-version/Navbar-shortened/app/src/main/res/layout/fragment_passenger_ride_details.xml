@@ -88,6 +88,18 @@
                 android:textSize="16sp"
                 android:layout_marginBottom="8dp" />
 
+            <Button
+                android:id="@+id/btnRateRide"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Rate ride"
+                android:textAllCaps="false"
+                android:backgroundTint="#F5CB5C"
+                android:textColor="@android:color/black"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="12dp"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/tvPetBaby"
                 android:layout_width="wrap_content"

@@ -3,7 +3,6 @@ package com.example.clickanddrive;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,30 +32,41 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PassengerRideDetailsFragment extends Fragment {
+public class PassengerRideInProgressFragment extends Fragment {
 
-    private static final String TAG = "PassengerRideDetails";
     private static final String ARG_RIDE_ID = "ride_id";
+    private static final long REFRESH_INTERVAL_MS = 5_000L;
 
     private Long rideId;
+
     private MapView mapView;
 
+    private TextView tvRideStatus;
+    private TextView tvEta;
     private TextView tvDriverName;
     private TextView tvDriverEmail;
-    private TextView tvStatus;
-    private TextView tvPrice;
-    private TextView tvTime;
     private TextView tvRoute;
-    private TextView tvRatings;
-    private TextView tvReports;
+    private TextView tvPrice;
     private TextView tvPetBaby;
+
     private Button btnRateRide;
+    private Button btnBackToHome;
 
-    private boolean routeDrawn = false;
     private boolean mapStyleLoaded = false;
+    private boolean routeDrawn = false;
 
-    public static PassengerRideDetailsFragment newInstance(Long rideId) {
-        PassengerRideDetailsFragment fragment = new PassengerRideDetailsFragment();
+    private final Handler refreshHandler = new Handler(Looper.getMainLooper());
+
+    private final Runnable refreshRunnable = new Runnable() {
+        @Override
+        public void run() {
+            fetchRideInProgress(false);
+            refreshHandler.postDelayed(this, REFRESH_INTERVAL_MS);
+        }
+    };
+
+    public static PassengerRideInProgressFragment newInstance(Long rideId) {
+        PassengerRideInProgressFragment fragment = new PassengerRideInProgressFragment();
         Bundle args = new Bundle();
         args.putLong(ARG_RIDE_ID, rideId);
         fragment.setArguments(args);
@@ -68,7 +78,7 @@ public class PassengerRideDetailsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_passenger_ride_details, container, false);
+        return inflater.inflate(R.layout.fragment_passenger_ride_in_progress, container, false);
     }
 
     @Override
@@ -81,23 +91,21 @@ public class PassengerRideDetailsFragment extends Fragment {
         }
 
         mapView = view.findViewById(R.id.mapView);
+        tvRideStatus = view.findViewById(R.id.tvRideStatus);
+        tvEta = view.findViewById(R.id.tvEta);
         tvDriverName = view.findViewById(R.id.tvDriverName);
         tvDriverEmail = view.findViewById(R.id.tvDriverEmail);
-        tvStatus = view.findViewById(R.id.tvStatus);
-        tvPrice = view.findViewById(R.id.tvPrice);
-        tvTime = view.findViewById(R.id.tvTime);
         tvRoute = view.findViewById(R.id.tvRoute);
-        tvRatings = view.findViewById(R.id.tvRatings);
-        tvReports = view.findViewById(R.id.tvReports);
+        tvPrice = view.findViewById(R.id.tvPrice);
         tvPetBaby = view.findViewById(R.id.tvPetBaby);
-        btnRateRide = view.findViewById(R.id.btnRateRide);
 
-        if (btnRateRide != null) {
-            btnRateRide.setVisibility(View.GONE);
-            btnRateRide.setOnClickListener(v -> openRateRideScreen());
-        } else {
-            Log.e(TAG, "btnRateRide is missing from fragment_passenger_ride_details.xml");
-        }
+        btnRateRide = view.findViewById(R.id.btnRateRide);
+        btnBackToHome = view.findViewById(R.id.btnBackToHome);
+
+        btnRateRide.setVisibility(View.GONE);
+        btnRateRide.setOnClickListener(v -> openRateRideScreen());
+
+        btnBackToHome.setOnClickListener(v -> openHomeScreen());
 
         CameraOptions cameraOptions = new CameraOptions.Builder()
                 .center(Point.fromLngLat(19.8423, 45.2543))
@@ -108,7 +116,7 @@ public class PassengerRideDetailsFragment extends Fragment {
 
         mapView.getMapboxMap().loadStyleUri(Style.DARK, style -> {
             mapStyleLoaded = true;
-            fetchRideDetails(true);
+            fetchRideInProgress(true);
         });
     }
 
@@ -116,16 +124,18 @@ public class PassengerRideDetailsFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-
+        refreshHandler.removeCallbacks(refreshRunnable);
+        refreshHandler.postDelayed(refreshRunnable, REFRESH_INTERVAL_MS);
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
+        refreshHandler.removeCallbacks(refreshRunnable);
     }
 
-    private void fetchRideDetails(boolean allowRouteDraw) {
+    private void fetchRideInProgress(boolean allowRouteDraw) {
         if (rideId == null) {
             Toast.makeText(getContext(), "Ride id is missing", Toast.LENGTH_SHORT).show();
             return;
@@ -141,19 +151,13 @@ public class PassengerRideDetailsFragment extends Fragment {
                         if (response.isSuccessful() && response.body() != null) {
                             PassengerRideDetailsResponse details = response.body();
 
-                            Log.d(TAG, "Ride details refreshed. status="
-                                    + details.getStatus()
-                                    + ", driverRating=" + details.getDriverRating()
-                                    + ", vehicleRating=" + details.getVehicleRating());
-
                             bindData(details);
 
                             if (allowRouteDraw && mapStyleLoaded && !routeDrawn) {
                                 drawRoute(details);
                             }
                         } else {
-                            Log.e(TAG, "Failed to load ride details. Response code: " + response.code());
-                            Toast.makeText(getContext(), "Failed to load ride details", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Failed to load current ride", Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -161,60 +165,66 @@ public class PassengerRideDetailsFragment extends Fragment {
                     public void onFailure(Call<PassengerRideDetailsResponse> call, Throwable t) {
                         if (!isAdded()) return;
 
-                        Log.e(TAG, "Network error while loading ride details", t);
                         Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
     private void bindData(PassengerRideDetailsResponse details) {
+        String status = safe(details.getStatus());
+
+        tvRideStatus.setText("Status: " + status);
+        tvEta.setText("ETA: " + getEtaText(status));
+
         tvDriverName.setText("Driver: " + safe(details.getDriverName()));
         tvDriverEmail.setText("Email: " + safe(details.getDriverEmail()));
-        tvStatus.setText("Status: " + safe(details.getStatus()));
-        tvPrice.setText("Price: " + (details.getTotalPrice() == null ? "-" : details.getTotalPrice() + " RSD"));
-        tvTime.setText("Time: " + safe(details.getStartTime()) + " - " + safe(details.getEndTime()));
 
         String origin = details.getOrigin() != null ? safe(details.getOrigin().getAddress()) : "-";
         String destination = details.getDestination() != null ? safe(details.getDestination().getAddress()) : "-";
-        tvRoute.setText("Route: " + origin + " -> " + destination);
 
-        boolean alreadyRated = isAlreadyRated(details);
+        tvRoute.setText("Route: " + origin + " → " + destination);
 
-        if (alreadyRated) {
-            tvRatings.setText("Ratings: Driver "
-                    + details.getDriverRating()
-                    + "/5, Vehicle "
-                    + details.getVehicleRating()
-                    + "/5");
-        } else {
-            tvRatings.setText("Ratings: no ratings");
-        }
-
-        if (details.getInconsistencyReports() != null && !details.getInconsistencyReports().isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-
-            for (String report : details.getInconsistencyReports()) {
-                sb.append("• ").append(report).append("\n");
-            }
-
-            tvReports.setText("Reports:\n" + sb.toString().trim());
-        } else {
-            tvReports.setText("Reports: none");
-        }
+        tvPrice.setText("Price: " + (details.getTotalPrice() == null ? "-" : details.getTotalPrice() + " RSD"));
 
         tvPetBaby.setText("Pet friendly: " + yesNo(details.isPetFriendly())
                 + " | Baby friendly: " + yesNo(details.isBabyFriendly()));
 
-        boolean canRate = isFinished(details.getStatus()) && !alreadyRated;
+        boolean alreadyRated = isAlreadyRated(details);
+        boolean canRate = isFinished(status) && !alreadyRated;
 
-        Log.d(TAG, "canRate=" + canRate
-                + ", isFinished=" + isFinished(details.getStatus())
-                + ", alreadyRated=" + alreadyRated);
+        btnRateRide.setVisibility(canRate ? View.VISIBLE : View.GONE);
+        btnRateRide.setEnabled(canRate);
 
-        if (btnRateRide != null) {
-            btnRateRide.setVisibility(canRate ? View.VISIBLE : View.GONE);
-            btnRateRide.setEnabled(canRate);
+        if (isFinished(status)) {
+            refreshHandler.removeCallbacks(refreshRunnable);
+            tvEta.setText("ETA: Ride finished");
         }
+    }
+
+    private String getEtaText(String status) {
+        if (status == null) {
+            return "-";
+        }
+
+        String normalized = status.trim().toUpperCase(Locale.ROOT);
+
+        if (normalized.equals("SCHEDULED")) {
+            return "Waiting for driver";
+        }
+
+        if (normalized.equals("ACCEPTED")) {
+            return "Driver is assigned";
+        }
+
+        if (normalized.equals("IN_PROGRESS") || normalized.equals("STARTED") || normalized.contains("PROGRESS")) {
+            return "Ride in progress";
+        }
+
+        if (isFinished(status)) {
+            return "Ride finished";
+        }
+
+        return "Calculating...";
     }
 
     private boolean isAlreadyRated(PassengerRideDetailsResponse details) {
@@ -242,10 +252,21 @@ public class PassengerRideDetailsFragment extends Fragment {
             return;
         }
 
+        refreshHandler.removeCallbacks(refreshRunnable);
+
         requireActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.flFragment, RateRideFragment.newInstance(rideId))
                 .addToBackStack(null)
+                .commit();
+    }
+
+    private void openHomeScreen() {
+        refreshHandler.removeCallbacks(refreshRunnable);
+
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.flFragment, new HomeFragment())
                 .commit();
     }
 
@@ -304,6 +325,8 @@ public class PassengerRideDetailsFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+
+        refreshHandler.removeCallbacks(refreshRunnable);
 
         mapStyleLoaded = false;
         routeDrawn = false;

@@ -404,16 +404,29 @@ public class NewRideUserFormFragment extends Fragment {
         });
     }
 
+    private void navigateToPassengerRideInProgress(Long rideId) {
+        if (getActivity() != null) {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.flFragment, PassengerRideInProgressFragment.newInstance(rideId))
+                    .addToBackStack(null)
+                    .commit();
+        }
+    }
+
     private void handleRideResponse(RideResponse response, RouteCalculator.RouteCalculationResult routeResult) {
 
         if (response.getStatus() == RideStatus.SCHEDULED) {
             Toast.makeText(getContext(), "Ride scheduled", Toast.LENGTH_LONG).show();
 
-            // Create routedata with all inputs
-            RouteData routeData = createRouteData(routeResult);
+            Long rideId = response.getId();
 
-            // Navigate to map
-            navigateToMap(routeData);
+            if (rideId == null) {
+                Toast.makeText(getContext(), "Ride created, but ride id is missing", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            navigateToPassengerRideInProgress(rideId);
 
             clearForm();
         } else if (response.getStatus() == RideStatus.FAILED) {
