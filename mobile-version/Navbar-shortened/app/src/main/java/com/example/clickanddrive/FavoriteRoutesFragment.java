@@ -16,6 +16,8 @@ import android.widget.Toast;
 
 import com.example.clickanddrive.adapters.FavoriteRoutesAdapter;
 import com.example.clickanddrive.clients.ClientUtils;
+import com.example.clickanddrive.clients.services.PassengerService;
+import com.example.clickanddrive.clients.services.RideService;
 import com.example.clickanddrive.dtosample.responses.RouteFromFavoritesResponse;
 
 import java.util.ArrayList;
@@ -76,14 +78,14 @@ public class FavoriteRoutesFragment extends Fragment {
     private void loadFavoriteRoutes() {
         Long userId = SessionManager.userId;
         System.out.println("CURRENT USER TYPE: " + SessionManager.currentUserType);
-        Call<List<RouteFromFavoritesResponse>> call = ClientUtils.passengerService.getFavoriteRoutes(userId);
+        Call<PassengerService.PageResponse<RouteFromFavoritesResponse>> call = ClientUtils.passengerService.getFavoriteRoutes(userId, 0, 1000);
 
-        call.enqueue(new Callback<List<RouteFromFavoritesResponse>>() {
+        call.enqueue(new Callback<PassengerService.PageResponse<RouteFromFavoritesResponse>>() {
             @Override
-            public void onResponse(Call<List<RouteFromFavoritesResponse>> call, Response<List<RouteFromFavoritesResponse>> response) {
+            public void onResponse(Call<PassengerService.PageResponse<RouteFromFavoritesResponse>> call, Response<PassengerService.PageResponse<RouteFromFavoritesResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     // Loaded routes
-                    List<RouteFromFavoritesResponse> routes = response.body();
+                    List<RouteFromFavoritesResponse> routes = response.body().getContent();
 
                     allRoutes.clear();
                     allRoutes.addAll(routes);
@@ -103,7 +105,7 @@ public class FavoriteRoutesFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<List<RouteFromFavoritesResponse>> call, Throwable t) {
+            public void onFailure(Call<PassengerService.PageResponse<RouteFromFavoritesResponse>> call, Throwable t) {
                 Toast.makeText(requireContext(), "Network error" + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
