@@ -10,12 +10,13 @@ import retrofit2.Call;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface PassengerService {
 
     // GET for retrieving passengers favorite routes
     @GET("passenger/{passengerId}/favorite-routes")
-    Call<List<RouteFromFavoritesResponse>> getFavoriteRoutes(@Path("passengerId") Long passengerId);
+    Call<PageResponse<RouteFromFavoritesResponse>> getFavoriteRoutes(@Path("passengerId") Long passengerId, @Query("page") int page, @Query("size") int size);
 
     // Remove a route from favorites list
     @DELETE("passenger/{passengerId}/{routeId}/remove-route")
@@ -26,4 +27,18 @@ public interface PassengerService {
 
     @GET("passenger/rides/{rideId}/details")
     Call<PassengerRideDetailsResponse> getRideDetails(@Path("rideId") Long rideId);
+
+    class PageResponse<T> {
+        private List<T> content;
+        private int totalPages;
+        private long totalElements;
+
+        public List<T> getContent() {
+            return content;
+        }
+
+        public int getTotalPages() {
+            return totalPages;
+        }
+    }
 }
