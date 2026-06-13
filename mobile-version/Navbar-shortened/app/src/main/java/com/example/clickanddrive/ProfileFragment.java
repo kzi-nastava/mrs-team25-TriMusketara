@@ -360,7 +360,6 @@ public class ProfileFragment extends Fragment {
                 addButton("Favorite routes", R.drawable.heart ,() -> openFavoriteRoutesFragment());
                 addButton("Ride history", R.drawable.history, this::openUserHistoryFragment);
                 addButton("Reports", R.drawable.report,  () -> {});
-                addButton("Notes", R.drawable.notes, () -> {});
                 addButton("Support", R.drawable.support, () -> {});
                 addButton("Log out", R.drawable.logout, () -> {
                     if (isAdded() && getActivity() instanceof MainActivity) {
@@ -382,11 +381,10 @@ public class ProfileFragment extends Fragment {
                 break;
 
             case SessionManager.ADMIN:
-                addButton("Register new driver", 0, () -> openDriverRegistrationFragment());
-                addButton("Check current rides", 0, () -> {});
+                addButton("Register new driver", R.drawable.driver_registration, () -> openDriverRegistrationFragment());
+                addButton("Check current rides", R.drawable.check_current_rides, () -> {});
                 addButton("Change prices", R.drawable.price, () -> {});
                 addButton("Ride history", R.drawable.history, this::openAdminHistoryFragment);
-                addButton("Requests", 0,  () -> {});
                 addButton("Reports", R.drawable.report,  () -> {});
                 addButton("Block a user", R.drawable.block_icon,  () -> openBlockAUserFragment());
                 addButton("Log out", R.drawable.logout, () -> {
