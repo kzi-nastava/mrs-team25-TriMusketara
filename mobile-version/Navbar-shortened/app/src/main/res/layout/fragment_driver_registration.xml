@@ -104,24 +104,6 @@
                         android:textColor="@color/white"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Password -->
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:boxStrokeColor="@color/text_input_box_stroke"
-                    app:boxStrokeWidth="2dp"
-                    android:textColorHint="@color/white"
-                    android:layout_marginBottom="12dp">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/driver_password_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Password"
-                        android:textColor="@color/white"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
                 <!-- Address -->
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -293,7 +275,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Num. of seats"
-                        android:textColor="@color/white"/>
+                        android:textColor="@color/white"
+                        android:inputType="number"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Baby Friendly Toggle -->

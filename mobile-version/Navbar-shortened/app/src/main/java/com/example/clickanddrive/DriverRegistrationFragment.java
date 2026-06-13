@@ -37,7 +37,7 @@ public class DriverRegistrationFragment extends Fragment {
 
     // Driver inputs
     private TextInputEditText driverName, driverLName, driverEmail,
-            driverPassword, driverAddress, driverPhone;
+             driverAddress, driverPhone;
     private Spinner spinnerGender;
 
     // Vehicle inputs
@@ -83,7 +83,6 @@ public class DriverRegistrationFragment extends Fragment {
         driverName = view.findViewById(R.id.driver_name_input);
         driverLName = view.findViewById(R.id.driver_lname_input);
         driverEmail = view.findViewById(R.id.driver_email_input);
-        driverPassword = view.findViewById(R.id.driver_password_input);
         driverAddress = view.findViewById(R.id.driver_address_input);
         spinnerGender = view.findViewById(R.id.spinner_gender);
         driverPhone = view.findViewById(R.id.driver_phone_input);
@@ -229,11 +228,6 @@ public class DriverRegistrationFragment extends Fragment {
             return false;
         }
 
-        if (isEmpty(driverPassword)) {
-            driverPassword.setError("Required");
-            return false;
-        }
-
         if (isEmpty(driverAddress)) {
             driverAddress.setError("Required");
             return false;
@@ -283,7 +277,6 @@ public class DriverRegistrationFragment extends Fragment {
         driverName.setText("");
         driverLName.setText("");
         driverEmail.setText("");
-        driverPassword.setText("");
         driverAddress.setText("");
         driverPhone.setText("");
 
