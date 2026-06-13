@@ -22,6 +22,7 @@
         android:layout_marginBottom="24dp"/>
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/blockCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="16dp"
@@ -69,6 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Reason: "
+                android:visibility="gone"
                 android:textSize="16sp"
                 android:textColor="@color/whiteish"
                 android:alpha="0.7"
@@ -79,6 +81,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Your account has been blocked by admin."
+                android:visibility="gone"
                 android:textSize="17sp"
                 android:textColor="@color/whiteish"
                 android:lineSpacingExtra="4dp"/>
@@ -86,9 +89,9 @@
     </androidx.cardview.widget.CardView>
 
     <TextView
+        android:id="@+id/tv_note_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Please contact support if you believe this is a mistake."
         android:textSize="14sp"
         android:textColor="@color/whiteish"
         android:alpha="0.7"
