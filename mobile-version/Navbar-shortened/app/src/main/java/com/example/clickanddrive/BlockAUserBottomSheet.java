@@ -209,6 +209,12 @@ public class BlockAUserBottomSheet extends BottomSheetDialogFragment {
                                                Response<UserProfileResponse> response) {
                             if (response.isSuccessful() && response.body() != null) {
                                 user = response.body();
+
+                                if (user.getId() == SessionManager.userId) {
+                                    SessionManager.setIsBlocked(false);
+                                    SessionManager.setBlockReason(null);
+                                }
+
                                 updateBlockButtonText();
                                 Toast.makeText(getContext(), "User unblocked successfully",
                                         Toast.LENGTH_SHORT).show();

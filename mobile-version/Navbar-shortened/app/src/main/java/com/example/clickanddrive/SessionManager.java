@@ -42,6 +42,8 @@ public class SessionManager {
         currentUserType = GUEST;
         token = null;
         userId = null;
+        isBlocked = false;
+        blockReason = null;
     }
 
     public static boolean isUserBlocked() {
@@ -50,5 +52,13 @@ public class SessionManager {
 
     public static String getBlockReason() {
         return blockReason;
+    }
+
+    public static void setIsBlocked(boolean blocked) {
+        isBlocked = blocked;
+    }
+
+    public static void setBlockReason(String reason) {
+        blockReason = reason;
     }
 }
