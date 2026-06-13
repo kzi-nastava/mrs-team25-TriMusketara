@@ -1,6 +1,7 @@
 package com.example.clickanddrive;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -113,27 +114,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void logoutAndGoToLoginSafe() {
+        // Delete data from session
         SessionManager.logout();
 
-        // 2. clear fragment back stack safely
-        if (!isFinishing() && !isDestroyed()) {
-            getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        // New Intent for MainActivity
+        Intent intent = new Intent(this, MainActivity.class);
 
-            // 3. reset bottom nav
-            BottomNavigationView nav = findViewById(R.id.bottomNavigationView);
-            if (nav != null) {
-                nav.getMenu().clear();
-                nav.inflateMenu(R.menu.bottom_nav_user); // guest menu
-            }
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-            // 4. post fragment transaction na UI thread
-            findViewById(R.id.flFragment).post(() -> {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.flFragment, new LoginFragment())
-                        .commitAllowingStateLoss();
-            });
-        }
+        startActivity(intent);
+        finish(); // close current (old) instance
     }
 
     public void setCurrentFragment(Fragment fragment) {
