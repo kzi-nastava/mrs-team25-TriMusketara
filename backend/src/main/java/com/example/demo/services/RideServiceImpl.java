@@ -8,6 +8,7 @@ import com.example.demo.model.*;
 import com.example.demo.repositories.*;
 import com.example.demo.services.interfaces.EmailService;
 import com.example.demo.services.interfaces.RideService;
+
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,9 @@ public class RideServiceImpl implements RideService {
     //Service
     private final EmailService emailService;
     private final VehiclePriceRepository vehiclePriceRepository;
+
+    //Other
+    private static final double TRACKING_SIMULATION_SPEED = 10.0;
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
@@ -399,6 +403,88 @@ public class RideServiceImpl implements RideService {
         }
     }
 
+    @Override
+    @Transactional
+    public RideTrackingResponseDTO getRideTracking(Long rideId) {
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride not found"));
+
+        if (ride.getRoute() == null ||
+                ride.getRoute().getOrigin() == null ||
+                ride.getRoute().getDestination() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ride route is missing");
+        }
+
+        Location origin = ride.getRoute().getOrigin();
+        Location destination = ride.getRoute().getDestination();
+
+        int durationMinutes = ride.getRoute().getDuration() <= 0
+                ? 1
+                : ride.getRoute().getDuration();
+
+        double progress = calculateTrackingProgress(ride, durationMinutes);
+
+        double currentLongitude = interpolate(
+                origin.getLongitude(),
+                destination.getLongitude(),
+                progress
+        );
+
+        double currentLatitude = interpolate(
+                origin.getLatitude(),
+                destination.getLatitude(),
+                progress
+        );
+
+        LocationDTO vehicleLocation = new LocationDTO(
+                currentLongitude,
+                currentLatitude,
+                "Vehicle current location"
+        );
+
+        int eta = Math.max(
+                0,
+                (int) Math.ceil(durationMinutes * (1.0 - progress))
+        );
+
+        double progressPercent = Math.round(progress * 10000.0) / 100.0;
+
+        return new RideTrackingResponseDTO(
+                ride.getId(),
+                vehicleLocation,
+                eta,
+                ride.getStatus().name(),
+                progressPercent
+        );
+    }
+
+    private double calculateTrackingProgress(Ride ride, int durationMinutes) {
+        if (ride.getStatus() == RideStatus.FINISHED ||
+                ride.getStatus() == RideStatus.STOPPED) {
+            return 1.0;
+        }
+
+        if (ride.getStatus() != RideStatus.STARTED || ride.getStartTime() == null) {
+            return 0.0;
+        }
+
+        long elapsedSeconds = Duration.between(
+                ride.getStartTime(),
+                LocalDateTime.now()
+        ).getSeconds();
+
+        double simulatedElapsedSeconds = elapsedSeconds * TRACKING_SIMULATION_SPEED;
+        long totalSeconds = Math.max(1, durationMinutes * 60L);
+
+        return Math.min(1.0, Math.max(0.0, simulatedElapsedSeconds / totalSeconds));
+
+    }
+
+    private double interpolate(double start, double end, double progress) {
+        return start + (end - start) * progress;
+    }
+
+
     @Transactional
     public void stopRide(Long rideId, RideStopRequestDTO request) {
 
@@ -633,8 +719,15 @@ public class RideServiceImpl implements RideService {
         }
 
         // is passenger on the ride?
-        boolean isPassenger = ride.getPassengers().stream()
+        boolean isCreator = ride.getRideCreator() != null
+                && ride.getRideCreator().getEmail().equals(passengerEmail);
+
+        boolean isLinkedPassenger = ride.getPassengers() != null
+                && ride.getPassengers().stream()
                 .anyMatch(p -> p.getEmail().equals(passengerEmail));
+
+        boolean isPassenger = isCreator || isLinkedPassenger;
+
         if (!isPassenger) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not a passenger in this ride.");
         }

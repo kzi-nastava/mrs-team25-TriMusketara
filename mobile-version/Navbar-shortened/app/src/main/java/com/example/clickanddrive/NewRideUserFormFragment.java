@@ -426,7 +426,7 @@ public class NewRideUserFormFragment extends Fragment {
                 return;
             }
 
-            navigateToPassengerRideInProgress(rideId);
+            showRideAcceptedDialog(rideId);
 
             clearForm();
         } else if (response.getStatus() == RideStatus.FAILED) {
@@ -536,5 +536,18 @@ public class NewRideUserFormFragment extends Fragment {
         updateAdditionalStops();
         updateLinkedPassengers();
         btnSetTime.setText("Select Time");
+    }
+
+    private void showRideAcceptedDialog(Long rideId) {
+        if (!isAdded()) {
+            return;
+        }
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Driver accepted ride")
+                .setMessage("Your ride has been accepted. You can now track it on the map.")
+                .setPositiveButton("Track ride", (dialog, which) -> navigateToPassengerRideInProgress(rideId))
+                .setNegativeButton("Later", null)
+                .show();
     }
 }

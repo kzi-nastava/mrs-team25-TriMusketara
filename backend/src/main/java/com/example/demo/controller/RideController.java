@@ -126,8 +126,9 @@ public class RideController {
 
     // 2.6.2: Following the ride
     @GetMapping("/{id}/tracking")
+    @PreAuthorize("hasAnyRole('USER', 'DRIVER', 'ADMIN')")
     public ResponseEntity<RideTrackingResponseDTO> getRideTracking(@PathVariable Long id) {
-        return ResponseEntity.ok(new RideTrackingResponseDTO(id, new LocationDTO( 45.26, 19.83, "Bul. Oslobodjenja"), 5));
+        return ResponseEntity.ok(rideService.getRideTracking(id));
     }
 
     @GetMapping("/driver/{driverId}")

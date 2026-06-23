@@ -22,6 +22,7 @@ import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationManagerKt;
 import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationOptions;
 
 
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,6 +44,8 @@ public class MapHelper {
     private static final String ICON_STOP = "icon-stop";
     private static final String ICON_DEST = "icon-dest";
     private com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager pointAnnotationManager;
+
+    private com.mapbox.maps.plugin.annotation.generated.PointAnnotation vehicleAnnotation;
 
 
     private CircleAnnotationManager circleAnnotationManager;
