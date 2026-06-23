@@ -24,9 +24,9 @@
         <com.mapbox.maps.MapView
             android:id="@+id/mapView"
             android:layout_width="match_parent"
-            android:layout_height="260dp"
+            android:layout_height="300dp"
             android:layout_marginBottom="16dp"
-            mapbox:mapbox_cameraZoom="11" />
+            mapbox:mapbox_cameraZoom="13" />
 
         <TextView
             android:id="@+id/tvRideStatus"
@@ -92,6 +92,22 @@
             android:textColor="#CCCCCC"
             android:textSize="15sp"
             android:layout_marginBottom="20dp" />
+
+        <Button
+            android:id="@+id/btnReportInconsistency"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Report inconsistency"
+            android:textAllCaps="false"
+            android:layout_marginBottom="10dp" />
+
+        <Button
+            android:id="@+id/btnPanic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="PANIC"
+            android:textAllCaps="false"
+            android:layout_marginBottom="10dp" />
 
         <Button
             android:id="@+id/btnRateRide"

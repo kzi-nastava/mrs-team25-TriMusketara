@@ -5,6 +5,8 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +30,7 @@ import com.example.clickanddrive.dtosample.LocationDTO;
 import com.example.clickanddrive.dtosample.enumerations.RideStatus;
 import com.example.clickanddrive.dtosample.enumerations.VehicleType;
 import com.example.clickanddrive.dtosample.requests.CreateRideRequest;
+import com.example.clickanddrive.dtosample.responses.PassengerRideDetailsResponse;
 import com.example.clickanddrive.dtosample.responses.RideResponse;
 import com.example.clickanddrive.map.MapboxDirections;
 import com.example.clickanddrive.map.MapboxGeocoder;
@@ -79,6 +82,8 @@ public class NewRideUserFormFragment extends Fragment {
     private Double prefilledOriginLng = null;
     private Double prefilledDestLat = null;
     private Double prefilledDestLng = null;
+
+    private final Handler rideStartHandler = new Handler(Looper.getMainLooper());
 
     @Nullable
     @Override
@@ -426,7 +431,9 @@ public class NewRideUserFormFragment extends Fragment {
                 return;
             }
 
-            showRideAcceptedDialog(rideId);
+            Toast.makeText(getContext(), "Ride scheduled. Waiting for driver to begin ride.", Toast.LENGTH_LONG).show();
+
+            startWaitingForRideStart(rideId);
 
             clearForm();
         } else if (response.getStatus() == RideStatus.FAILED) {
@@ -434,6 +441,66 @@ public class NewRideUserFormFragment extends Fragment {
         } else {
             Toast.makeText(getContext(), "Ride status: " + response.getStatus(), Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void startWaitingForRideStart(Long rideId) {
+        rideStartHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (!isAdded()) {
+                    return;
+                }
+
+                ClientUtils.passengerService.getRideDetails(rideId)
+                        .enqueue(new Callback<PassengerRideDetailsResponse>() {
+                            @Override
+                            public void onResponse(Call<PassengerRideDetailsResponse> call,
+                                                   Response<PassengerRideDetailsResponse> response) {
+                                if (!isAdded()) {
+                                    return;
+                                }
+
+                                if (response.isSuccessful() && response.body() != null) {
+                                    String status = response.body().getStatus();
+
+                                    if ("STARTED".equalsIgnoreCase(status)) {
+                                        showRideStartedDialog(rideId);
+                                    } else {
+                                        rideStartHandler.postDelayed(this::pollAgain, 3000);
+                                    }
+                                } else {
+                                    rideStartHandler.postDelayed(this::pollAgain, 3000);
+                                }
+                            }
+
+                            private void pollAgain() {
+                                startWaitingForRideStart(rideId);
+                            }
+
+                            @Override
+                            public void onFailure(Call<PassengerRideDetailsResponse> call, Throwable t) {
+                                if (!isAdded()) {
+                                    return;
+                                }
+
+                                rideStartHandler.postDelayed(() -> startWaitingForRideStart(rideId), 3000);
+                            }
+                        });
+            }
+        }, 3000);
+    }
+
+    private void showRideStartedDialog(Long rideId) {
+        if (!isAdded()) {
+            return;
+        }
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Ride started")
+                .setMessage("The driver has started your ride. You can now track it on the map.")
+                .setPositiveButton("Track ride", (dialog, which) -> navigateToPassengerRideInProgress(rideId))
+                .setNegativeButton("Later", null)
+                .show();
     }
 
     private RouteData createRouteData(RouteCalculator.RouteCalculationResult result) {

@@ -1,5 +1,6 @@
 package com.example.clickanddrive;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -7,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,7 +18,9 @@ import androidx.fragment.app.Fragment;
 
 import com.example.clickanddrive.clients.ClientUtils;
 import com.example.clickanddrive.dtosample.LocationDTO;
+import com.example.clickanddrive.dtosample.requests.InconsistencyReportRequest;
 import com.example.clickanddrive.dtosample.responses.PassengerRideDetailsResponse;
+import com.example.clickanddrive.dtosample.responses.RideTrackingResponse;
 import com.example.clickanddrive.map.MapHelper;
 import com.example.clickanddrive.map.MapboxDirections;
 import com.mapbox.geojson.Point;
@@ -27,6 +31,7 @@ import com.mapbox.maps.Style;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -35,11 +40,12 @@ import retrofit2.Response;
 public class PassengerRideInProgressFragment extends Fragment {
 
     private static final String ARG_RIDE_ID = "ride_id";
-    private static final long REFRESH_INTERVAL_MS = 5_000L;
+    private static final long REFRESH_INTERVAL_MS = 1_000L;
 
     private Long rideId;
 
     private MapView mapView;
+    private MapHelper mapHelper;
 
     private TextView tvRideStatus;
     private TextView tvEta;
@@ -51,10 +57,14 @@ public class PassengerRideInProgressFragment extends Fragment {
 
     private Button btnRateRide;
     private Button btnBackToHome;
+    private Button btnReportInconsistency;
+    private Button btnPanic;
 
     private boolean mapStyleLoaded = false;
     private boolean routeDrawn = false;
 
+    private final List<MapboxDirections.Coordinate> trackingRouteCoordinates = new ArrayList<>();
+    private int mapboxDurationMinutes = 0;
     private final Handler refreshHandler = new Handler(Looper.getMainLooper());
 
     private final Runnable refreshRunnable = new Runnable() {
@@ -91,6 +101,7 @@ public class PassengerRideInProgressFragment extends Fragment {
         }
 
         mapView = view.findViewById(R.id.mapView);
+
         tvRideStatus = view.findViewById(R.id.tvRideStatus);
         tvEta = view.findViewById(R.id.tvEta);
         tvDriverName = view.findViewById(R.id.tvDriverName);
@@ -101,21 +112,27 @@ public class PassengerRideInProgressFragment extends Fragment {
 
         btnRateRide = view.findViewById(R.id.btnRateRide);
         btnBackToHome = view.findViewById(R.id.btnBackToHome);
+        btnReportInconsistency = view.findViewById(R.id.btnReportInconsistency);
+        btnPanic = view.findViewById(R.id.btnPanic);
 
+        btnBackToHome.setVisibility(View.GONE);
         btnRateRide.setVisibility(View.GONE);
         btnRateRide.setOnClickListener(v -> openRateRideScreen());
 
         btnBackToHome.setOnClickListener(v -> openHomeScreen());
+        btnReportInconsistency.setOnClickListener(v -> showInconsistencyDialog());
+        btnPanic.setOnClickListener(v -> showDummyPanicNotification());
 
         CameraOptions cameraOptions = new CameraOptions.Builder()
                 .center(Point.fromLngLat(19.8423, 45.2543))
-                .zoom(11.0)
+                .zoom(13.0)
                 .build();
 
         mapView.getMapboxMap().setCamera(cameraOptions);
 
         mapView.getMapboxMap().loadStyleUri(Style.DARK, style -> {
             mapStyleLoaded = true;
+            mapHelper = new MapHelper(mapView);
             fetchRideInProgress(true);
         });
     }
@@ -156,6 +173,8 @@ public class PassengerRideInProgressFragment extends Fragment {
                             if (allowRouteDraw && mapStyleLoaded && !routeDrawn) {
                                 drawRoute(details);
                             }
+
+                            fetchTracking();
                         } else {
                             Toast.makeText(getContext(), "Failed to load current ride", Toast.LENGTH_SHORT).show();
                         }
@@ -170,6 +189,81 @@ public class PassengerRideInProgressFragment extends Fragment {
                 });
     }
 
+    private void fetchTracking() {
+        if (rideId == null || mapHelper == null) {
+            return;
+        }
+
+        ClientUtils.rideService.getRideTracking(rideId)
+                .enqueue(new Callback<RideTrackingResponse>() {
+                    @Override
+                    public void onResponse(Call<RideTrackingResponse> call,
+                                           Response<RideTrackingResponse> response) {
+                        if (!isAdded()) {
+                            return;
+                        }
+
+                        if (response.isSuccessful() && response.body() != null) {
+                            RideTrackingResponse tracking = response.body();
+
+                            int etaFromMapbox = calculateEtaFromMapboxDuration(tracking.getProgressPercent());
+
+                            tvEta.setText("ETA: "
+                                    + etaFromMapbox
+                                    + " min ("
+                                    + tracking.getProgressPercent()
+                                    + "%)");
+
+                            if (!trackingRouteCoordinates.isEmpty()) {
+                                updateVehicleMarkerOnRoute(
+                                        tracking.getProgressPercent(),
+                                        etaFromMapbox
+                                );
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<RideTrackingResponse> call, Throwable t) {
+                        if (!isAdded()) {
+                            return;
+                        }
+
+                        Toast.makeText(getContext(), "Tracking update failed", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void updateVehicleMarkerOnRoute(double progressPercent, int etaMinutes) {
+        if (mapHelper == null || trackingRouteCoordinates.isEmpty()) {
+            return;
+        }
+
+        double normalizedProgress = Math.max(0.0, Math.min(100.0, progressPercent)) / 100.0;
+
+        int lastIndex = trackingRouteCoordinates.size() - 1;
+        int routeIndex = (int) Math.round(normalizedProgress * lastIndex);
+
+        routeIndex = Math.max(0, Math.min(lastIndex, routeIndex));
+
+        MapboxDirections.Coordinate coordinate = trackingRouteCoordinates.get(routeIndex);
+
+        mapHelper.updateVehicleMarker(coordinate.lng, coordinate.lat, etaMinutes);
+    }
+
+    private int calculateEtaFromMapboxDuration(double progressPercent) {
+        if (mapboxDurationMinutes <= 0) {
+            return 0;
+        }
+
+        double normalizedProgress = Math.max(0.0, Math.min(100.0, progressPercent)) / 100.0;
+
+        return Math.max(
+                0,
+                (int) Math.ceil(mapboxDurationMinutes * (1.0 - normalizedProgress))
+        );
+    }
+
     private void bindData(PassengerRideDetailsResponse details) {
         String status = safe(details.getStatus());
 
@@ -182,23 +276,123 @@ public class PassengerRideInProgressFragment extends Fragment {
         String origin = details.getOrigin() != null ? safe(details.getOrigin().getAddress()) : "-";
         String destination = details.getDestination() != null ? safe(details.getDestination().getAddress()) : "-";
 
-        tvRoute.setText("Route: " + origin + " → " + destination);
+        tvRoute.setText("Route: " + origin + " -> " + destination);
 
         tvPrice.setText("Price: " + (details.getTotalPrice() == null ? "-" : details.getTotalPrice() + " RSD"));
 
         tvPetBaby.setText("Pet friendly: " + yesNo(details.isPetFriendly())
                 + " | Baby friendly: " + yesNo(details.isBabyFriendly()));
 
+        boolean finished = isFinished(status);
         boolean alreadyRated = isAlreadyRated(details);
-        boolean canRate = isFinished(status) && !alreadyRated;
+        boolean canRate = finished && !alreadyRated;
+
+        btnReportInconsistency.setVisibility(finished ? View.GONE : View.VISIBLE);
+        btnReportInconsistency.setEnabled(!finished);
+
+        btnPanic.setVisibility(finished ? View.GONE : View.VISIBLE);
+        btnPanic.setEnabled(!finished);
 
         btnRateRide.setVisibility(canRate ? View.VISIBLE : View.GONE);
         btnRateRide.setEnabled(canRate);
 
-        if (isFinished(status)) {
+        btnBackToHome.setVisibility(finished ? View.VISIBLE : View.GONE);
+        btnBackToHome.setEnabled(finished);
+
+        if (finished) {
             refreshHandler.removeCallbacks(refreshRunnable);
             tvEta.setText("ETA: Ride finished");
         }
+    }
+
+    private void showDummyPanicNotification() {
+        String[] messages = {
+                "PANIC request sent. Support team has been notified.",
+                "Emergency alert simulated successfully.",
+                "PANIC pressed. This will be implemented by another team member."
+        };
+
+        int index = new Random().nextInt(messages.length);
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("PANIC")
+                .setMessage(messages[index])
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
+    private void showInconsistencyDialog() {
+        if (rideId == null) {
+            Toast.makeText(getContext(), "Ride id is missing", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        EditText input = new EditText(requireContext());
+        input.setHint("Describe what is wrong with the route");
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Report inconsistency")
+                .setMessage("If the driver is taking an inappropriate route, describe the problem.")
+                .setView(input)
+                .setPositiveButton("Send", (dialog, which) -> {
+                    String reason = input.getText().toString().trim();
+
+                    if (reason.isEmpty()) {
+                        Toast.makeText(getContext(), "Reason is required", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    sendInconsistencyReport(reason);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void sendInconsistencyReport(String reason) {
+        if (rideId == null) {
+            Toast.makeText(getContext(), "Ride id is missing", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        InconsistencyReportRequest request = new InconsistencyReportRequest(reason);
+
+        btnReportInconsistency.setEnabled(false);
+
+        ClientUtils.rideService.reportInconsistency(rideId, request)
+                .enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        if (!isAdded()) {
+                            return;
+                        }
+
+                        btnReportInconsistency.setEnabled(true);
+
+                        if (response.isSuccessful()) {
+                            Toast.makeText(
+                                    getContext(),
+                                    "Inconsistency report sent",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        } else {
+                            Toast.makeText(
+                                    getContext(),
+                                    "Failed to send report: " + response.code(),
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        if (!isAdded()) {
+                            return;
+                        }
+
+                        btnReportInconsistency.setEnabled(true);
+                        Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private String getEtaText(String status) {
@@ -289,7 +483,10 @@ public class PassengerRideInProgressFragment extends Fragment {
                 if (!isAdded()) return;
 
                 requireActivity().runOnUiThread(() -> {
-                    MapHelper mapHelper = new MapHelper(mapView);
+                    if (mapHelper == null) {
+                        mapHelper = new MapHelper(mapView);
+                    }
+
                     mapHelper.drawPreCalculatedRoute(
                             result.routeCoordinates,
                             origin.getLongitude(),
@@ -298,6 +495,10 @@ public class PassengerRideInProgressFragment extends Fragment {
                             destination.getLatitude(),
                             null
                     );
+
+                    trackingRouteCoordinates.clear();
+                    trackingRouteCoordinates.addAll(result.routeCoordinates);
+                    mapboxDurationMinutes = result.durationMinutes;
 
                     routeDrawn = true;
                 });
@@ -330,6 +531,9 @@ public class PassengerRideInProgressFragment extends Fragment {
 
         mapStyleLoaded = false;
         routeDrawn = false;
+        trackingRouteCoordinates.clear();
+
         mapView = null;
+        mapHelper = null;
     }
 }

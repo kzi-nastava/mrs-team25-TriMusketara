@@ -1,6 +1,7 @@
 package com.example.clickanddrive.clients.services;
 
 import com.example.clickanddrive.dtosample.requests.CreateRideRequest;
+import com.example.clickanddrive.dtosample.requests.InconsistencyReportRequest;
 import com.example.clickanddrive.dtosample.requests.ReviewRequest;
 import com.example.clickanddrive.dtosample.requests.RideCancellationRequest;
 import com.example.clickanddrive.dtosample.requests.RideStopRequest;
@@ -32,6 +33,12 @@ public interface RideService {
 
     @GET("rides/{id}/tracking")
     Call<RideTrackingResponse> getRideTracking(@Path("id") Long rideId);
+
+    @POST("rides/{id}/inconsistency-report")
+    Call<Void> reportInconsistency(
+            @Path("id") Long rideId,
+            @Body InconsistencyReportRequest request
+    );
 
     @POST("rides/cancel/{id}")
     Call<Void> cancelRide(@Path("id") Long rideId, @Body RideCancellationRequest request);

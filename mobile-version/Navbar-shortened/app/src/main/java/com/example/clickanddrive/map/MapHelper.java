@@ -3,6 +3,7 @@ package com.example.clickanddrive.map;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.example.clickanddrive.R;
@@ -17,11 +18,10 @@ import com.mapbox.maps.Style;
 import com.mapbox.maps.plugin.annotation.AnnotationConfig;
 import com.mapbox.maps.plugin.annotation.AnnotationPlugin;
 import com.mapbox.maps.plugin.annotation.AnnotationPluginImplKt;
-import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationManager;
-import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationManagerKt;
-import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationOptions;
-
-
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotation;
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager;
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManagerKt;
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,15 +40,13 @@ public class MapHelper {
     private static final String ROUTE_LAYER_ID = "route-layer";
     private static final String ROUTE_COLOR = "#F5CB5C";
     private static final float ROUTE_WIDTH = 5.0f;
+
     private static final String ICON_ORIGIN = "icon-origin";
     private static final String ICON_STOP = "icon-stop";
     private static final String ICON_DEST = "icon-dest";
-    private com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager pointAnnotationManager;
 
-    private com.mapbox.maps.plugin.annotation.generated.PointAnnotation vehicleAnnotation;
-
-
-    private CircleAnnotationManager circleAnnotationManager;
+    private PointAnnotationManager pointAnnotationManager;
+    private PointAnnotation vehicleAnnotation;
 
     public MapHelper(MapView mapView) {
         this.mapView = mapView;
@@ -58,7 +56,7 @@ public class MapHelper {
 
     private void initializeAnnotationManager() {
         AnnotationPlugin annotationPlugin = AnnotationPluginImplKt.getAnnotations(mapView);
-        pointAnnotationManager = com.mapbox.maps.plugin.annotation.generated.PointAnnotationManagerKt.createPointAnnotationManager(
+        pointAnnotationManager = PointAnnotationManagerKt.createPointAnnotationManager(
                 annotationPlugin,
                 new AnnotationConfig()
         );
@@ -73,10 +71,8 @@ public class MapHelper {
             List<LocationDTO> stopLocations) {
 
         mainHandler.post(() -> {
-            // Draw route line
             drawRouteLine(routeCoordinates);
 
-            // Markers
             List<MapboxDirections.Coordinate> markerCoords = new ArrayList<>();
             markerCoords.add(new MapboxDirections.Coordinate(originLng, originLat));
 
@@ -153,12 +149,20 @@ public class MapHelper {
     }
 
     private void addRouteMarkers(List<MapboxDirections.Coordinate> coordinates) {
+        if (pointAnnotationManager == null) {
+            initializeAnnotationManager();
+        }
+
         pointAnnotationManager.deleteAll();
+        vehicleAnnotation = null;
 
         mapView.getMapboxMap().getStyle(style -> {
-            style.addImage(ICON_ORIGIN, drawableToBitmap(R.drawable.taxi_map_svg));
-            style.addImage(ICON_STOP, drawableToBitmap(R.drawable.stop_map_svg));
-            style.addImage(ICON_DEST, drawableToBitmap(R.drawable.destination_map_svg));
+            try {
+                style.addImage(ICON_ORIGIN, drawableToBitmap(R.drawable.taxi_map_svg));
+                style.addImage(ICON_STOP, drawableToBitmap(R.drawable.stop_map_svg));
+                style.addImage(ICON_DEST, drawableToBitmap(R.drawable.destination_map_svg));
+            } catch (Exception ignored) {
+            }
 
             addMarker(coordinates.get(0).lng, coordinates.get(0).lat, ICON_ORIGIN);
 
@@ -170,22 +174,61 @@ public class MapHelper {
         });
     }
 
+    public void updateVehicleMarker(double lng, double lat) {
+        updateVehicleMarker(lng, lat, 999);
+    }
+
+    public void updateVehicleMarker(double lng, double lat, int etaMinutes) {
+        mainHandler.post(() -> {
+            if (pointAnnotationManager == null) {
+                initializeAnnotationManager();
+            }
+
+            Point point = Point.fromLngLat(lng, lat);
+
+            if (vehicleAnnotation == null) {
+                PointAnnotationOptions options = new PointAnnotationOptions()
+                        .withPoint(point)
+                        .withIconImage(ICON_ORIGIN)
+                        .withIconSize(1.4);
+
+                vehicleAnnotation = pointAnnotationManager.create(options);
+            } else {
+                vehicleAnnotation.setPoint(point);
+                pointAnnotationManager.update(vehicleAnnotation);
+            }
+
+            double zoom = etaMinutes <= 7 ? 14.0 : 12.0;
+
+            mapView.getMapboxMap().setCamera(
+                    new com.mapbox.maps.CameraOptions.Builder()
+                            .center(point)
+                            .zoom(zoom)
+                            .build()
+            );
+        });
+    }
+
     private android.graphics.Bitmap drawableToBitmap(int drawableId) {
         android.graphics.drawable.Drawable drawable = androidx.core.content.ContextCompat.getDrawable(mapView.getContext(), drawableId);
         if (drawable == null) return null;
+
         android.graphics.Bitmap bitmap = android.graphics.Bitmap.createBitmap(
                 drawable.getIntrinsicWidth(),
                 drawable.getIntrinsicHeight(),
-                android.graphics.Bitmap.Config.ARGB_8888);
+                android.graphics.Bitmap.Config.ARGB_8888
+        );
+
         android.graphics.Canvas canvas = new android.graphics.Canvas(bitmap);
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
+
         return bitmap;
     }
 
     private void addMarker(double lng, double lat, String iconId) {
-        com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions options =
-                new com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions()
+        PointAnnotationOptions options =
+                new PointAnnotationOptions()
                         .withPoint(Point.fromLngLat(lng, lat))
                         .withIconImage(iconId)
                         .withIconSize(1.2);
@@ -203,7 +246,7 @@ public class MapHelper {
 
         com.mapbox.maps.CameraOptions cameraOptions = mapView.getMapboxMap().cameraForCoordinates(
                 points,
-                new com.mapbox.maps.EdgeInsets(200.0, 100.0, 200.0, 100.0), // Padding: top, left, bottom, right
+                new com.mapbox.maps.EdgeInsets(200.0, 100.0, 200.0, 100.0),
                 null,
                 null
         );
