@@ -24,4 +24,6 @@ public interface RideService {
     void cancelAnyRide(Long rideId, RideCancellationRequestDTO request);
     PassengerRideDetailsResponseDTO getRideDetails(Long rideId);
 
+    RideTrackingResponseDTO getRideTracking(Long rideId);
+
 }

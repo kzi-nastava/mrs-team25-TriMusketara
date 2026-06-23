@@ -1,10 +1,12 @@
 package com.example.clickanddrive.clients.services;
 
 import com.example.clickanddrive.dtosample.requests.CreateRideRequest;
+import com.example.clickanddrive.dtosample.requests.InconsistencyReportRequest;
 import com.example.clickanddrive.dtosample.requests.ReviewRequest;
 import com.example.clickanddrive.dtosample.requests.RideCancellationRequest;
 import com.example.clickanddrive.dtosample.requests.RideStopRequest;
 import com.example.clickanddrive.dtosample.responses.RideResponse;
+import com.example.clickanddrive.dtosample.responses.RideTrackingResponse;
 import com.example.clickanddrive.dtosample.responses.ScheduledRideResponse;
 
 import java.util.List;
@@ -28,6 +30,15 @@ public interface RideService {
 
     @POST("rides/{id}/start")
     Call<Void> startRide(@Path("id") Long rideId, @Body Map<String, Boolean> body);
+
+    @GET("rides/{id}/tracking")
+    Call<RideTrackingResponse> getRideTracking(@Path("id") Long rideId);
+
+    @POST("rides/{id}/inconsistency-report")
+    Call<Void> reportInconsistency(
+            @Path("id") Long rideId,
+            @Body InconsistencyReportRequest request
+    );
 
     @POST("rides/cancel/{id}")
     Call<Void> cancelRide(@Path("id") Long rideId, @Body RideCancellationRequest request);
