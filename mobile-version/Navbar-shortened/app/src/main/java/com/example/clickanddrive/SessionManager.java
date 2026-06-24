@@ -8,6 +8,8 @@ public class SessionManager {
   
     public static int currentUserType = GUEST;
 
+    public static String userEmail = null;
+
     public static String token = null;  // JWT token
     public static Long userId = null;   // ID korisnika
 
@@ -16,9 +18,10 @@ public class SessionManager {
     private static boolean isBlocked = false;
     private static String blockReason = null;
 
-    public static void login(String role, String jwtToken, Long id, boolean blocked, String reason) {
+    public static void login(String role, String jwtToken, Long id, String email, boolean blocked, String reason) {
         token = jwtToken;
         userId = id;
+        userEmail = email;
         isBlocked = blocked;
         blockReason = reason;
 
@@ -44,6 +47,7 @@ public class SessionManager {
         userId = null;
         isBlocked = false;
         blockReason = null;
+        userEmail = null;
     }
 
     public static boolean isUserBlocked() {

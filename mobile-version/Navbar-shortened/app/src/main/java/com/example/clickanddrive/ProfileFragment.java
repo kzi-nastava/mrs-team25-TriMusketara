@@ -360,7 +360,7 @@ public class ProfileFragment extends Fragment {
                 addButton("Favorite routes", R.drawable.heart ,() -> openFavoriteRoutesFragment());
                 addButton("Ride history", R.drawable.history, this::openUserHistoryFragment);
                 addButton("Reports", R.drawable.report,  () -> {});
-                addButton("Support", R.drawable.support, () -> {});
+                addButton("Support", R.drawable.support, this::openChatFragment);
                 addButton("Log out", R.drawable.logout, () -> {
                     if (isAdded() && getActivity() instanceof MainActivity) {
                         ((MainActivity) getActivity()).logoutAndGoToLoginSafe();
@@ -372,7 +372,7 @@ public class ProfileFragment extends Fragment {
                 addButton("Ride history", R.drawable.history,  () -> openDriverHistoryFragment());
                 addButton("Reports", R.drawable.report,  () -> {});
                 addButton("Notes", R.drawable.notes, () -> openDriverNotesFragment());
-                addButton("Support", R.drawable.support, () -> {});
+                addButton("Support", R.drawable.support, this::openChatFragment);
                 addButton("Log out", R.drawable.logout, () -> {
                     if (isAdded() && getActivity() instanceof MainActivity) {
                         ((MainActivity) getActivity()).logoutAndGoToLoginSafe();
@@ -386,6 +386,7 @@ public class ProfileFragment extends Fragment {
                 addButton("Change prices", R.drawable.price, () -> {});
                 addButton("Ride history", R.drawable.history, this::openAdminHistoryFragment);
                 addButton("Reports", R.drawable.report,  () -> {});
+                addButton("Support", R.drawable.support, this::openChatFragment);
                 addButton("Block a user", R.drawable.block_icon,  () -> openBlockAUserFragment());
                 addButton("Log out", R.drawable.logout, () -> {
                     if (isAdded() && getActivity() instanceof MainActivity) {
@@ -491,6 +492,14 @@ public class ProfileFragment extends Fragment {
         DriverNotesFragment fragment = new DriverNotesFragment();
         requireActivity().getSupportFragmentManager()
                 .beginTransaction().replace(R.id.flFragment, fragment).addToBackStack(null).commit();
+    }
+
+    private void openChatFragment() {
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.flFragment, new ChatFragment())
+                .addToBackStack(null)
+                .commit();
     }
 
 

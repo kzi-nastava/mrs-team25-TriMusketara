@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
             }else if (id == R.id.scheduled_rides) {
                 setCurrentFragment(scheduledRidesFragment);
                 return true;
-            } else if (id == R.id.support) {
+            }  else if (id == R.id.panic_notifications) {
                 setCurrentFragment(panicNotificationsFragment);
                 return true;
             }

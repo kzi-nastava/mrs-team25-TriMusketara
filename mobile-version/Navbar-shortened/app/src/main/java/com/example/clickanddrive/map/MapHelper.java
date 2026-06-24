@@ -198,7 +198,7 @@ public class MapHelper {
                 pointAnnotationManager.update(vehicleAnnotation);
             }
 
-            double zoom = etaMinutes <= 7 ? 14.0 : 12.0;
+            double zoom = etaMinutes <= 5 ? 14.0 : 12.0;
 
             mapView.getMapboxMap().setCamera(
                     new com.mapbox.maps.CameraOptions.Builder()
