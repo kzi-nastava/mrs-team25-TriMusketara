@@ -79,6 +79,7 @@ public class LoginFragment extends Fragment {
                     SessionManager.login(loginResponse.getRole(),
                             loginResponse.getToken(),
                             loginResponse.getUserId(),
+                            loginResponse.getEmail(),
                             loginResponse.isBlocked(),
                             loginResponse.getBlockReason());
 

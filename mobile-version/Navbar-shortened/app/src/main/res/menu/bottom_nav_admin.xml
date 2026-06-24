@@ -3,9 +3,10 @@
     <item android:title="Home"
         android:id="@+id/home"
         android:icon="@drawable/home"/>
-    <item android:title="Support"
-        android:id="@+id/support"
-        android:icon="@drawable/support"/>
+    <item
+        android:title="Panic"
+        android:id="@+id/panic_notifications"
+        android:icon="@drawable/report" />
     <item android:title="Profile"
         android:id="@+id/profile"
         android:icon="@drawable/profile_icon"/>

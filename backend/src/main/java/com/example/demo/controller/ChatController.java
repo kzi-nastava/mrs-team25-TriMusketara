@@ -9,7 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/chat")
@@ -41,13 +44,34 @@ public class ChatController {
         m.setSentAt(LocalDateTime.now());
 
         messageRepository.save(m);
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(new ChatMessageDTO(
+                m.getContent(),
+                m.getFrom().getEmail(),
+                m.getTo().getEmail(),
+                m.getSentAt(),
+                m.isSeen()
+        ));
     }
 
     @GetMapping("/admin/users/{adminEmail:.+}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<String>> getChatUsers(@PathVariable String adminEmail) {
-        return ResponseEntity.ok(messageRepository.findUserEmailsWhoChatedWithAdmin(adminEmail));
+        List<Message> messages = messageRepository.findAdminChatMessagesOrderedByNewest(adminEmail);
+
+        Set<String> users = new LinkedHashSet<>();
+
+        for (Message message : messages) {
+            String senderEmail = message.getFrom().getEmail();
+            String receiverEmail = message.getTo().getEmail();
+
+            if (senderEmail.equals(adminEmail)) {
+                users.add(receiverEmail);
+            } else {
+                users.add(senderEmail);
+            }
+        }
+
+        return ResponseEntity.ok(new ArrayList<>(users));
     }
 
     @PutMapping("/seen/{receiverEmail:.+}/{senderEmail:.+}")
