@@ -46,7 +46,7 @@ public class RideServiceImpl implements RideService {
     private final VehiclePriceRepository vehiclePriceRepository;
 
     //Other
-    private static final double TRACKING_SIMULATION_SPEED = 10.0;
+    private static final double TRACKING_SIMULATION_SPEED = 5.0;
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
