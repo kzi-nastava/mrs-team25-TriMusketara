@@ -17,11 +17,12 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.clickanddrive.clients.ClientUtils;
+import com.example.clickanddrive.dtosample.LocationDTO;
+import com.example.clickanddrive.dtosample.responses.AdminRideDetailsResponse;
 import com.example.clickanddrive.dtosample.responses.AdminRideStateResponse;
 import com.example.clickanddrive.dtosample.responses.RideTrackingResponse;
 import com.example.clickanddrive.map.MapHelper;
 import com.example.clickanddrive.map.MapboxDirections;
-import com.example.clickanddrive.map.MapboxGeocoder;
 import com.mapbox.geojson.Point;
 import com.mapbox.maps.CameraOptions;
 import com.mapbox.maps.MapView;
@@ -40,6 +41,7 @@ public class AdminActiveRidesFragment extends Fragment {
 
     private final Handler refreshHandler = new Handler(Looper.getMainLooper());
     private final List<AdminRideStateResponse> activeRides = new ArrayList<>();
+    private final List<MapboxDirections.Coordinate> trackingRouteCoordinates = new ArrayList<>();
 
     private MapView mapView;
     private MapHelper mapHelper;
@@ -54,6 +56,7 @@ public class AdminActiveRidesFragment extends Fragment {
 
     private Long selectedRideId;
     private Long drawnRouteRideId;
+    private int mapboxDurationMinutes = 0;
     private boolean mapStyleLoaded = false;
 
     private final Runnable refreshRunnable = new Runnable() {
@@ -97,9 +100,20 @@ public class AdminActiveRidesFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 AdminRideStateResponse ride = activeRides.get(position);
-                selectedRideId = ride.getRideId();
+
+                if (ride.getRideId() == null) {
+                    return;
+                }
+
+                if (!ride.getRideId().equals(selectedRideId)) {
+                    selectedRideId = ride.getRideId();
+                    drawnRouteRideId = null;
+                    trackingRouteCoordinates.clear();
+                    mapboxDurationMinutes = 0;
+                }
+
                 bindRideInfo(ride);
-                drawRouteIfNeeded(ride);
+                loadRideDetailsAndDrawRoute(ride.getRideId());
                 fetchTracking();
             }
 
@@ -114,6 +128,7 @@ public class AdminActiveRidesFragment extends Fragment {
                 .build();
 
         mapView.getMapboxMap().setCamera(cameraOptions);
+
         mapView.getMapboxMap().loadStyleUri(Style.DARK, style -> {
             mapStyleLoaded = true;
             mapHelper = new MapHelper(mapView);
@@ -143,12 +158,13 @@ public class AdminActiveRidesFragment extends Fragment {
 
                 if (response.isSuccessful() && response.body() != null) {
                     Long previousSelection = selectedRideId;
+
                     activeRides.clear();
                     activeRides.addAll(response.body());
                     rideAdapter.notifyDataSetChanged();
+
                     updateEmptyState();
                     restoreSelection(previousSelection);
-                    fetchTracking();
                 } else if (showErrors) {
                     Toast.makeText(getContext(), "Failed to load active rides", Toast.LENGTH_SHORT).show();
                 }
@@ -169,11 +185,14 @@ public class AdminActiveRidesFragment extends Fragment {
         if (activeRides.isEmpty()) {
             selectedRideId = null;
             drawnRouteRideId = null;
+            trackingRouteCoordinates.clear();
+            mapboxDurationMinutes = 0;
             bindNoRide();
             return;
         }
 
         int selectedIndex = 0;
+
         if (previousSelection != null) {
             for (int i = 0; i < activeRides.size(); i++) {
                 if (previousSelection.equals(activeRides.get(i).getRideId())) {
@@ -187,8 +206,154 @@ public class AdminActiveRidesFragment extends Fragment {
 
         AdminRideStateResponse selectedRide = activeRides.get(selectedIndex);
         selectedRideId = selectedRide.getRideId();
+
         bindRideInfo(selectedRide);
-        drawRouteIfNeeded(selectedRide);
+        loadRideDetailsAndDrawRoute(selectedRide.getRideId());
+        fetchTracking();
+    }
+
+    private void loadRideDetailsAndDrawRoute(Long rideId) {
+        if (!mapStyleLoaded || rideId == null || rideId.equals(drawnRouteRideId)) {
+            return;
+        }
+
+        ClientUtils.adminService.getRideDetails(rideId).enqueue(new Callback<AdminRideDetailsResponse>() {
+            @Override
+            public void onResponse(Call<AdminRideDetailsResponse> call,
+                                   Response<AdminRideDetailsResponse> response) {
+                if (!isAdded()) return;
+
+                if (response.isSuccessful() && response.body() != null) {
+                    drawRoute(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AdminRideDetailsResponse> call, Throwable t) {
+                if (!isAdded()) return;
+                Toast.makeText(getContext(), "Failed to load route details", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void drawRoute(AdminRideDetailsResponse details) {
+        LocationDTO origin = details.getOrigin();
+        LocationDTO destination = details.getDestination();
+
+        if (origin == null || destination == null) {
+            Toast.makeText(getContext(), "Route coordinates are missing", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        List<MapboxDirections.Coordinate> waypoints = new ArrayList<>();
+        waypoints.add(new MapboxDirections.Coordinate(origin.getLongitude(), origin.getLatitude()));
+        waypoints.add(new MapboxDirections.Coordinate(destination.getLongitude(), destination.getLatitude()));
+
+        new MapboxDirections().getRoute(waypoints, new MapboxDirections.DirectionsCallback() {
+            @Override
+            public void onSuccess(MapboxDirections.RouteResult result) {
+                if (!isAdded()) return;
+
+                requireActivity().runOnUiThread(() -> {
+                    if (mapHelper == null) {
+                        mapHelper = new MapHelper(mapView);
+                    }
+
+                    mapHelper.drawPreCalculatedRoute(
+                            result.routeCoordinates,
+                            origin.getLongitude(),
+                            origin.getLatitude(),
+                            destination.getLongitude(),
+                            destination.getLatitude(),
+                            null
+                    );
+
+                    trackingRouteCoordinates.clear();
+                    trackingRouteCoordinates.addAll(result.routeCoordinates);
+                    mapboxDurationMinutes = result.durationMinutes;
+                    drawnRouteRideId = details.getRideId();
+                });
+            }
+
+            @Override
+            public void onError(String error) {
+                if (!isAdded()) return;
+
+                requireActivity().runOnUiThread(() ->
+                        Toast.makeText(getContext(), "Map route error: " + error, Toast.LENGTH_SHORT).show()
+                );
+            }
+        });
+    }
+
+    private void fetchTracking() {
+        if (selectedRideId == null || mapHelper == null) {
+            return;
+        }
+
+        ClientUtils.rideService.getRideTracking(selectedRideId).enqueue(new Callback<RideTrackingResponse>() {
+            @Override
+            public void onResponse(Call<RideTrackingResponse> call,
+                                   Response<RideTrackingResponse> response) {
+                if (!isAdded()) return;
+
+                if (response.isSuccessful() && response.body() != null) {
+                    RideTrackingResponse tracking = response.body();
+
+                    int etaFromMapbox = calculateEtaFromMapboxDuration(tracking.getProgressPercent());
+
+                    tvRideStatus.setText("Status: " + safe(tracking.getStatus()));
+                    tvEta.setText("ETA: "
+                            + etaFromMapbox
+                            + " min ("
+                            + tracking.getProgressPercent()
+                            + "%)");
+
+                    if (!trackingRouteCoordinates.isEmpty()) {
+                        updateVehicleMarkerOnRoute(
+                                tracking.getProgressPercent(),
+                                etaFromMapbox
+                        );
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RideTrackingResponse> call, Throwable t) {
+                if (!isAdded()) return;
+                Toast.makeText(getContext(), "Tracking update failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateVehicleMarkerOnRoute(double progressPercent, int etaMinutes) {
+        if (mapHelper == null || trackingRouteCoordinates.isEmpty()) {
+            return;
+        }
+
+        double normalizedProgress = Math.max(0.0, Math.min(100.0, progressPercent)) / 100.0;
+
+        int lastIndex = trackingRouteCoordinates.size() - 1;
+        int routeIndex = (int) Math.round(normalizedProgress * lastIndex);
+
+        routeIndex = Math.max(0, Math.min(lastIndex, routeIndex));
+
+        MapboxDirections.Coordinate coordinate = trackingRouteCoordinates.get(routeIndex);
+
+        mapHelper.updateVehicleMarker(coordinate.lng, coordinate.lat, etaMinutes);
+    }
+
+    private int calculateEtaFromMapboxDuration(double progressPercent) {
+        if (mapboxDurationMinutes <= 0) {
+            return 0;
+        }
+
+        double normalizedProgress = Math.max(0.0, Math.min(100.0, progressPercent)) / 100.0;
+
+        return Math.max(
+                0,
+                (int) Math.ceil(mapboxDurationMinutes * (1.0 - normalizedProgress))
+        );
     }
 
     private void updateEmptyState() {
@@ -207,126 +372,10 @@ public class AdminActiveRidesFragment extends Fragment {
 
     private void bindRideInfo(AdminRideStateResponse ride) {
         tvRideStatus.setText("Status: " + safe(ride.getStatus()));
+        tvEta.setText("ETA: calculating...");
         tvDriver.setText("Driver: " + safe(ride.getDriverEmail()));
         tvPassengers.setText("Passengers: " + formatPassengers(ride.getPassengerEmails()));
         tvRoute.setText("Route: " + safe(ride.getOriginAddress()) + " -> " + safe(ride.getDestinationAddress()));
-    }
-
-    private void fetchTracking() {
-        if (selectedRideId == null || mapHelper == null) {
-            return;
-        }
-
-        ClientUtils.rideService.getRideTracking(selectedRideId).enqueue(new Callback<RideTrackingResponse>() {
-            @Override
-            public void onResponse(Call<RideTrackingResponse> call, Response<RideTrackingResponse> response) {
-                if (!isAdded()) return;
-
-                if (response.isSuccessful() && response.body() != null) {
-                    RideTrackingResponse tracking = response.body();
-
-                    tvRideStatus.setText("Status: " + safe(tracking.getStatus()));
-                    tvEta.setText("ETA: " + tracking.getEstimatedTimeInMinutes()
-                            + " min (" + tracking.getProgressPercent() + "%)");
-
-                    if (tracking.getVehicleLocation() != null) {
-                        mapHelper.updateVehicleMarker(
-                                tracking.getVehicleLocation().getLongitude(),
-                                tracking.getVehicleLocation().getLatitude(),
-                                tracking.getEstimatedTimeInMinutes()
-                        );
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<RideTrackingResponse> call, Throwable t) {
-                if (!isAdded()) return;
-                Toast.makeText(getContext(), "Tracking update failed", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void drawRouteIfNeeded(AdminRideStateResponse ride) {
-        if (!mapStyleLoaded || ride == null || ride.getRideId() == null || ride.getRideId().equals(drawnRouteRideId)) {
-            return;
-        }
-
-        String origin = ride.getOriginAddress();
-        String destination = ride.getDestinationAddress();
-
-        if (origin == null || origin.trim().isEmpty() || destination == null || destination.trim().isEmpty()) {
-            return;
-        }
-
-        geocodeAddressPair(ride.getRideId(), origin, destination);
-    }
-
-    private void geocodeAddressPair(Long rideId, String origin, String destination) {
-        new MapboxGeocoder().geocode(origin, new MapboxGeocoder.GeocodeCallback() {
-            @Override
-            public void onSuccess(double originLng, double originLat) {
-                new MapboxGeocoder().geocode(destination, new MapboxGeocoder.GeocodeCallback() {
-                    @Override
-                    public void onSuccess(double destLng, double destLat) {
-                        requestDirections(rideId, originLng, originLat, destLng, destLat);
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        showMapError("Destination geocoding failed");
-                    }
-                });
-            }
-
-            @Override
-            public void onError(String error) {
-                showMapError("Origin geocoding failed");
-            }
-        });
-    }
-
-    private void requestDirections(Long rideId, double originLng, double originLat, double destLng, double destLat) {
-        List<MapboxDirections.Coordinate> waypoints = new ArrayList<>();
-        waypoints.add(new MapboxDirections.Coordinate(originLng, originLat));
-        waypoints.add(new MapboxDirections.Coordinate(destLng, destLat));
-
-        new MapboxDirections().getRoute(waypoints, new MapboxDirections.DirectionsCallback() {
-            @Override
-            public void onSuccess(MapboxDirections.RouteResult result) {
-                if (!isAdded()) return;
-
-                requireActivity().runOnUiThread(() -> {
-                    if (mapHelper == null) {
-                        mapHelper = new MapHelper(mapView);
-                    }
-
-                    mapHelper.drawPreCalculatedRoute(
-                            result.routeCoordinates,
-                            originLng,
-                            originLat,
-                            destLng,
-                            destLat,
-                            null
-                    );
-
-                    drawnRouteRideId = rideId;
-                });
-            }
-
-            @Override
-            public void onError(String error) {
-                showMapError("Map route error");
-            }
-        });
-    }
-
-    private void showMapError(String message) {
-        if (!isAdded()) return;
-
-        requireActivity().runOnUiThread(() ->
-                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show()
-        );
     }
 
     private String formatPassengers(List<String> passengers) {
@@ -347,9 +396,13 @@ public class AdminActiveRidesFragment extends Fragment {
 
         refreshHandler.removeCallbacks(refreshRunnable);
         activeRides.clear();
+        trackingRouteCoordinates.clear();
+
         selectedRideId = null;
         drawnRouteRideId = null;
+        mapboxDurationMinutes = 0;
         mapStyleLoaded = false;
+
         mapView = null;
         mapHelper = null;
     }

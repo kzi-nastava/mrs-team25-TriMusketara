@@ -13,94 +13,161 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="18dp"
-            android:gravity="center"
-            android:text="Ride prices"
-            android:textColor="@color/profile_bg"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             app:cardBackgroundColor="@color/nav_bg"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
+            app:cardCornerRadius="14dp"
+            app:cardElevation="6dp"
+            app:strokeColor="@color/profile_bg"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="24dp">
 
-                <EditText
-                    android:id="@+id/etStandardPrice"
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="@color/whiteish"
-                    android:hint="Standard base price"
-                    android:inputType="numberDecimal"
-                    android:minHeight="48dp"
-                    android:textColor="@color/user_input"
-                    android:textColorHint="@color/hint_color" />
+                    android:layout_marginBottom="26dp"
+                    android:gravity="center"
+                    android:text="Change prices"
+                    android:textColor="@color/profile_bg"
+                    android:textSize="24sp"
+                    android:textStyle="italic" />
 
-                <EditText
-                    android:id="@+id/etLuxuryPrice"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:backgroundTint="@color/whiteish"
-                    android:hint="Luxury base price"
-                    android:inputType="numberDecimal"
-                    android:minHeight="48dp"
-                    android:textColor="@color/user_input"
-                    android:textColorHint="@color/hint_color" />
+                    android:layout_marginBottom="14dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                <EditText
-                    android:id="@+id/etVanPrice"
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Standard:"
+                        android:textColor="@color/white"
+                        android:textSize="18sp" />
+
+                    <EditText
+                        android:id="@+id/etStandardPrice"
+                        android:layout_width="120dp"
+                        android:layout_height="38dp"
+                        android:backgroundTint="#B8B8B8"
+                        android:gravity="center"
+                        android:inputType="numberDecimal"
+                        android:textColor="@color/white"
+                        android:textColorHint="#555555"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:backgroundTint="@color/whiteish"
-                    android:hint="Van base price"
-                    android:inputType="numberDecimal"
-                    android:minHeight="48dp"
-                    android:textColor="@color/user_input"
-                    android:textColorHint="@color/hint_color" />
+                    android:layout_marginBottom="14dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                <EditText
-                    android:id="@+id/etPerKmPrice"
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Luxury:"
+                        android:textColor="@color/white"
+                        android:textSize="18sp" />
+
+                    <EditText
+                        android:id="@+id/etLuxuryPrice"
+                        android:layout_width="120dp"
+                        android:layout_height="38dp"
+                        android:backgroundTint="#B8B8B8"
+                        android:gravity="center"
+                        android:inputType="numberDecimal"
+                        android:textColor="@color/white"
+                        android:textColorHint="#555555"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:backgroundTint="@color/whiteish"
-                    android:hint="Price per km"
-                    android:inputType="numberDecimal"
-                    android:minHeight="48dp"
-                    android:textColor="@color/user_input"
-                    android:textColorHint="@color/hint_color" />
+                    android:layout_marginBottom="14dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Van:"
+                        android:textColor="@color/white"
+                        android:textSize="18sp" />
+
+                    <EditText
+                        android:id="@+id/etVanPrice"
+                        android:layout_width="120dp"
+                        android:layout_height="38dp"
+                        android:backgroundTint="#B8B8B8"
+                        android:gravity="center"
+                        android:inputType="numberDecimal"
+                        android:textColor="@color/white"
+                        android:textColorHint="#555555"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="18dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Price per km:"
+                        android:textColor="@color/white"
+                        android:textSize="18sp" />
+
+                    <EditText
+                        android:id="@+id/etPerKmPrice"
+                        android:layout_width="120dp"
+                        android:layout_height="38dp"
+                        android:backgroundTint="#B8B8B8"
+                        android:gravity="center"
+                        android:inputType="numberDecimal"
+                        android:textColor="@color/white"
+                        android:textColorHint="#555555"
+                        android:textStyle="bold" />
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/tvPriceError"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center"
                     android:textColor="@color/redish"
                     android:textSize="14sp"
                     android:visibility="gone" />
 
                 <Button
                     android:id="@+id/btnSavePrices"
-                    style="@style/PrimaryButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
-                    android:text="Save prices"
-                    android:textAllCaps="false" />
+                    android:layout_height="52dp"
+                    android:backgroundTint="@color/profile_bg"
+                    android:text="Update prices"
+                    android:textAllCaps="false"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 </ScrollView>
