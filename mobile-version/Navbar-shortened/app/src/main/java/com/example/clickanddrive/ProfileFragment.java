@@ -382,8 +382,8 @@ public class ProfileFragment extends Fragment {
 
             case SessionManager.ADMIN:
                 addButton("Register new driver", R.drawable.driver_registration, () -> openDriverRegistrationFragment());
-                addButton("Check current rides", R.drawable.check_current_rides, () -> {});
-                addButton("Change prices", R.drawable.price, () -> {});
+                addButton("Check current rides", R.drawable.check_current_rides, this::openAdminActiveRidesFragment);
+                addButton("Change prices", R.drawable.price, this::openAdminPricesFragment);
                 addButton("Ride history", R.drawable.history, this::openAdminHistoryFragment);
                 addButton("Reports", R.drawable.report,  () -> {});
                 addButton("Support", R.drawable.support, this::openChatFragment);
@@ -466,6 +466,22 @@ public class ProfileFragment extends Fragment {
         requireActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.flFragment, new AdminHistoryFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+
+    private void openAdminActiveRidesFragment() {
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.flFragment, new AdminActiveRidesFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+
+    private void openAdminPricesFragment() {
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.flFragment, new AdminPricesFragment())
                 .addToBackStack(null)
                 .commit();
     }

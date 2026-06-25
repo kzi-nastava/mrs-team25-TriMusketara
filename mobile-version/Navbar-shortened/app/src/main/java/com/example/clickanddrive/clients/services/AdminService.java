@@ -7,6 +7,8 @@ import com.example.clickanddrive.dtosample.responses.AdminRideHistoryResponse;
 import com.example.clickanddrive.dtosample.responses.AdminUserResponse;
 import com.example.clickanddrive.dtosample.responses.DriverRegistrationResponse;
 import com.example.clickanddrive.dtosample.responses.UserProfileResponse;
+import com.example.clickanddrive.dtosample.VehiclePriceDTO;
+import com.example.clickanddrive.dtosample.responses.AdminRideStateResponse;
 
 import java.util.List;
 
@@ -59,4 +61,13 @@ public interface AdminService {
 
     @GET("admin/rides/{id}")
     Call<AdminRideDetailsResponse> getRideDetails(@Path("id") Long rideId);
+
+    @GET("admin/rides/active")
+    Call<List<AdminRideStateResponse>> getActiveRides();
+
+    @GET("admin/prices")
+    Call<VehiclePriceDTO> getVehiclePrices();
+
+    @PUT("admin/prices")
+    Call<VehiclePriceDTO> updateVehiclePrices(@Body VehiclePriceDTO request);
 }
