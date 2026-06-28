@@ -100,6 +100,33 @@
                 android:layout_marginBottom="12dp"
                 android:visibility="gone" />
 
+            <!-- Favorites toggle -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:id="@+id/tvFavoriteLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Save route to favorites"
+                    android:textColor="@color/whiteish"
+                    android:textSize="15sp"
+                    android:alpha="0.85"/>
+
+                <ImageView
+                    android:id="@+id/ivFavoriteHeart"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/heart"
+                    android:padding="4dp"
+                    android:contentDescription="Add to favorites"/>
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/tvPetBaby"
                 android:layout_width="wrap_content"

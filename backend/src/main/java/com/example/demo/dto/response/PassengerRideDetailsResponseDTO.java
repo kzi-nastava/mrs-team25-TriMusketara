@@ -17,6 +17,8 @@ import java.util.List;
 public class PassengerRideDetailsResponseDTO {
     private Long id;
 
+    private Long routeId; // routeId for adding route to favorites
+
     private String driverEmail;
     private String driverName;
 

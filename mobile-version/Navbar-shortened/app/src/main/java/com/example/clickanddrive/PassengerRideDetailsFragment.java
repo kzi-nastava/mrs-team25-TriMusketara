@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,8 +17,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.clickanddrive.clients.ClientUtils;
+import com.example.clickanddrive.clients.services.PassengerService;
 import com.example.clickanddrive.dtosample.LocationDTO;
 import com.example.clickanddrive.dtosample.responses.PassengerRideDetailsResponse;
+import com.example.clickanddrive.dtosample.responses.RouteFromFavoritesResponse;
 import com.example.clickanddrive.map.MapHelper;
 import com.example.clickanddrive.map.MapboxDirections;
 import com.mapbox.geojson.Point;
@@ -51,6 +54,10 @@ public class PassengerRideDetailsFragment extends Fragment {
     private TextView tvReports;
     private TextView tvPetBaby;
     private Button btnRateRide;
+    private ImageView ivFavoriteHeart;
+
+    private Long currentRouteId = null;
+    private boolean isFavorite = false;
 
     private boolean routeDrawn = false;
     private boolean mapStyleLoaded = false;
@@ -91,12 +98,17 @@ public class PassengerRideDetailsFragment extends Fragment {
         tvReports = view.findViewById(R.id.tvReports);
         tvPetBaby = view.findViewById(R.id.tvPetBaby);
         btnRateRide = view.findViewById(R.id.btnRateRide);
+        ivFavoriteHeart = view.findViewById(R.id.ivFavoriteHeart);
 
         if (btnRateRide != null) {
             btnRateRide.setVisibility(View.GONE);
             btnRateRide.setOnClickListener(v -> openRateRideScreen());
         } else {
             Log.e(TAG, "btnRateRide is missing from fragment_passenger_ride_details.xml");
+        }
+
+        if (ivFavoriteHeart != null) {
+            ivFavoriteHeart.setOnClickListener(v -> toggleFavorite());
         }
 
         CameraOptions cameraOptions = new CameraOptions.Builder()
@@ -168,6 +180,18 @@ public class PassengerRideDetailsFragment extends Fragment {
     }
 
     private void bindData(PassengerRideDetailsResponse details) {
+        currentRouteId = details.getRouteId();
+
+        if (ivFavoriteHeart != null) {
+            boolean hasRoute = currentRouteId != null;
+            ivFavoriteHeart.setVisibility(hasRoute ? View.VISIBLE : View.GONE);
+            View label = getView() != null ? getView().findViewById(R.id.tvFavoriteLabel) : null;
+            if (label != null) label.setVisibility(hasRoute ? View.VISIBLE : View.GONE);
+
+            // Check if route already in favorites, if is color the heart
+            if (hasRoute) checkIfFavoriteAndUpdateHeart(currentRouteId);
+        }
+
         tvDriverName.setText("Driver: " + safe(details.getDriverName()));
         tvDriverEmail.setText("Email: " + safe(details.getDriverEmail()));
         tvStatus.setText("Status: " + safe(details.getStatus()));
@@ -234,6 +258,86 @@ public class PassengerRideDetailsFragment extends Fragment {
                 || normalized.equals("ENDED")
                 || normalized.contains("FINISH")
                 || normalized.contains("COMPLETE");
+    }
+
+    private void toggleFavorite() {
+        if (currentRouteId == null) {
+            Toast.makeText(getContext(), "Route data not available", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Long userId = SessionManager.userId;
+
+        if (isFavorite) {
+            // Remove from favorites
+            ClientUtils.passengerService.removeFromFavorites(userId, currentRouteId)
+                    .enqueue(new Callback<Void>() {
+
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            if (!isAdded()) return;
+                            if (response.isSuccessful()) {
+                                isFavorite = false;
+                                ivFavoriteHeart.setImageResource(R.drawable.heart);
+                                Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
+                            }
+                            else {
+                                Toast.makeText(getContext(), "Error removing from favorites", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+                            if (!isAdded()) return;
+                            Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        } else {
+            // Add to favorites
+            ClientUtils.passengerService.addToFavorites(userId, currentRouteId)
+                    .enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            if (!isAdded()) return;
+                            if (response.isSuccessful()) {
+                                isFavorite = true;
+                                ivFavoriteHeart.setImageResource(R.drawable.heart_full_red);
+                                Toast.makeText(getContext(), "Added to favorites", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getContext(), "Error adding to favorites", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+                            if (!isAdded()) return;
+                            Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+    }
+
+    private void checkIfFavoriteAndUpdateHeart(Long routeId) {
+        ClientUtils.passengerService.getFavoriteRoutes(SessionManager.userId, 0, 10000)
+                .enqueue(new Callback<PassengerService.PageResponse<RouteFromFavoritesResponse>>() {
+                    @Override
+                    public void onResponse(Call<PassengerService.PageResponse<RouteFromFavoritesResponse>> call, Response<PassengerService.PageResponse<RouteFromFavoritesResponse>> response) {
+                        if (!isAdded() || response.body() == null) return;
+
+                        boolean found = response.body().getContent().stream()
+                                .anyMatch(r -> routeId.equals(r.getId()));
+
+                        isFavorite = found;
+                        requireActivity().runOnUiThread(() -> ivFavoriteHeart.setImageResource(
+                                found ? R.drawable.heart_full_red : R.drawable.heart
+                        ));
+                    }
+
+                    @Override
+                    public void onFailure(Call<PassengerService.PageResponse<RouteFromFavoritesResponse>> call, Throwable t) {
+                        Log.w(TAG, "Could not check favorites status: " + t.getMessage());
+                    }
+                });
     }
 
     private void openRateRideScreen() {

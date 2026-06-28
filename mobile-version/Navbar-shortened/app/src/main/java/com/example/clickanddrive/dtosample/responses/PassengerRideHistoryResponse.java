@@ -7,8 +7,8 @@ import java.time.format.DateTimeFormatter;
 
 public class PassengerRideHistoryResponse {
     private Long id;
-    private String startTime;
-    private String endTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private LocationDTO origin;
     private LocationDTO destination;
     private double totalPrice;
@@ -22,12 +22,13 @@ public class PassengerRideHistoryResponse {
         return id;
     }
 
+    // Inace su ove funkcije  vracale Stringove, jer su datumi bili String, sad su datum, ali jos uvek vracamo string da ne menjamo sad na 100 mesta, ako bude trebao datum napraviti nov getter
     public String getStartTime() {
-        return startTime;
+        return startTime != null ? startTime.toString() : null;
     }
 
     public String getEndTime() {
-        return endTime;
+        return endTime != null ? endTime.toString() : null;
     }
 
     public LocationDTO getOrigin() {
@@ -58,22 +59,13 @@ public class PassengerRideHistoryResponse {
         this.expanded = expanded;
     }
 
+    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm");
     public String getFormattedStartTime() {
-        try {
-            LocalDateTime dt = LocalDateTime.parse(startTime);
-            return dt.format(DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm"));
-        } catch (Exception e) {
-            return startTime;
-        }
+        return startTime != null ? startTime.format(FMT) : "-";
     }
 
     public String getFormattedEndTime() {
-        try {
-            LocalDateTime dt = LocalDateTime.parse(endTime);
-            return dt.format(DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm"));
-        } catch (Exception e) {
-            return endTime;
-        }
+        return endTime != null ? endTime.format(FMT) : "-";
     }
 
     public String getFormattedDateRange() {

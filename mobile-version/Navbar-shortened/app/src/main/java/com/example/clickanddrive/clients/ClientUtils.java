@@ -15,12 +15,15 @@ import com.example.clickanddrive.clients.services.ChatService;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
 
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
@@ -63,8 +66,31 @@ public class ClientUtils {
     /*
      * Prvo je potrebno da definisemo retrofit instancu preko koje ce komunikacija ici
      * */
-    static Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context) ->
-        new JsonPrimitive(src.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))).create();
+    static Gson gson = new GsonBuilder()
+            // Serializer
+            .registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context)
+                    -> new JsonPrimitive(src.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
+            // Deserializer
+            .registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, type, ctx) -> {
+                JsonArray arr = json.getAsJsonArray();
+                return LocalDate.of(arr.get(0).getAsInt(), arr.get(1).getAsInt(), arr.get(2).getAsInt());
+            })
+            .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (json, type, ctx) -> {
+                if (json.isJsonArray()) {
+                    JsonArray arr = json.getAsJsonArray();
+                    int year  = arr.get(0).getAsInt();
+                    int month = arr.get(1).getAsInt();
+                    int day   = arr.get(2).getAsInt();
+                    int hour  = arr.size() > 3 ? arr.get(3).getAsInt() : 0;
+                    int min   = arr.size() > 4 ? arr.get(4).getAsInt() : 0;
+                    int sec   = arr.size() > 5 ? arr.get(5).getAsInt() : 0;
+                    return LocalDateTime.of(year, month, day, hour, min, sec);
+                } else {
+                    String s = json.getAsString();
+                    return LocalDateTime.parse(s, java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                }
+            })
+            .create();
 
     public static Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(SERVICE_API_PATH)
