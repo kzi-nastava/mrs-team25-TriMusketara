@@ -359,7 +359,7 @@ public class ProfileFragment extends Fragment {
             case SessionManager.USER:
                 addButton("Favorite routes", R.drawable.heart ,() -> openFavoriteRoutesFragment());
                 addButton("Ride history", R.drawable.history, this::openUserHistoryFragment);
-                addButton("Reports", R.drawable.report,  () -> {});
+                addButton("Reports", R.drawable.report,  () -> openReportsFragment());
                 addButton("Support", R.drawable.support, this::openChatFragment);
                 addButton("Log out", R.drawable.logout, () -> {
                     if (isAdded() && getActivity() instanceof MainActivity) {
@@ -370,7 +370,7 @@ public class ProfileFragment extends Fragment {
 
             case SessionManager.DRIVER:
                 addButton("Ride history", R.drawable.history,  () -> openDriverHistoryFragment());
-                addButton("Reports", R.drawable.report,  () -> {});
+                addButton("Reports", R.drawable.report,  () -> openReportsFragment());
                 addButton("Notes", R.drawable.notes, () -> openDriverNotesFragment());
                 addButton("Support", R.drawable.support, this::openChatFragment);
                 addButton("Log out", R.drawable.logout, () -> {
@@ -385,7 +385,7 @@ public class ProfileFragment extends Fragment {
                 addButton("Check current rides", R.drawable.check_current_rides, this::openAdminActiveRidesFragment);
                 addButton("Change prices", R.drawable.price, this::openAdminPricesFragment);
                 addButton("Ride history", R.drawable.history, this::openAdminHistoryFragment);
-                addButton("Reports", R.drawable.report,  () -> {});
+                addButton("Reports", R.drawable.report,  () -> openReportsFragment());
                 addButton("Support", R.drawable.support, this::openChatFragment);
                 addButton("Block a user", R.drawable.block_icon,  () -> openBlockAUserFragment());
                 addButton("Log out", R.drawable.logout, () -> {
@@ -518,5 +518,11 @@ public class ProfileFragment extends Fragment {
                 .commit();
     }
 
-
+    private void openReportsFragment() {
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.flFragment, new ReportsFragment())
+                .addToBackStack(null)
+                .commit();
+    }
 }
