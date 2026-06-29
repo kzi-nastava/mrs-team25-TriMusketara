@@ -21,6 +21,7 @@ public class CreateRideRequest {
     private boolean petFriendly;
     private int durationMinutes;
     private double distanceKm;
+    private Long favoriteRouteId; // null if the ride is not ordered from favorites
 
     public CreateRideRequest() {}
 
@@ -125,6 +126,9 @@ public class CreateRideRequest {
     public void setDistanceKm(double distanceKm) {
         this.distanceKm = distanceKm;
     }
+
+    public Long getFavoriteRouteId() { return favoriteRouteId; }
+    public void setFavoriteRouteId(Long favoriteRouteId) { this.favoriteRouteId = favoriteRouteId; }
 
     @NonNull
     @Override

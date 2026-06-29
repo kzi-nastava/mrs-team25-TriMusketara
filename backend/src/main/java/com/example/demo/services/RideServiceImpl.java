@@ -126,6 +126,14 @@ public class RideServiceImpl implements RideService {
         // Save the passenger who created the ride
         ride.setRideCreator(creator);
 
+        // If ordered from favorites
+        if (request.getFavoriteRouteId() != null) {
+            routeRepository.findById(request.getFavoriteRouteId()).ifPresent(favRoute -> {
+                favRoute.setTimesUsed(favRoute.getTimesUsed() + 1);
+                routeRepository.save(favRoute);
+            });
+        }
+
         // Assign driver to ride
         if (driver == null) { // There is no available driver at the moment
             ride.setStatus(RideStatus.FAILED); // later send notification
