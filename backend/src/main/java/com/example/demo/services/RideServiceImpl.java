@@ -51,6 +51,9 @@ public class RideServiceImpl implements RideService {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
+    @Autowired
+    private NotificationService notificationService;
+
     // Ride creation
     @Override
     public RideResponseDTO createRide(CreateRideRequestDTO request) {
@@ -156,6 +159,9 @@ public class RideServiceImpl implements RideService {
                     "/topic/driver/" + driver.getId() + "/rides",
                     Map.of("action", "NEW_RIDE", "timestamp", LocalDateTime.now().toString())
             );
+
+            // Save notif in db
+            notificationService.save(driver.getId(), "New ride assigned to you", ride.getId());
 
             // Send notifications and emails to linked passengers for this ride
             processNotifications(request.getPassengerEmails(), ride);

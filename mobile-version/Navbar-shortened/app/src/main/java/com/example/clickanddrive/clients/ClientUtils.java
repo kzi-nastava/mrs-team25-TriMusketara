@@ -4,6 +4,7 @@ import com.example.clickanddrive.BuildConfig;
 import com.example.clickanddrive.SessionManager;
 import com.example.clickanddrive.clients.services.AdminService;
 import com.example.clickanddrive.clients.services.DriverService;
+import com.example.clickanddrive.clients.services.NotificationService;
 import com.example.clickanddrive.clients.services.PanicService;
 import com.example.clickanddrive.clients.services.PassengerService;
 import com.example.clickanddrive.clients.services.ReportService;
@@ -125,4 +126,6 @@ public class ClientUtils {
     public static ChatService chatService = retrofit.create(ChatService.class);
 
     public static ReportService reportService = retrofit.create(ReportService.class);
+
+    public static NotificationService notificationService = retrofit.create(NotificationService.class);
 }

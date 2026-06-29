@@ -3,6 +3,7 @@ package com.example.clickanddrive;
 import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -26,6 +27,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                    != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(
+                        new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1
+                );
+            }
+        }
 
         // One bottom navigation bar will exist for all roles
         // However based on who is logged in, a different menu will be displayed in the nav bar
@@ -114,6 +124,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void logoutAndGoToLoginSafe() {
+
+        // Stop polling
+        NotificationPollingManager.stop();
+
         // Delete data from session
         SessionManager.logout();
 
