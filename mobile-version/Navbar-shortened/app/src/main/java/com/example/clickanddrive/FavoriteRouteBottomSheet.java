@@ -14,9 +14,22 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.clickanddrive.dtosample.responses.RouteFromFavoritesResponse;
+import com.example.clickanddrive.map.MapHelper;
+import com.example.clickanddrive.map.MapboxDirections;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.mapbox.geojson.Point;
+import com.mapbox.maps.CameraOptions;
+import com.mapbox.maps.MapView;
+import com.mapbox.maps.Style;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FavoriteRouteBottomSheet extends BottomSheetDialogFragment {
+
+    private MapView mapView;
+    private boolean mapStyleLoaded = false;
+    private boolean routeDrawn = false;
 
     public static FavoriteRouteBottomSheet newInstance(RouteFromFavoritesResponse route) {
 
@@ -59,6 +72,7 @@ public class FavoriteRouteBottomSheet extends BottomSheetDialogFragment {
         TextView durationTv = view.findViewById(R.id.route_duration);
         TextView usageTv = view.findViewById(R.id.route_used);
         Button orderAgainBtn = view.findViewById(R.id.btn_order_again);
+        mapView = view.findViewById(R.id.map_preview);
 
         if (getArguments() != null) {
             Long routeId = getArguments().getLong("routeId");
@@ -67,11 +81,20 @@ public class FavoriteRouteBottomSheet extends BottomSheetDialogFragment {
             double distance = getArguments().getDouble("distance");
             int duration = getArguments().getInt("duration");
             int usageCount = getArguments().getInt("timesUsed");
+            double originLat = getArguments().getDouble("originLat");
+            double originLng = getArguments().getDouble("originLng");
+            double destLat = getArguments().getDouble("destLat");
+            double destLng = getArguments().getDouble("destLng");
 
             routeTitle.setText(from + " - " + to);
             distanceTv.setText(String.format("%.1f", distance));
             durationTv.setText(String.format("%d min", duration));
             usageTv.setText(usageCount + "x");
+
+            mapView.getMapboxMap().loadStyleUri(Style.DARK, style -> {
+                mapStyleLoaded = true;
+                drawRoute(originLng, originLat, destLng, destLat);
+            });
         }
 
         // Order route again...
@@ -85,6 +108,61 @@ public class FavoriteRouteBottomSheet extends BottomSheetDialogFragment {
         });
 
         return view;
+    }
+
+    private void drawRoute(double originLng, double originLat,
+                           double destLng, double destLat) {
+        if (!mapStyleLoaded || routeDrawn) return;
+
+        List<MapboxDirections.Coordinate> waypoints = new ArrayList<>();
+        waypoints.add(new MapboxDirections.Coordinate(originLng, originLat));
+        waypoints.add(new MapboxDirections.Coordinate(destLng, destLat));
+
+        new MapboxDirections().getRoute(waypoints, new MapboxDirections.DirectionsCallback() {
+            @Override
+            public void onSuccess(MapboxDirections.RouteResult result) {
+                if (!isAdded() || mapView == null) return;
+
+                requireActivity().runOnUiThread(() -> {
+                    MapHelper mapHelper = new MapHelper(mapView);
+                    mapHelper.drawPreCalculatedRoute(
+                            result.routeCoordinates,
+                            originLng, originLat,
+                            destLng, destLat,
+                            null
+                    );
+                    routeDrawn = true;
+
+                    List<com.mapbox.geojson.Point> points = new ArrayList<>();
+                    for (MapboxDirections.Coordinate c : result.routeCoordinates) {
+                        points.add(com.mapbox.geojson.Point.fromLngLat(c.lng, c.lat));
+                    }
+                    mapView.post(() -> {
+                        if (mapView == null) return;
+                        com.mapbox.maps.CameraOptions fit = mapView.getMapboxMap()
+                                .cameraForCoordinates(
+                                        points,
+                                        new com.mapbox.maps.EdgeInsets(80.0, 80.0, 80.0, 80.0),
+                                        null, null
+                                );
+                        mapView.getMapboxMap().setCamera(fit);
+                    });
+                });
+            }
+
+            @Override
+            public void onError(String error) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mapStyleLoaded = false;
+        routeDrawn = false;
+        mapView = null;
     }
 
     private void handleOrderAgain() {
@@ -151,7 +229,4 @@ public class FavoriteRouteBottomSheet extends BottomSheetDialogFragment {
 
         dialog.show();
     }
-
-
 }
-
