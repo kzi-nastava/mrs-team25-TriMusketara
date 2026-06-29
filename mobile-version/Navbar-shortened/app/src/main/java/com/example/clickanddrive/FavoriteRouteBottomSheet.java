@@ -91,17 +91,6 @@ public class FavoriteRouteBottomSheet extends BottomSheetDialogFragment {
             durationTv.setText(String.format("%d min", duration));
             usageTv.setText(usageCount + "x");
 
-            // Center the camera between origin and destination
-            double centerLat = (originLat + destLat) / 2.0;
-            double centerLng = (originLng + destLng) / 2.0;
-
-            CameraOptions camera = new CameraOptions.Builder()
-                    .center(Point.fromLngLat(centerLng, centerLat))
-                    .zoom(8.0)
-                    .build();
-            mapView.getMapboxMap().setCamera(camera);
-
-            // Draw route
             mapView.getMapboxMap().loadStyleUri(Style.DARK, style -> {
                 mapStyleLoaded = true;
                 drawRoute(originLng, originLat, destLng, destLat);
@@ -143,6 +132,21 @@ public class FavoriteRouteBottomSheet extends BottomSheetDialogFragment {
                             null
                     );
                     routeDrawn = true;
+
+                    List<com.mapbox.geojson.Point> points = new ArrayList<>();
+                    for (MapboxDirections.Coordinate c : result.routeCoordinates) {
+                        points.add(com.mapbox.geojson.Point.fromLngLat(c.lng, c.lat));
+                    }
+                    mapView.post(() -> {
+                        if (mapView == null) return;
+                        com.mapbox.maps.CameraOptions fit = mapView.getMapboxMap()
+                                .cameraForCoordinates(
+                                        points,
+                                        new com.mapbox.maps.EdgeInsets(80.0, 80.0, 80.0, 80.0),
+                                        null, null
+                                );
+                        mapView.getMapboxMap().setCamera(fit);
+                    });
                 });
             }
 
