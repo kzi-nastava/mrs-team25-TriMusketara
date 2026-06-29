@@ -10,6 +10,7 @@ import android.view.View;
 
 import com.example.clickanddrive.dtosample.responses.DailyStats;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class BarChartView extends View {
@@ -130,13 +131,8 @@ public class BarChartView extends View {
 
     }
 
-    private String formatLabel(String isoDate) {
-        if (isoDate == null || isoDate.length() < 10) return "";
-        try {
-            String[] parts = isoDate.split("-");
-            return Integer.parseInt(parts[2]) + "." + Integer.parseInt(parts[1]);
-        } catch (Exception e) {
-            return isoDate.length() >= 7 ? isoDate.substring(5) : isoDate;
-        }
+    private String formatLabel(LocalDate date) {
+        if (date == null) return "";
+        return date.getDayOfMonth() + "." + date.getMonthValue();
     }
 }

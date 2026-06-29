@@ -273,7 +273,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="DAILY AVERAGES"
+                        android:text="AVERAGES PER RIDE"
                         android:textColor="@color/profile_bg"
                         android:textSize="13sp"
                         android:textStyle="bold"
@@ -290,12 +290,12 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Avg. rides / day"
+                            android:text="Avg. price / ride"
                             android:textColor="@color/whiteish"
                             android:textSize="14sp"
                             android:alpha="0.75" />
                         <TextView
-                            android:id="@+id/tv_avg_rides"
+                            android:id="@+id/tv_money_per_ride"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/whiteish"
@@ -320,7 +320,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Avg. km / day"
+                            android:text="Avg. distance / ride"
                             android:textColor="@color/whiteish"
                             android:textSize="14sp"
                             android:alpha="0.75" />
@@ -349,12 +349,12 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Avg. amount / day"
+                            android:text="Avg. rides / day"
                             android:textColor="@color/whiteish"
                             android:textSize="14sp"
                             android:alpha="0.75" />
                         <TextView
-                            android:id="@+id/tv_avg_money"
+                            android:id="@+id/tv_avg_rides"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/whiteish"

@@ -1,7 +1,9 @@
 package com.example.clickanddrive.dtosample.responses;
 
+import java.time.LocalDate;
+
 public class DailyStats {
-    private String date;
+    private LocalDate date;
     private int numberOfRides;
     private double totalKilometers;
     private double totalMoney;
@@ -9,11 +11,11 @@ public class DailyStats {
     private double cumulativeKilometers;
     private double cumulativeMoney;
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

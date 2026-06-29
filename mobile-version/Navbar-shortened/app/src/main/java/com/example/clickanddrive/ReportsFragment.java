@@ -45,7 +45,7 @@ public class ReportsFragment extends Fragment {
     private ProgressBar progressBar;
 
     private TextView tvTotalRides, tvTotalKm, tvTotalMoney;
-    private TextView tvAvgRides, tvAvgKm, tvAvgMoney;
+    private TextView tvAvgRides, tvAvgKm, tvAvgMoneyPerRide;
     private BarChartView barChartView;
 
     // --- State ---
@@ -97,7 +97,7 @@ public class ReportsFragment extends Fragment {
         tvTotalMoney = v.findViewById(R.id.tv_total_money);
         tvAvgRides   = v.findViewById(R.id.tv_avg_rides);
         tvAvgKm      = v.findViewById(R.id.tv_avg_km);
-        tvAvgMoney   = v.findViewById(R.id.tv_avg_money);
+        tvAvgMoneyPerRide   = v.findViewById(R.id.tv_money_per_ride);
         barChartView = v.findViewById(R.id.bar_chart_view);
     }
 
@@ -300,9 +300,14 @@ public class ReportsFragment extends Fragment {
         String moneyPrefix = isEarnings ? "+" : "-";
         tvTotalMoney.setText(moneyPrefix + String.format("%.0f", Math.abs(s.getTotalMoney())));
 
+        double avgPricePerRide = s.getTotalRides() > 0
+                ? Math.abs(s.getTotalMoney()) / s.getTotalRides() : 0;
+        double avgKmPerRide = s.getTotalRides() > 0
+                ? s.getTotalKilometers() / s.getTotalRides() : 0;
+
+        tvAvgMoneyPerRide.setText(String.format("%.0f RSD", avgPricePerRide));
+        tvAvgKm.setText(String.format("%.1f km", avgKmPerRide));
         tvAvgRides.setText(String.format("%.1f", s.getAvgRidesPerDay()));
-        tvAvgKm.setText(String.format("%.1f km", s.getAvgKilometersPerDay()));
-        tvAvgMoney.setText(String.format("%.0f RSD", Math.abs(s.getAvgMoneyPerDay())));
 
         // Chart
         if (report.getDailyStats() != null) {
