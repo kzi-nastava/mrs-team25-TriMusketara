@@ -15,12 +15,15 @@ import com.example.clickanddrive.clients.services.ChatService;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
 
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
@@ -63,8 +66,38 @@ public class ClientUtils {
     /*
      * Prvo je potrebno da definisemo retrofit instancu preko koje ce komunikacija ici
      * */
-    static Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context) ->
-        new JsonPrimitive(src.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))).create();
+    static Gson gson = new GsonBuilder()
+            // LocalDate: prima JSON array [year, month, day] sa backenda
+            .registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, type, ctx) -> {
+                JsonArray arr = json.getAsJsonArray();
+                return LocalDate.of(arr.get(0).getAsInt(), arr.get(1).getAsInt(), arr.get(2).getAsInt());
+            })
+            // LocalDateTime: jedan TypeAdapter koji radi i slanje i primanje
+            .registerTypeAdapter(LocalDateTime.class, new com.google.gson.TypeAdapter<LocalDateTime>() {
+                @Override
+                public void write(com.google.gson.stream.JsonWriter out, LocalDateTime value) throws java.io.IOException {
+                    if (value == null) { out.nullValue(); return; }
+                    out.value(value.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                }
+                @Override
+                public LocalDateTime read(com.google.gson.stream.JsonReader in) throws java.io.IOException {
+                    if (in.peek() == com.google.gson.stream.JsonToken.NULL) { in.nextNull(); return null; }
+                    if (in.peek() == com.google.gson.stream.JsonToken.BEGIN_ARRAY) {
+                        in.beginArray();
+                        int year = in.nextInt(), month = in.nextInt(), day = in.nextInt();
+                        int hour = 0, min = 0, sec = 0;
+                        if (in.hasNext()) hour = in.nextInt();
+                        if (in.hasNext()) min  = in.nextInt();
+                        if (in.hasNext()) sec  = in.nextInt();
+                        while (in.hasNext()) in.skipValue(); // nano i ostalo
+                        in.endArray();
+                        return LocalDateTime.of(year, month, day, hour, min, sec);
+                    } else {
+                        return LocalDateTime.parse(in.nextString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                    }
+                }
+            })
+            .create();
 
     public static Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(SERVICE_API_PATH)

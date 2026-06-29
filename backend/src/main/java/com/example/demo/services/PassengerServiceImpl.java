@@ -70,6 +70,25 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
+    @Transactional
+    public void addToFavoriteRoutes(Long passengerId, Long routeId) {
+        Passenger passenger = passengerRepository.findById(passengerId)
+                .orElseThrow(() -> new RuntimeException("Passenger not found"));
+
+        Route route = routeRepository.findById(routeId)
+                .orElseThrow(() -> new RuntimeException("Route not found"));
+
+        // No duplicates
+        boolean alreadyFavorite = passenger.getFavoriteRoutes().stream()
+                .anyMatch(r -> r.getId().equals(routeId));
+
+        if (!alreadyFavorite) {
+            passenger.getFavoriteRoutes().add(route);
+            passengerRepository.save(passenger);
+        }
+    }
+
+    @Override
     public List<UserProfileResponseDTO> getAllPassengers() {
         List<Passenger> passengers = passengerRepository.findAll();
 

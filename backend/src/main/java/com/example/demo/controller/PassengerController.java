@@ -37,6 +37,14 @@ public class PassengerController {
         return ResponseEntity.ok().build();
     }
 
+    // Add new route to favorites
+    @PostMapping("/{passengerId}/{routeId}/add-favorite")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Void> addToFavorites(@PathVariable Long passengerId, @PathVariable Long routeId) {
+        passengerService.addToFavoriteRoutes(passengerId, routeId);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/{id}/ride-history")
     public ResponseEntity<?> getPassengerHistory(@PathVariable Long id) {
 

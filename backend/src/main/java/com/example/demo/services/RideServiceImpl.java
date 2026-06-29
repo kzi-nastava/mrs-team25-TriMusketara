@@ -126,6 +126,14 @@ public class RideServiceImpl implements RideService {
         // Save the passenger who created the ride
         ride.setRideCreator(creator);
 
+        // If ordered from favorites
+        if (request.getFavoriteRouteId() != null) {
+            routeRepository.findById(request.getFavoriteRouteId()).ifPresent(favRoute -> {
+                favRoute.setTimesUsed(favRoute.getTimesUsed() + 1);
+                routeRepository.save(favRoute);
+            });
+        }
+
         // Assign driver to ride
         if (driver == null) { // There is no available driver at the moment
             ride.setStatus(RideStatus.FAILED); // later send notification
@@ -803,6 +811,7 @@ public class RideServiceImpl implements RideService {
 
         PassengerRideDetailsResponseDTO dto = new PassengerRideDetailsResponseDTO();
 
+        dto.setId(ride.getId());
         dto.setDriverEmail(ride.getDriver().getEmail());
         dto.setStartTime(ride.getStartTime());
         dto.setEndTime(ride.getEndTime());
@@ -816,6 +825,9 @@ public class RideServiceImpl implements RideService {
         }
 
         if (ride.getRoute() != null) {
+
+            dto.setRouteId(ride.getRoute().getId()); // for adding to favorites
+
             Location start = ride.getRoute().getOrigin();
             Location end = ride.getRoute().getDestination();
 

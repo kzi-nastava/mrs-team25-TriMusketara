@@ -383,6 +383,13 @@ public class NewRideUserFormFragment extends Fragment {
                 routeResult.distanceKm
         );
 
+        // If the form is oppened through favorite routes, send the routeId, so we can increment the timesUsed flag
+        if (getArguments() != null && getArguments().containsKey("FAVORITE_ROUTE_ID")) {
+            long favId = getArguments().getLong("FAVORITE_ROUTE_ID", -1L);
+
+            if (favId != -1L) request.setFavoriteRouteId(favId);
+        }
+
         sendRideToBackend(request, routeResult);
     }
 

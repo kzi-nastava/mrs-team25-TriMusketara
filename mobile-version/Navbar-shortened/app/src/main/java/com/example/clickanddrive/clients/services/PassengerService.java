@@ -9,6 +9,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -21,6 +22,10 @@ public interface PassengerService {
     // Remove a route from favorites list
     @DELETE("passenger/{passengerId}/{routeId}/remove-route")
     Call<Void> removeFromFavorites(@Path("passengerId") Long passengerId, @Path("routeId") Long routeId);
+
+    // Add a route to favorites
+    @POST("passenger/{passengerId}/{routeId}/add-favorite")
+    Call<Void> addToFavorites(@Path("passengerId") Long passengerId, @Path("routeId") Long routeId);
 
     @GET("passenger/{id}/ride-history")
     Call<List<PassengerRideHistoryResponse>> getPassengerRideHistory(@Path("id") Long id);

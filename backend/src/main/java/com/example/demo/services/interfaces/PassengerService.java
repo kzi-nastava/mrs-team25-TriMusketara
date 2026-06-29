@@ -13,4 +13,5 @@ public interface PassengerService {
     void removeFromFavoriteRoutes(Long passengerId, Long routeId);
     List<UserProfileResponseDTO> getAllPassengers();
     List<PassengerRideHistoryResponseDTO> getPassengerRideHistory(Long passengerId);
+    void addToFavoriteRoutes(Long passengerId, Long routeId);
 }
