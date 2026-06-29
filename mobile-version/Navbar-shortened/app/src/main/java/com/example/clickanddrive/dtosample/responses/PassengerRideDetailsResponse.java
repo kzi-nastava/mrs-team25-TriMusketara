@@ -2,15 +2,17 @@ package com.example.clickanddrive.dtosample.responses;
 
 import com.example.clickanddrive.dtosample.LocationDTO;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class PassengerRideDetailsResponse {
     private Long id;
+    private Long routeId; // for adding to favorites
     private String driverEmail;
     private String driverName;
     private Double totalPrice;
-    private String startTime;
-    private String endTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private String status;
     private LocationDTO origin;
     private LocationDTO destination;
@@ -22,6 +24,10 @@ public class PassengerRideDetailsResponse {
 
     public Long getId() {
         return id;
+    }
+
+    public Long getRouteId() {
+        return routeId;
     }
 
     public String getDriverEmail() {
@@ -37,11 +43,11 @@ public class PassengerRideDetailsResponse {
     }
 
     public String getStartTime() {
-        return startTime;
+        return startTime != null ? startTime.toString() : null;
     }
 
     public String getEndTime() {
-        return endTime;
+        return endTime != null ? endTime.toString() : null;
     }
 
     public String getStatus() {

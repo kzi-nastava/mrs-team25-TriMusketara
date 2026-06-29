@@ -50,4 +50,7 @@ public class CreateRideRequestDTO {
 
     @NotNull(message = "Distance cannot be null")
     private double distanceKm;
+
+    // Optional, it has value when the ride is ordered from favorites
+    private Long favoriteRouteId;
 }
