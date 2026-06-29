@@ -6,6 +6,7 @@ import com.example.clickanddrive.clients.services.AdminService;
 import com.example.clickanddrive.clients.services.DriverService;
 import com.example.clickanddrive.clients.services.PanicService;
 import com.example.clickanddrive.clients.services.PassengerService;
+import com.example.clickanddrive.clients.services.ReportService;
 import com.example.clickanddrive.clients.services.RideService;
 import com.example.clickanddrive.clients.services.UserService;
 import com.example.clickanddrive.clients.services.GuestRideService;
@@ -69,8 +70,12 @@ public class ClientUtils {
     static Gson gson = new GsonBuilder()
             // LocalDate: prima JSON array [year, month, day] sa backenda
             .registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, type, ctx) -> {
-                JsonArray arr = json.getAsJsonArray();
-                return LocalDate.of(arr.get(0).getAsInt(), arr.get(1).getAsInt(), arr.get(2).getAsInt());
+                if (json.isJsonArray()) {
+                    JsonArray arr = json.getAsJsonArray();
+                    return LocalDate.of(arr.get(0).getAsInt(), arr.get(1).getAsInt(), arr.get(2).getAsInt());
+                } else {
+                    return LocalDate.parse(json.getAsString(), DateTimeFormatter.ISO_LOCAL_DATE);
+                }
             })
             // LocalDateTime: jedan TypeAdapter koji radi i slanje i primanje
             .registerTypeAdapter(LocalDateTime.class, new com.google.gson.TypeAdapter<LocalDateTime>() {
@@ -118,4 +123,6 @@ public class ClientUtils {
     public static VehicleService vehicleService = retrofit.create(VehicleService.class);
 
     public static ChatService chatService = retrofit.create(ChatService.class);
+
+    public static ReportService reportService = retrofit.create(ReportService.class);
 }
