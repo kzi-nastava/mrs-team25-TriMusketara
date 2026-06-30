@@ -5,15 +5,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class NotificationDTO {
+    private Long id; // for markAsRead
     private String content;
     private Long rideId;
     private String timestamp;
 
     public NotificationDTO(String content, Long rideId) {
+        this.content = content;
+        this.rideId = rideId;
+        this.timestamp = java.time.LocalDateTime.now().toString();
+    }
+
+    public NotificationDTO(String content, Long rideId, Long id) {
+        this.id = id;
         this.content = content;
         this.rideId = rideId;
         this.timestamp = java.time.LocalDateTime.now().toString();
@@ -31,6 +40,3 @@ public class NotificationDTO {
         return timestamp;
     }
 }
-
-
-

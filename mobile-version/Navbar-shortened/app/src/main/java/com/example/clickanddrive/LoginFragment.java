@@ -88,6 +88,9 @@ public class LoginFragment extends Fragment {
                         ((MainActivity) getActivity()).setCurrentFragment(new HomeFragment());
                     }
 
+                    // Start polling
+                    NotificationPollingManager.start(getActivity().getApplicationContext());
+
                     Toast.makeText(getContext(), "Login successful as " + loginResponse.getRole(),
                             Toast.LENGTH_SHORT).show();
 

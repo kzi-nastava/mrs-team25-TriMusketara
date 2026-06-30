@@ -3,6 +3,7 @@ package com.example.clickanddrive;
 import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -26,6 +27,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                    != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(
+                        new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1
+                );
+            }
+        }
 
         // One bottom navigation bar will exist for all roles
         // However based on who is logged in, a different menu will be displayed in the nav bar
@@ -53,6 +63,11 @@ public class MainActivity extends AppCompatActivity {
 
 
         refreshBottomNavigation();
+
+        // Click on notifications opens the screen
+        if (getIntent().getBooleanExtra("FROM_NOTIFICATION", false)) {
+            handleNotificationClick(getIntent());
+        }
 
         // Check if we should open login fragment
         if (getIntent().hasExtra("OPEN_LOGIN") && getIntent().getBooleanExtra("OPEN_LOGIN", false)) {
@@ -113,7 +128,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void handleNotificationClick(Intent intent) {
+        //long rideId = intent.getLongExtra("NOTIFICATION_RIDE_ID", -1L);
+
+        if (SessionManager.currentUserType == SessionManager.DRIVER) {
+            setCurrentFragment(new ScheduledRidesFragment());
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        if (intent.getBooleanExtra("FROM_NOTIFICATION", false)) {
+            handleNotificationClick(intent);
+        }
+    }
+
     public void logoutAndGoToLoginSafe() {
+
+        // Stop polling
+        NotificationPollingManager.stop();
+
         // Delete data from session
         SessionManager.logout();
 

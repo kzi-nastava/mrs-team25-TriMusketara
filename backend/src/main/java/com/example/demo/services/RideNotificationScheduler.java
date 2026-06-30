@@ -23,6 +23,9 @@ public class RideNotificationScheduler {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
+    @Autowired
+    private NotificationService notificationService;
+
     // (60000ms)
     @Scheduled(fixedRate = 60000)
     @Transactional
@@ -54,17 +57,20 @@ public class RideNotificationScheduler {
     private void sendNotification(Ride ride, String message) {
         // Send message to passenger
         // /topic/passenger/{id}/notes
-        NotificationDTO notification = new NotificationDTO(message, ride.getId());
+        NotificationDTO notification = new NotificationDTO(message, ride.getId(), null);
 
         // Send notification to ride creator
         Long creatorId = ride.getRideCreator().getId();
         messagingTemplate.convertAndSend("/topic/passenger/" + creatorId + "/notes", notification);
         //System.out.println("Notification sent to: " + creatorId);
 
+        notificationService.save(creatorId, message, ride.getId());
+
         // Send notification to other passenger, if there are any linked to ride
         for (Passenger p : ride.getPassengers()) {
             messagingTemplate.convertAndSend("/topic/passenger/" + p.getId() + "/notes", notification);
             //System.out.println("Notification sent to passenger: " + p.getId());
+            notificationService.save(p.getId(), message, ride.getId());
         }
     }
 }
