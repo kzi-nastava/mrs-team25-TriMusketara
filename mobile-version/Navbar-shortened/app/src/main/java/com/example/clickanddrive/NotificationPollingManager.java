@@ -66,19 +66,19 @@ public class NotificationPollingManager {
     private static void poll(Context context) {
         Long userId = SessionManager.userId;
         String token = SessionManager.token;
-        Log.d(TAG, "Polling userId=" + userId + " token=" + (token != null ? token.substring(0, 20) + "..." : "NULL"));
+        //Log.d(TAG, "Polling userId=" + userId + " token=" + (token != null ? token.substring(0, 20) + "..." : "NULL"));
         if (userId == null) return;
 
         ClientUtils.notificationService.getUnread(userId).enqueue(new Callback<List<NotificationResponse>>() {
             @Override
             public void onResponse(Call<List<NotificationResponse>> call,
                                    Response<List<NotificationResponse>> response) {
-                Log.d(TAG, "Poll response: " + response.code());
+                //Log.d(TAG, "Poll response: " + response.code());
                 if (response.isSuccessful() && response.body() != null) {
                     List<NotificationResponse> notifications = response.body();
-                    Log.d(TAG, "Received " + notifications.size() + " notifications");
+                    //Log.d(TAG, "Received " + notifications.size() + " notifications");
                     for (NotificationResponse notif : notifications) {
-                        Log.d(TAG, "Showing notif: " + notif.getContent());
+                        //Log.d(TAG, "Showing notif: " + notif.getContent());
                         showSystemNotification(context, notif);
                         markAsRead(notif.getId());
                     }
@@ -110,9 +110,12 @@ public class NotificationPollingManager {
         );
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_app_icon)
                 .setContentTitle("ClickAndDrive")
                 .setContentText(notif.getContent())
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(notif.getContent()))
+                .setColor(0xFFF5CB5C)
+                .setColorized(false)
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent);
