@@ -141,6 +141,10 @@ public class RideServiceImpl implements RideService {
         if (driver == null) { // There is no available driver at the moment
             ride.setStatus(RideStatus.FAILED); // later send notification
             rideRepository.save(ride);
+
+            // Notif to passenger than no available drivers
+            notificationService.save(creator.getId(), "No driver are currently available. Please try again later", ride.getId());
+
             // Map ride to response with status FAILED
             return new RideResponseDTO(
                     ride.getId(),
@@ -162,6 +166,7 @@ public class RideServiceImpl implements RideService {
 
             // Save notif in db
             notificationService.save(driver.getId(), "New ride assigned to you", ride.getId());
+            notificationService.save(creator.getId(), "Your ride has been accepted and a driver is on the way.", ride.getId());
 
             // Send notifications and emails to linked passengers for this ride
             processNotifications(request.getPassengerEmails(), ride);

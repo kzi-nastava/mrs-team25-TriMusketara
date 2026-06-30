@@ -27,7 +27,7 @@ public class NotificationPollingManager {
 
     private static final String TAG = "NotificationPolling";
     private static final String CHANNEL_ID = "clickanddrive_notifications";
-    private static final int POLL_INTERVAL_MS = 30_000; // 30s
+    private static final int POLL_INTERVAL_MS = 15_000; // Xs
 
     private static Handler handler;
     private static Runnable pollRunnable;
@@ -65,18 +65,25 @@ public class NotificationPollingManager {
 
     private static void poll(Context context) {
         Long userId = SessionManager.userId;
+        String token = SessionManager.token;
+        Log.d(TAG, "Polling userId=" + userId + " token=" + (token != null ? token.substring(0, 20) + "..." : "NULL"));
         if (userId == null) return;
 
         ClientUtils.notificationService.getUnread(userId).enqueue(new Callback<List<NotificationResponse>>() {
             @Override
             public void onResponse(Call<List<NotificationResponse>> call,
                                    Response<List<NotificationResponse>> response) {
+                Log.d(TAG, "Poll response: " + response.code());
                 if (response.isSuccessful() && response.body() != null) {
                     List<NotificationResponse> notifications = response.body();
+                    Log.d(TAG, "Received " + notifications.size() + " notifications");
                     for (NotificationResponse notif : notifications) {
+                        Log.d(TAG, "Showing notif: " + notif.getContent());
                         showSystemNotification(context, notif);
                         markAsRead(notif.getId());
                     }
+                } else {
+                    Log.w(TAG, "Poll error: " + response.code());
                 }
             }
 
@@ -92,10 +99,14 @@ public class NotificationPollingManager {
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         Intent intent = new Intent(context, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        if (notif.getRideId() != null) {
+            intent.putExtra("NOTIFICATION_RIDE_ID", notif.getRideId());
+        }
+        intent.putExtra("FROM_NOTIFICATION", true);
         PendingIntent pendingIntent = PendingIntent.getActivity(
-                context, 0, intent,
-                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE
+                context, notif.getRideId() != null ? notif.getRideId().intValue() : 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
@@ -110,10 +121,18 @@ public class NotificationPollingManager {
     }
 
     private static void markAsRead(Long notificationId) {
-        if (notificationId == null) return;
+        if (notificationId == null) {
+            Log.w(TAG, "markAsRead called with null id");
+            return;
+        }
+        Log.d(TAG, "Calling markAsRead for id=" + notificationId);
         ClientUtils.notificationService.markAsRead(notificationId).enqueue(new Callback<Void>() {
-            @Override public void onResponse(Call<Void> call, Response<Void> response) {}
-            @Override public void onFailure(Call<Void> call, Throwable t) {}
+            @Override public void onResponse(Call<Void> call, Response<Void> response) {
+                Log.d(TAG, "markAsRead response: " + response.code() + " for id=" + notificationId);
+            }
+            @Override public void onFailure(Call<Void> call, Throwable t) {
+                Log.w(TAG, "markAsRead failed: " + t.getMessage());
+            }
         });
     }
 

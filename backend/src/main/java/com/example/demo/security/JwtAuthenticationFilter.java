@@ -41,8 +41,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String authHeader = request.getHeader("Authorization");
+        //System.out.println(">>> JwtFilter path=" + path + " authHeader=" + (authHeader != null ? authHeader.substring(0, Math.min(30, authHeader.length())) + "..." : "NULL"));
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7); // ukloni "Bearer "
+
+            //boolean valid = jwtUtil.isTokenValid(token);
+            //System.out.println(">>> Token valid=" + valid + " for path=" + path);
             if (jwtUtil.isTokenValid(token)) {
                 Long userId = jwtUtil.extractUserId(token);
                 User user = userRepository.findById(userId).orElse(null);
@@ -51,6 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     // Determine role based on class
                     String tokenRole = jwtUtil.extractRole(token);
                     String role = mapRoleFromToken(tokenRole);
+                    //System.out.println(">>> tokenRole=" + tokenRole + " mappedRole=" + role);
                     List<SimpleGrantedAuthority> authorities = List.of(
                             new SimpleGrantedAuthority("ROLE_" + role)
                     );

@@ -64,6 +64,11 @@ public class MainActivity extends AppCompatActivity {
 
         refreshBottomNavigation();
 
+        // Click on notifications opens the screen
+        if (getIntent().getBooleanExtra("FROM_NOTIFICATION", false)) {
+            handleNotificationClick(getIntent());
+        }
+
         // Check if we should open login fragment
         if (getIntent().hasExtra("OPEN_LOGIN") && getIntent().getBooleanExtra("OPEN_LOGIN", false)) {
             logoutAndGoToLoginSafe();
@@ -120,6 +125,23 @@ public class MainActivity extends AppCompatActivity {
             case SessionManager.ADMIN:
                 bottomNavigationView.inflateMenu(R.menu.bottom_nav_admin);
                 break;
+        }
+    }
+
+    private void handleNotificationClick(Intent intent) {
+        //long rideId = intent.getLongExtra("NOTIFICATION_RIDE_ID", -1L);
+
+        if (SessionManager.currentUserType == SessionManager.DRIVER) {
+            setCurrentFragment(new ScheduledRidesFragment());
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        if (intent.getBooleanExtra("FROM_NOTIFICATION", false)) {
+            handleNotificationClick(intent);
         }
     }
 

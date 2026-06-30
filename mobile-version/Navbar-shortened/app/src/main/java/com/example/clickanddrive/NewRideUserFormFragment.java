@@ -429,7 +429,7 @@ public class NewRideUserFormFragment extends Fragment {
     private void handleRideResponse(RideResponse response, RouteCalculator.RouteCalculationResult routeResult) {
 
         if (response.getStatus() == RideStatus.SCHEDULED) {
-            Toast.makeText(getContext(), "Ride scheduled", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getContext(), "Ride scheduled", Toast.LENGTH_LONG).show();
 
             Long rideId = response.getId();
 
@@ -438,13 +438,13 @@ public class NewRideUserFormFragment extends Fragment {
                 return;
             }
 
-            Toast.makeText(getContext(), "Ride scheduled. Waiting for driver to begin ride.", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getContext(), "Ride scheduled. Waiting for driver to begin ride.", Toast.LENGTH_LONG).show();
 
             startWaitingForRideStart(rideId);
 
             clearForm();
         } else if (response.getStatus() == RideStatus.FAILED) {
-            Toast.makeText(getContext(), "No available drivers at the moment", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getContext(), "No available drivers at the moment", Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(getContext(), "Ride status: " + response.getStatus(), Toast.LENGTH_LONG).show();
         }
